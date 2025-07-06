@@ -1,0 +1,49 @@
+/* src/pages/Membership/WelcomePage.css */
+.welcome-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    padding: 20px;
+  }
+  
+  .welcome-card {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .welcome-card h1 {
+    color: #0066cc;
+    margin-bottom: 20px;
+  }
+  
+  .welcome-card p {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 15px;
+  }
+  
+  .cta-button {
+    display: inline-block;
+    background-color: #0066cc;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    text-decoration: none;
+    margin-top: 20px;
+  }
+  
+  .cta-button:hover {
+    background-color: #0055aa;
+    transform: translateY(-2px);
+  }
