@@ -14,10 +14,7 @@ const Home = () => {
     <div className="home-page">
       <HeroSlider />
       <BrandSlider />
-      
-      {/* New Member Deals Section */}
-      <MemberDeals />
-      
+      <MemberDeals />      
       <section className="categories-section">
         <div className="container">
           <h2>Shop by Category</h2>

@@ -16,7 +16,7 @@ const productsSlice = createSlice({
       state.items = action.payload;
       state.status = 'succeeded'; // Add this to clear loading state
     },
-    filterByCategory: (state, action) => { // Added this new reducer
+    filterByCategory: (state, action) => { 
       state.filteredItems = state.items.filter(
         product => product.categoryId === action.payload
       );
@@ -34,7 +34,7 @@ const productsSlice = createSlice({
     setError: (state, action) => {
       state.error = action.payload;
     },
-    resetFilteredItems: (state) => { // Added this new reducer
+    resetFilteredItems: (state) => { 
       state.filteredItems = [];
     }
   }
@@ -42,7 +42,7 @@ const productsSlice = createSlice({
 
 export const { 
   setProducts, 
-  filterByCategory, // Export the new reducer
+  filterByCategory, 
   filterByBrand, 
   setLoading, 
   setError,

@@ -15,7 +15,7 @@ const Login = () => {
     e.preventDefault();
     dispatch(loginStart());
     
-    // Mock authentication - in real app, you would call an API
+    // Mock authentication - in real app, an API will be called...
     setTimeout(() => {
       if (email === 'user@example.com' && password === 'password123') {
         dispatch(loginSuccess({ email, name: 'Test User' }));
