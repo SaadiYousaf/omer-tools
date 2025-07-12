@@ -7,20 +7,22 @@ import './FeaturedProducts.css';
 const FeaturedProducts = () => {
   const products = useSelector(state => 
     Array.isArray(state.products?.items) 
-      ? state.products.items.slice(0, 4) 
+      ? state.products.items
+          .filter(product => product.isFeatured) // Only show featured products
+          .slice(0, 4) 
       : []
   );
   
   return (
     <div className="featured-products">
-      <h2>Featured Products</h2>
+      <h2>Sale Products</h2>
       <div className="products-grid">
         {products.length > 0 ? (
           products.map(product => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product.id} product={product} isFeatured={true} />
           ))
         ) : (
-          <div>No featured products available</div>
+          <div>No Sale products available</div>
         )}
       </div>
     </div>

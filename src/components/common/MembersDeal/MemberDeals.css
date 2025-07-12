@@ -57,15 +57,12 @@
   margin-bottom: 15px;
   font-weight: 800;
   text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  animation: fadeInUp 0.8s ease;
 }
 
 .deals-subtitle {
   font-size: 1.2rem;
   margin-bottom: 30px;
   opacity: 0.9;
-  animation: fadeInUp 0.8s ease 0.2s forwards;
-  opacity: 0;
 }
 
 .cta-button {
@@ -85,8 +82,8 @@
   box-shadow: 0 4px 15px rgba(0,0,0,0.2);
   position: relative;
   overflow: hidden;
-  animation: fadeInUp 0.8s ease 0.4s forwards;
-  opacity: 0;
+  opacity: 1; /* Ensure button is always visible */
+  transform: translateY(0); /* Reset any transform */
 }
 
 .cta-button:hover {
@@ -135,16 +132,5 @@
   }
   100% {
     background-position: 0% 50%;
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }

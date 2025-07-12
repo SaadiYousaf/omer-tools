@@ -9,27 +9,18 @@ const slides = [
   {
     id: 1,
     image: slide1,
-    title: 'POWER TOOLS',
-    subtitle: 'UP TO 30% OFF',
-    highlight: '30% OFF',
     cta: 'Shop Now',
     link: '/category/power-tools'
   },
   {
     id: 2,
     image: slide2,
-    title: 'NEW ARRIVALS',
-    subtitle: 'Latest Tools Collection',
-    highlight: 'NEW',
     cta: 'Explore',
     link: '/new-arrivals'
   },
   {
     id: 3,
     image: slide3,
-    title: 'FREE SHIPPING',
-    subtitle: 'ON ALL ONLINE ORDERS',
-    highlight: 'EXCLUSIONS APPLY',
     cta: 'Learn More',
     link: '/shipping-info'
   }
@@ -56,9 +47,6 @@ const HeroSlider = () => {
           >
             <div className="slide-overlay"></div>
             <div className="slide-content">
-              <span className="highlight-badge">{slide.highlight}</span>
-              <h2 data-text={slide.title}>{slide.title}</h2>
-              <p>{slide.subtitle}</p>
               <a href={slide.link} className="cta-button">{slide.cta}</a>
             </div>
           </div>

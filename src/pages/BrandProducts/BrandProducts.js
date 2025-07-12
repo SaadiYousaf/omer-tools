@@ -20,6 +20,7 @@ const BrandProducts = () => {
       dispatch(setLoading(true));
       setTimeout(() => {
         dispatch(filterByBrand(brandSlug));
+        
       }, 500);
     }
   }, [brandSlug, dispatch]);
@@ -33,7 +34,7 @@ const BrandProducts = () => {
       <div className="container">
         <h1 className="brand-title">{brand?.name || 'Brand Products'}</h1>
         <p className="brand-description">
-          {brand?.description || 'Explore our premium collection'}
+          {brand?.brand || 'Explore our premium collection'}
         </p>
         
         {products.length > 0 ? (

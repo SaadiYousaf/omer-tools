@@ -12,6 +12,7 @@ import Login from './pages/Login/Login';
 import ProtectedRoute from './components/common/ProtectedRoute/ProtectedRoute';
 import MembershipPage from './pages/Membership/MembershipPage';
 import WelcomePage from './pages/Membership/WelcomePage';
+import ClearanceSale from './pages/ClearanceSale/ClearanceSale';
 
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
           <Route path="/product/:productId" element={<Product />} />
           <Route path="/login" element={<Login />} />
           <Route path="/brand/:brandSlug" element={<BrandProducts />} />
+          <Route path="/clearance" element={<ClearanceSale/>} />
 
           
           {/* Protected routes */}
