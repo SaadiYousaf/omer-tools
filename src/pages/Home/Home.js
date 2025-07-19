@@ -1,5 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
+import { useDispatch } from 'react-redux';
+import { setProducts } from '../../store/productsSlice';
 import CategorySlider from "../../components/common/CategorySlider/CategorySlider";
 import FeaturedProducts from "../../components/common/FeaturedProducts/FeaturedProducts";
 import HeroSlider from "../../components/common/HeroSlider/HeroSlider";
@@ -8,6 +10,7 @@ import MemberDeals from "../../components/common/MembersDeal/MemberDeals";
 import "./Home.css";
 
 const Home = () => {
+  const dispatch = useDispatch();
   const categories = useSelector((state) => state.categories.categories);
   const products = useSelector((state) =>
     Array.isArray(state.products?.items)
@@ -21,6 +24,7 @@ const Home = () => {
     <div className="home-page">
       <HeroSlider />
       <BrandSlider />
+      <CategorySlider categories={categories} />
       <MemberDeals />
       <section className="categories-section">
         <div className="container">
@@ -42,11 +46,11 @@ const Home = () => {
           <HeroSlider />
         </div>
       </div>
-      <section className="featured-products">
+      {/* <section className="featured-products">
         <div className="container">
           <FeaturedProducts />
         </div>
-      </section>
+      </section> */}
     </div>
   );
 };

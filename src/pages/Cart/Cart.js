@@ -1,10 +1,12 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { removeItemFromCart, clearCart } from '../../store/cartSlice';
+import { useNavigate } from 'react-router-dom';
 import './Cart.css';
 
 const Cart = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { items, totalQuantity, totalAmount } = useSelector(state => state.cart);
 
   const handleRemoveItem = (productId) => {
@@ -13,6 +15,10 @@ const Cart = () => {
 
   const handleClearCart = () => {
     dispatch(clearCart());
+  };
+
+  const handleCheckout = () => {
+    navigate('/checkout');
   };
 
   if (totalQuantity === 0) {
@@ -26,7 +32,7 @@ const Cart = () => {
 
   return (
     <div className="cart-page">
-      <h2>Your Cart ({totalQuantity} items)</h2>
+      <h2>Your Cart ({totalQuantity} {totalQuantity === 1 ? 'item' : 'items'})</h2>
       
       <div className="cart-items">
         {items.map(item => (
@@ -68,7 +74,12 @@ const Cart = () => {
         
         <div className="cart-actions">
           <button className="continue-shopping">Continue Shopping</button>
-          <button className="checkout-btn">Proceed to Checkout</button>
+          <button 
+            onClick={handleCheckout}
+            className="checkout-btn"
+          >
+            Proceed to Checkout
+          </button>
           <button 
             onClick={handleClearCart}
             className="clear-cart-btn"

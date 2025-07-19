@@ -1,79 +1,55 @@
 // src/components/common/Card/ProductCard.js
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { addItemToCart } from '../../../store/cartSlice';
-import { FiPlus } from 'react-icons/fi';
-import './ProductCard.css';
+import React from "react";
+import { Link } from 'react-router-dom';
+import "./ProductCard.css";
 
-const ProductCard = ({ product, isFeatured = false }) => {
-  const dispatch = useDispatch();
-  const [isHovered, setIsHovered] = useState(false);
-
+const ProductCard = ({ product }) => {
   if (!product) return null;
 
-  const handleAddToCart = (e) => {
-    e.stopPropagation();
-    dispatch(addItemToCart({
-      id: product.id,
-      name: product.name,
-      price: product.discountedPrice || product.price,
-      image: product.image || '/images/default-product.jpg',
-      quantity: 1
-    }));
-  };
+  const hasDiscount =
+    product.price &&
+    product.discountedPrice &&
+    product.discountedPrice < product.price;
 
-  // Calculate discount if original price and discounted price exist
-  const hasDiscount = product.price && product.discountedPrice && product.discountedPrice < product.price;
-  const discountPercentage = hasDiscount 
-    ? Math.round(((product.price - product.discountedPrice) / product.price) * 100)
-    : 0;
-  const discountAmount = hasDiscount 
-    ? (product.price - product.discountedPrice).toFixed(2)
+  const discountPercentage = hasDiscount
+    ? Math.round(
+        ((product.price - product.discountedPrice) / product.price) * 100
+      )
     : 0;
 
   const displayPrice = product.discountedPrice || product.price;
 
   return (
-    <article 
-      className="ultra-product-card"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <div className="card-media">
-        <div className="image-container">
+    <article className="apple-product-card">
+      <Link to={`/product/${product.id}`} className="product-link">
+        {hasDiscount && (
+          <div className="discount-badge">{discountPercentage}% OFF</div>
+        )}
+
+        <div className="card-media">
           <img
-            src={product.image || '/images/default-product.jpg'}
-            alt={product.name || 'Product image'}
+            src={product.image || "/images/default-product.jpg"}
+            alt={product.name || "Product image"}
             loading="lazy"
             className="product-image"
             onError={(e) => {
-              e.target.src = '/images/default-product.jpg';
+              e.target.src = "/images/default-product.jpg";
             }}
           />
-          {isFeatured && hasDiscount && (
-            <div className="discount-badge">
-              <span className="discount-percentage">{discountPercentage}% OFF</span>
-              <span className="discount-amount">Save ₹{discountAmount}</span>
-            </div>
-          )}
-          <div className={`quick-shop ${isHovered ? 'visible' : ''}`}>
-            <button className="add-cart-button" onClick={handleAddToCart}>
-              <FiPlus className="icon" />
-              <span>Quick Add</span>
-            </button>
+        </div>
+
+        <div className="card-content">
+          <h3 className="product-title">{product.name || "Product Name"}</h3>
+          <div className="price-container">
+            {hasDiscount && (
+              <span className="original-price">
+                ${product.price.toFixed(2)}
+              </span>
+            )}
+            <span className="current-price">${displayPrice.toFixed(2)}</span>
           </div>
         </div>
-      </div>
-
-      <div className="card-content">
-        <h3 className="product-title">{product.name || 'Product Name'}</h3>
-        <div className="price-container">
-          {hasDiscount && (
-            <span className="original-price">₹{product.price.toFixed(2)}</span>
-          )}
-          <span className="current-price">₹{displayPrice.toFixed(2)}</span>
-        </div>
-      </div>
+      </Link>
     </article>
   );
 };

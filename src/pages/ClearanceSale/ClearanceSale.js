@@ -4,6 +4,7 @@ import FeaturedProducts from '../../components/common/FeaturedProducts/FeaturedP
 import './ClearanceSale.css';
 
 const ClearanceSale = () => {
+    
   return (
     <div className="clearance-sale-page">
       <section className="clearance-hero">

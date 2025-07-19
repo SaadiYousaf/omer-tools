@@ -1,0 +1,270 @@
+/* ProfilePage.css */
+.profile-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .profile-header {
+    background-color: #0056b3;
+    color: white;
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 30px;
+  }
+  
+  .profile-header h1 {
+    margin: 0;
+    font-size: 28px;
+  }
+  
+  .profile-header p {
+    margin: 5px 0 0;
+    font-size: 16px;
+  }
+  
+  .profile-content {
+    display: flex;
+    gap: 30px;
+  }
+  
+  .profile-sidebar {
+    flex: 0 0 250px;
+  }
+  
+  .account-info {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    border: 1px solid #e0e0e0;
+  }
+  
+  .account-info h3 {
+    margin-top: 0;
+    color: #0056b3;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 10px;
+  }
+  
+  .account-info p {
+    margin: 10px 0;
+  }
+  
+  .account-nav {
+    display: flex;
+    flex-direction: column;
+    background: #f9f9f9;
+    border-radius: 5px;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+  }
+  
+  .account-nav a {
+    padding: 12px 15px;
+    text-decoration: none;
+    color: #333;
+    border-bottom: 1px solid #e0e0e0;
+    transition: all 0.3s;
+  }
+  
+  .account-nav a:hover {
+    background-color: #e0e0e0;
+    color: #0056b3;
+  }
+  
+  .account-nav a.active {
+    background-color: #0056b3;
+    color: white;
+    font-weight: bold;
+  }
+  
+  .profile-main {
+    flex: 1;
+  }
+  
+  .recent-orders {
+    margin-bottom: 30px;
+  }
+  
+  .recent-orders h2 {
+    color: #0056b3;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 10px;
+  }
+  
+  .orders-list {
+    margin-top: 20px;
+  }
+  
+  .order-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background: #f9f9f9;
+  }
+  
+  .order-header {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .order-items {
+    margin-bottom: 15px;
+  }
+  
+  .order-items h4 {
+    margin: 0 0 10px;
+  }
+  
+  .order-items ul {
+    margin: 0;
+    padding-left: 20px;
+  }
+  
+  .order-items li {
+    margin-bottom: 5px;
+  }
+  
+  .order-actions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .status-delivered {
+    color: #28a745;
+    font-weight: bold;
+  }
+  
+  .status-processing {
+    color: #ffc107;
+    font-weight: bold;
+  }
+  
+  .status-cancelled {
+    color: #dc3545;
+    font-weight: bold;
+  }
+  
+  .account-tools h2 {
+    color: #0056b3;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 10px;
+  }
+  
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+  }
+  
+  .tool-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    padding: 15px;
+    background: #f9f9f9;
+  }
+  
+  .tool-card h3 {
+    margin-top: 0;
+    color: #0056b3;
+  }
+  
+  .tool-card p {
+    margin: 10px 0;
+  }
+  
+  .btn {
+    display: inline-block;
+    padding: 8px 15px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s;
+    cursor: pointer;
+    border: none;
+  }
+  
+  .btn-view {
+    background-color: #0056b3;
+    color: white;
+  }
+  
+  .btn-view:hover {
+    background-color: #003d7a;
+  }
+  
+  .btn-reorder {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .btn-reorder:hover {
+    background-color: #218838;
+  }
+  
+  .btn-view-all {
+    display: inline-block;
+    margin-top: 15px;
+    background-color: #6c757d;
+    color: white;
+  }
+  
+  .btn-view-all:hover {
+    background-color: #5a6268;
+  }
+  
+  .btn-tool {
+    background-color: #0056b3;
+    color: white;
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+  
+  .btn-tool:hover {
+    background-color: #003d7a;
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 992px) {
+    .profile-content {
+      flex-direction: column;
+    }
+    
+    .profile-sidebar {
+      flex: 1;
+      margin-bottom: 30px;
+    }
+    
+    .order-header {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .tools-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .order-header {
+      grid-template-columns: 1fr;
+      gap: 5px;
+    }
+    
+    .order-actions {
+      flex-direction: column;
+    }
+    
+    .btn {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 5px;
+    }
+  }

@@ -12,6 +12,10 @@ const productsSlice = createSlice({
     error: null
   },
   reducers: {
+    setCurrentProduct: (state, action) => {
+      state.currentProduct = action.payload;
+      state.status = 'succeeded';
+    },
     setProducts: (state, action) => {
       state.items = action.payload;
       state.status = 'succeeded'; // Add this to clear loading state
@@ -46,6 +50,7 @@ export const {
   filterByBrand, 
   setLoading, 
   setError,
+  setCurrentProduct,
   resetFilteredItems
 } = productsSlice.actions;
 
