@@ -1,25 +1,45 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import './CategorySlider.css';
-import brand1 from "../BrandSlider/brands/brand1.PNG";
 
-const CategorySlider = ({categories}) => {
+const CategorySlider = ({ categories, brandImages, activeBrandIndex = 0 }) => {
   const sliderRef = useRef(null);
-  const [showLeftArrow, setShowLeftArrow] = useState(false);
-  const [showRightArrow, setShowRightArrow] = useState(true);
+  const [showArrows, setShowArrows] = useState({ left: false, right: true });
+  const scrollTimeoutRef = useRef(null);
 
-  useEffect(() => {
-    checkScrollPosition();
+  // Memoized scroll position check with debounce
+  const checkScrollPosition = useCallback(() => {
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+
+    scrollTimeoutRef.current = setTimeout(() => {
+      if (sliderRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = sliderRef.current;
+        setShowArrows({
+          left: scrollLeft > 10,
+          right: scrollLeft < scrollWidth - clientWidth - 10
+        });
+      }
+    }, 100);
   }, []);
 
-  const checkScrollPosition = () => {
-    if (sliderRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = sliderRef.current;
-      setShowLeftArrow(scrollLeft > 0);
-      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 1);
-    }
-  };
+  // Initial check and setup scroll listener
+  useEffect(() => {
+    checkScrollPosition();
+    
+    const slider = sliderRef.current;
+    if (!slider) return;
+
+    slider.addEventListener('scroll', checkScrollPosition);
+    return () => {
+      slider.removeEventListener('scroll', checkScrollPosition);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, [checkScrollPosition]);
 
   const scroll = (direction) => {
     if (sliderRef.current) {
@@ -33,10 +53,16 @@ const CategorySlider = ({categories}) => {
     }
   };
 
+  // Get brand image for category (cycle through available images)
+  const getBrandImage = (index) => {
+    if (!brandImages || brandImages.length === 0) return '/images/categories/default.png';
+    return brandImages[(activeBrandIndex + index) % brandImages.length];
+  };
+
   return (
     <div className="category-slider-wrapper">
       <div className="category-slider-container">
-        {showLeftArrow && (
+        {showArrows.left && (
           <button 
             className="slider-arrow left-arrow" 
             onClick={() => scroll('left')}
@@ -49,16 +75,15 @@ const CategorySlider = ({categories}) => {
         <div 
           className="category-slider" 
           ref={sliderRef}
-          onScroll={checkScrollPosition}
         >
-          {categories.map((category) => (
+          {categories.map((category, index) => (
             <Link
               to={`/category/${category.slug}`}
               key={category.id}
               className="category-item"
             >
               <img 
-                src={brand1} 
+                src={getBrandImage(index)} 
                 alt={category.name}
                 className="category-image"
                 onError={(e) => {
@@ -70,7 +95,7 @@ const CategorySlider = ({categories}) => {
           ))}
         </div>
 
-        {showRightArrow && (
+        {showArrows.right && (
           <button 
             className="slider-arrow right-arrow" 
             onClick={() => scroll('right')}

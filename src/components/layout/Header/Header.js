@@ -95,7 +95,7 @@ const Header = () => {
                     <FaUser /> <span>{user?.name}</span>
                   </button>
                   <div className="user-dropdown-menu">
-                    <Link
+                    {/* <Link
                       to="/profile"
                       className="dropdown-item"
                       onClick={() => setIsMobileMenuOpen(false)}
@@ -108,7 +108,7 @@ const Header = () => {
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       Order History
-                    </Link>
+                    </Link> */}
                     <button onClick={handleLogout} className="dropdown-item">
                       Logout
                     </button>
