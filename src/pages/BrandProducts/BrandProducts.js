@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { filterByBrand, setLoading } from '../../store/productsSlice';
 import ProductGrid from '../../components/common/ProductGrid/ProductGrid';
+import ScrollToTop from "../../components/common/Scroll/ScrollToTop";
 import './BrandProducts.css';
 //import { brands } from '../../components/common/BrandSlider/BrandSlider';
 
@@ -14,7 +15,9 @@ const BrandProducts = () => {
   const brand = useSelector((state) => 
     items.find(product => product.brand === brandSlug)
   );
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   useEffect(() => {
     if (brandSlug) {
       dispatch(setLoading(true));
@@ -31,6 +34,7 @@ const BrandProducts = () => {
 
   return (
     <div className="brand-products-page">
+         <ScrollToTop />
       <div className="container">
         <h1 className="brand-title">{brand?.name || 'Brand Products'}</h1>
         <p className="brand-description">

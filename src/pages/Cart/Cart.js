@@ -1,7 +1,8 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { removeItemFromCart, clearCart } from '../../store/cartSlice';
 import { useNavigate } from 'react-router-dom';
+import ScrollToTop from "../../components/common/Scroll/ScrollToTop";
 import './Cart.css';
 
 const Cart = () => {
@@ -20,6 +21,9 @@ const Cart = () => {
   const handleCheckout = () => {
     navigate('/checkout');
   };
+    useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
 
   if (totalQuantity === 0) {
     return (
@@ -32,6 +36,7 @@ const Cart = () => {
 
   return (
     <div className="cart-page">
+         <ScrollToTop />
       <h2>Your Cart ({totalQuantity} {totalQuantity === 1 ? 'item' : 'items'})</h2>
       
       <div className="cart-items">

@@ -1,6 +1,7 @@
 // src/pages/ComingSoon/ComingSoon.js
 import React from 'react';
 import './CommingSoon.css';
+import ScrollToTop from "../../components/common/Scroll/ScrollToTop";
 
 const CommingSoon = () => {
   return (

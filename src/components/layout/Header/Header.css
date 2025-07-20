@@ -244,7 +244,27 @@
   text-align: left;
   cursor: pointer;
 }
+.dropdown-scroller {
+  max-height: 65vh; /* Slightly less than parent */
+  overflow-y: auto;
+  scrollbar-width: thin; /* For Firefox */
+  scrollbar-color: #ccc transparent; /* For Firefox */
+}
 
+/* Custom scrollbar for Webkit browsers */
+.dropdown-scroller::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dropdown-scroller::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 5px 0;
+}
+
+.dropdown-scroller::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 3px;
+}
 .user-dropdown-menu .dropdown-item:hover {
   background-color: #f5f5f5;
   color: #0056b3;
@@ -412,7 +432,7 @@
   text-decoration: none;
   transition: all 0.3s;
   border-bottom: 1px solid #f0f0f0;
-  background-color: white;
+  background-color:#0056b3;
   white-space: nowrap;
 }
 

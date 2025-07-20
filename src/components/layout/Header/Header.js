@@ -144,21 +144,26 @@ const Header = () => {
               onMouseEnter={() => setActiveDropdown("categories")}
               onMouseLeave={() => setActiveDropdown(null)}
             >
+              
               <span className="dropdown-toggle">
                 <FaBars className="menu-bars" /> Shop by Category
               </span>
+
               <div className="dropdown-menu">
-                {categories.map((category) => (
-                  <Link
-                    key={category.id}
-                    to={`/category/${category.slug}`}
-                    className="dropdown-item"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {category.name}
-                  </Link>
-                ))}
+                <div className="dropdown-scroller">
+                  {categories.map((category) => (
+                    <Link
+                      key={category.id}
+                        to={`/category/${category.slug}`}
+                      className="dropdown-item"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {category.name}
+                    </Link>
+                  ))}
+                </div>
               </div>
+
             </li>
             <li className="nav-item" onClick={() => setIsMobileMenuOpen(false)}>
               <Link to="/shop-by-brand">Shop By Brand</Link>

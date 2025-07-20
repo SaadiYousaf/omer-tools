@@ -7,6 +7,7 @@ import { setProducts, setLoading, setError } from '../../store/productsSlice';
 import ProductCard from '../../components/common/Card/ProductCard';
 import Loading from '../../components/common/Loading/Loading';
 import { dummyProducts } from '../../data/dummyProducts';
+import ScrollToTop from "../../components/common/Scroll/ScrollToTop";
 import './Category.css';
 
 const Category = () => {
@@ -14,7 +15,9 @@ const Category = () => {
   const dispatch = useDispatch();
   const { categories, currentCategory } = useSelector(state => state.categories);
   const { items: products, status, error } = useSelector(state => state.products);
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   useEffect(() => {
     const category = categories?.find(cat => cat.slug === categorySlug);
     if (category) {
@@ -40,6 +43,7 @@ const Category = () => {
 
   return (
     <div className="category-page">
+         <ScrollToTop />
       <h1 className="category-title">{currentCategory?.name || 'Category'}</h1>
       <div className="products-grid">
         {products?.length > 0 ? (

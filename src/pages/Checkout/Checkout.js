@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Payment from '../../components/common/Payment/Payment';
 import Confirmation from '../../components/common/Confirmation/Confirmation';
+import ScrollToTop from "../../components/common/Scroll/ScrollToTop";
 import './Checkout.css';
 
 const Checkout = () => {
@@ -11,6 +12,9 @@ const Checkout = () => {
   const [paymentData, setPaymentData] = useState(null);
   const { items, totalAmount } = useSelector(state => state.cart);
   const navigate = useNavigate();
+    useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
 
   const calculateShipping = () => {
     return totalAmount > 100 ? 0 : 10;
@@ -76,6 +80,7 @@ const Checkout = () => {
 
   return (
     <div className="checkout-page">
+         <ScrollToTop />
       <div className="checkout-header">
         <h2>Checkout</h2>
         <div className="checkout-steps">

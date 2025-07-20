@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { setCurrentProduct, setLoading, setError } from '../../store/productsSlice';
 import { addItemToCart } from '../../store/cartSlice';
 import Loading from '../../components/common/Loading/Loading';
+import ScrollToTop from "../../components/common/Scroll/ScrollToTop";
 import './Product.css';
 
 const Product = () => {
@@ -13,6 +14,9 @@ const Product = () => {
   const { items, currentProduct, status, error } = useSelector(state => state.products);
   const [quantity, setQuantity] = useState(1);
   const [localStock, setLocalStock] = useState(0);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     dispatch(setLoading(true));
@@ -64,8 +68,9 @@ const Product = () => {
 
   return (
     <div className="product-page">
+         <ScrollToTop />
       <div className="product-container">
-        {/* ✅ FULL Product Images */}
+
         <div className="product-gallery">
           <div className="main-image">
             <img
@@ -97,7 +102,7 @@ const Product = () => {
           </div>
         </div>
 
-        {/* ✅ Product Details */}
+
         <div className="product-details">
           <h1 className="product-title">{currentProduct.name}</h1>
 
