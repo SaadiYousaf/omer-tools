@@ -3,7 +3,8 @@ import cartReducer from './cartSlice';
 import productsReducer from './productsSlice';
 import categoriesReducer from './categoriesSlice';
 import authReducer from './authSlice';
-import brandsReducer from './brandsSlice'
+import brandsReducer from './brandsSlice';
+import subcategoriesReducer from './subcategoriesSlice'
 
 const store = configureStore({
   reducer: {
@@ -11,7 +12,8 @@ const store = configureStore({
     products: productsReducer,
     categories: categoriesReducer,
     auth: authReducer,
-    brands: brandsReducer
+    brands: brandsReducer,
+    subcategories: subcategoriesReducer,
   }
 });
 

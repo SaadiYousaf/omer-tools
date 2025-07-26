@@ -1,39 +1,33 @@
-// src/pages/Product/Product.js
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { setCurrentProduct, setLoading, setError } from '../../store/productsSlice';
+import { fetchProductById } from '../../store/productsSlice';
 import { addItemToCart } from '../../store/cartSlice';
 import Loading from '../../components/common/Loading/Loading';
+import ErrorMessage from '../../components/layout/ErrorMessage/ErrorMessage';
 import ScrollToTop from "../../components/common/Scroll/ScrollToTop";
 import './Product.css';
 
 const Product = () => {
   const { productId } = useParams();
   const dispatch = useDispatch();
-  const { items, currentProduct, status, error } = useSelector(state => state.products);
+  const { currentProduct, status, error } = useSelector(state => state.products);
   const [quantity, setQuantity] = useState(1);
+  const [selectedImage, setSelectedImage] = useState(0);
   const [localStock, setLocalStock] = useState(0);
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   useEffect(() => {
-    dispatch(setLoading(true));
-    try {
-      const product = items.find(p => p.id.toString() === productId.toString());
-      if (product) {
-        dispatch(setCurrentProduct(product));
-        setLocalStock(product.stock ?? 10); // fallback stock = 10 if undefined
-      } else {
-        dispatch(setError('Product not found'));
-      }
-    } catch (err) {
-      dispatch(setError(err.message));
-    } finally {
-      dispatch(setLoading(false));
+    window.scrollTo(0, 0);
+    if (productId) {
+      dispatch(fetchProductById(productId));
     }
-  }, [productId, items, dispatch]);
+  }, [productId, dispatch]);
+
+  useEffect(() => {
+    if (currentProduct) {
+      setLocalStock(currentProduct.stock ?? 10);
+    }
+  }, [currentProduct]);
 
   const handleAddToCart = () => {
     if (currentProduct && localStock >= quantity) {
@@ -42,7 +36,7 @@ const Product = () => {
           id: currentProduct.id,
           name: currentProduct.name,
           price: currentProduct.discountedPrice || currentProduct.price,
-          image: currentProduct.image || '/images/default-product.jpg',
+          image: currentProduct.images?.[0] || '/images/default-product.jpg',
           quantity: quantity
         })
       );
@@ -57,24 +51,22 @@ const Product = () => {
     }
   };
 
-  if (status === 'loading') return <Loading />;
-  if (status === 'failed') return <div>Error: {error}</div>;
-  if (!currentProduct) return <div>Product not found</div>;
+  if (status === 'loading') return <Loading fullPage />;
+  if (status === 'failed') return <ErrorMessage message={error} />;
+  if (!currentProduct) return <div className="product-not-found">Product not found</div>;
 
-  const hasDiscount =
-    currentProduct.price &&
+  const hasDiscount = currentProduct.price &&
     currentProduct.discountedPrice &&
     currentProduct.discountedPrice < currentProduct.price;
 
   return (
     <div className="product-page">
-         <ScrollToTop />
+      <ScrollToTop />
       <div className="product-container">
-
         <div className="product-gallery">
           <div className="main-image">
             <img
-              src={currentProduct.image || '/images/default-product.jpg'}
+              src={currentProduct.images?.[selectedImage] || '/images/default-product.jpg'}
               alt={currentProduct.name}
               onError={(e) => {
                 e.target.src = '/images/default-product.jpg';
@@ -85,10 +77,17 @@ const Product = () => {
             {currentProduct.images?.length > 0 ? (
               currentProduct.images.map((img, index) => (
                 <div
-                  className={`thumbnail ${index === 0 ? 'active' : ''}`}
+                  className={`thumbnail ${index === selectedImage ? 'active' : ''}`}
                   key={index}
+                  onClick={() => setSelectedImage(index)}
                 >
-                  <img src={img} alt={`${currentProduct.name} ${index + 1}`} />
+                  <img 
+                    src={img} 
+                    alt={`${currentProduct.name} ${index + 1}`}
+                    onError={(e) => {
+                      e.target.src = '/images/default-product.jpg';
+                    }}
+                  />
                 </div>
               ))
             ) : (
@@ -102,13 +101,12 @@ const Product = () => {
           </div>
         </div>
 
-
         <div className="product-details">
           <h1 className="product-title">{currentProduct.name}</h1>
 
           <div className="product-meta">
-            <span className="sku">SKU: {currentProduct.sku || `TK-${currentProduct.id}`}</span>
-            <span className="availability">
+            <span className="sku">SKU: {currentProduct.sku || `PRD-${currentProduct.id}`}</span>
+            <span className={`availability ${localStock > 0 ? 'in-stock' : 'out-of-stock'}`}>
               {localStock > 0 ? `${localStock} In Stock` : 'Out of Stock'}
             </span>
           </div>
@@ -171,36 +169,51 @@ const Product = () => {
             </button>
           </div>
 
-          <div className="product-specs">
-            <h3>Specifications</h3>
-            <table>
-              <tbody>
-                {currentProduct.specifications ? (
-                  Object.entries(currentProduct.specifications).map(([key, value]) => (
-                    <tr key={key}>
-                      <td>{key}</td>
-                      <td>{value}</td>
-                    </tr>
-                  ))
-                ) : (
-                  <>
-                    <tr>
-                      <td>Brand</td>
-                      <td>{currentProduct.brand || 'Generic'}</td>
-                    </tr>
-                    <tr>
-                      <td>Model</td>
-                      <td>{currentProduct.model || 'N/A'}</td>
-                    </tr>
-                    <tr>
-                      <td>Weight</td>
-                      <td>{currentProduct.weight || 'N/A'}</td>
-                    </tr>
-                  </>
-                )}
-              </tbody>
-            </table>
-          </div>
+ <div className="product-specs">
+  <h3>Specifications</h3>
+  <table>
+    <tbody>
+      {currentProduct.specifications ? (
+        // Handle both stringified JSON and proper object formats
+        (() => {
+          try {
+            const specs = typeof currentProduct.specifications === 'string' 
+              ? JSON.parse(currentProduct.specifications)
+              : currentProduct.specifications;
+            
+            return Object.entries(specs).map(([key, value]) => (
+              <tr key={key}>
+                <td>{key}</td>
+                <td>{typeof value === 'object' ? JSON.stringify(value) : value}</td>
+              </tr>
+            ));
+          } catch (e) {
+            return (
+              <tr>
+                <td colSpan="2">Invalid specifications format</td>
+              </tr>
+            );
+          }
+        })()
+      ) : (
+        <>
+          <tr>
+            <td>Brand</td>
+            <td>{currentProduct.brand || 'Generic'}</td>
+          </tr>
+          <tr>
+            <td>Model</td>
+            <td>{currentProduct.model || 'N/A'}</td>
+          </tr>
+          <tr>
+            <td>Weight</td>
+            <td>{currentProduct.weight || 'N/A'}</td>
+          </tr>
+        </>
+      )}
+    </tbody>
+  </table>
+</div>
         </div>
       </div>
     </div>

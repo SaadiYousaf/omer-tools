@@ -1,20 +1,25 @@
-import React from "react";
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import "./ProductCard.css";
+import ScrollToTop from "../Scroll/ScrollToTop";
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, linkTo }) => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   if (!product) return null;
+
 
   const hasDiscount = product.price && product.discountedPrice && 
                      product.discountedPrice < product.price;
 
   return (
-    
     <article className="apple-product-card">
-      <Link to={`/product/${product.id}`} className="product-link">
+        <ScrollToTop />
+      <Link to={linkTo || `/product/${product.id}`} className="product-link">
         {hasDiscount && (
           <div className="discount-badge">
-            SAVE ${product.price - product.discountedPrice}
+            SAVE ${(product.price - product.discountedPrice).toFixed(2)}
           </div>
         )}
 
@@ -43,31 +48,8 @@ const ProductCard = ({ product }) => {
               <span className="current-price">${product.price?.toFixed(2) || "0.00"}</span>
             )}
           </div>
-          
-          <div className="color-options">
-            <span className="color-label">Color: </span>
-            {product.colors ? (
-              <>
-                {product.colors.slice(0, 3).map((color, index) => (
-                  <span 
-                    key={index} 
-                    className="color-option" 
-                    style={{ backgroundColor: color.value }}
-                    title={color.name}
-                  />
-                ))}
-                {product.colors.length > 3 && (
-                  <span className="more-colors">+{product.colors.length - 3}</span>
-                )}
-              </>
-            ) : (
-              <span className="no-colors">—</span>
-            )}
-          </div>
         </div>
       </Link>
-      
-
     </article>
   );
 };

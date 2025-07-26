@@ -1,33 +1,74 @@
 // src/components/common/BrandSlider/BrandSlider.js
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import {
+  setBrandsLoading,
+  setBrandsSuccess,
+  setBrandsFailed
+} from '../../../store/brandsSlice';
+import useApi from '../../../api/useApi';
 import './BrandSlider.css';
-import { dummyProducts } from '../../../data/dummyProducts';
 
 const BrandSlider = () => {
-  const [randomBrands, setRandomBrands] = useState([]);
+  const dispatch = useDispatch();
+  const { brands, status, error } = useSelector((state) => state.brands);
+  const { get } = useApi();
 
   useEffect(() => {
-    const shuffled = [...dummyProducts].sort(() => 0.5 - Math.random());
-    setRandomBrands(shuffled.slice(0, 8));
-  }, []);
+    const fetchBrands = async () => {
+      dispatch(setBrandsLoading());
+      try {
+        const data = await get('http://localhost:5117/api/brands');
+        dispatch(setBrandsSuccess(data));
+      } catch (err) {
+        dispatch(setBrandsFailed(err.message));
+      }
+    };
+
+    fetchBrands();
+  }, [dispatch, get]);
+
+  if (status === 'loading') {
+    return (
+      <section className="brand-slider-section">
+        <div className="container">
+          <div className="brand-grid">
+            {[...Array(8)].map((_, index) => (
+              <div key={`skeleton-${index}`} className="brand-item">
+                <div className="brand-card" style={{ backgroundColor: '#e0e0e0' }} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (status === 'failed') {
+    return (
+      <section className="brand-slider-section">
+        <div className="container">
+          <div className="brand-grid">
+            <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '2rem' }}>
+              Error loading brands. Please try again later.
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="brand-slider-section">
       <div className="container">
         <div className="brand-grid">
-          {randomBrands.map((brand) => (
-            <Link 
-              to={`/brand/${brand.brand}`} 
-              key={brand.id} 
-              className="brand-item"
-            >
-              <div 
+          {brands.slice(0, 8).map((brand) => (
+            <Link to={`/brand/${brand.id}`} key={brand.id} className="brand-item">
+              <div
                 className="brand-card"
-                style={{ backgroundImage: `url(${brand.image})` }}
-              >
-                {/* Image is now a background */}
-              </div>
+                style={{ backgroundImage: `url(${brand.logoUrl})` }}
+              />
             </Link>
           ))}
         </div>

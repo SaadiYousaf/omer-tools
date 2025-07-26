@@ -1,58 +1,65 @@
-// src/pages/Category/Category.js
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { setCurrentCategory } from '../../store/categoriesSlice';
-import { setProducts, setLoading, setError } from '../../store/productsSlice';
+import { Link } from 'react-router-dom';
+import { 
+  fetchSubcategories,
+  setCurrentSubcategory
+} from '../../store/subcategoriesSlice';
 import ProductCard from '../../components/common/Card/ProductCard';
 import Loading from '../../components/common/Loading/Loading';
-import { dummyProducts } from '../../data/dummyProducts';
-import ScrollToTop from "../../components/common/Scroll/ScrollToTop";
+import ErrorMessage from '../../components/layout/ErrorMessage/ErrorMessage';
 import './Category.css';
 
 const Category = () => {
-  const { categorySlug } = useParams();
+  const { categoryId } = useParams();
   const dispatch = useDispatch();
-  const { categories, currentCategory } = useSelector(state => state.categories);
-  const { items: products, status, error } = useSelector(state => state.products);
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-  useEffect(() => {
-    const category = categories?.find(cat => cat.slug === categorySlug);
-    if (category) {
-      dispatch(setCurrentCategory(category));
-      dispatch(setLoading(true));
+  
+  const { 
+    subcategories,
+    status
+  } = useSelector(state => state.subcategories);
 
-      // Filter real dummyProducts by category
-      const categoryProducts = dummyProducts.filter(
-        product => product.categoryId === category.id
-      );
-
-      setTimeout(() => {
-        dispatch(setProducts(categoryProducts));
-        dispatch(setLoading(false));
-      }, 500);
-    } else {
-      dispatch(setError('Category not found.'));
+  // Load subcategories when categoryId changes
+  useEffect(() => {
+    if (categoryId) {
+      dispatch(fetchSubcategories(categoryId));
     }
-  }, [categorySlug, categories, dispatch]);
+  }, [categoryId, dispatch]);
 
-  if (status === 'loading') return <Loading />;
-  if (status === 'failed') return <div>Error: {error}</div>;
+  if (status === 'loading') return <Loading fullPage />;
+  if (status === 'failed') return <ErrorMessage message="Failed to load subcategories" />;
 
   return (
     <div className="category-page">
-         <ScrollToTop />
-      <h1 className="category-title">{currentCategory?.name || 'Category'}</h1>
-      <div className="products-grid">
-        {products?.length > 0 ? (
-          products.map(product => (
-            <ProductCard key={product.id} product={product} />
-          ))
-        ) : (
-          <div>No products found in this category</div>
-        )}
+      <h2 className="category-title">Subcategories</h2>
+      <div className="subcategories-grid">
+        {subcategories.map(subcategory => {
+          // Format subcategory data to match product card expectations
+          const cardData = {
+            id: subcategory.id,
+            name: subcategory.name,
+            image: subcategory.imageUrl,
+            description: subcategory.description,
+            // Add mock price data to maintain card styling
+            price: 0,
+            discountedPrice: 0,
+            // Add empty colors array to prevent errors
+            colors: []
+          };
+
+          return (
+            <div key={subcategory.id} className="subcategory-card-wrapper">
+              <Link 
+                 to={`/category/${categoryId}/subcategory/${subcategory.id}`}
+                className="subcategory-link"
+              >
+                <ProductCard product={cardData} />
+                <div className="subcategory-badge">Subcategory</div>
+              </Link>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

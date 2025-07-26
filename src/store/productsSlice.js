@@ -1,57 +1,140 @@
-// src/store/productsSlice.js
-import { createSlice } from '@reduxjs/toolkit';
-import {dummyProducts} from "../data/dummyProducts.js";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
+const BASE_URL = 'http://localhost:5117';
+
+// Async Thunks
+export const fetchAllProducts = createAsyncThunk(
+  'products/fetchAllProducts',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/products`);
+      if (!response.ok) throw new Error('Failed to fetch products');
+      return await response.json();
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
+
+export const fetchProductById = createAsyncThunk(
+  'products/fetchProductById',
+  async (productId, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/products/${productId}`);
+      if (!response.ok) throw new Error('Product not found');
+      return await response.json();
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
+
+export const fetchProductsBySubcategory = createAsyncThunk(
+  'products/fetchProductsBySubcategory',
+  async (subcategoryId, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/products?subcategoryId=${subcategoryId}`);
+      if (!response.ok) throw new Error('Failed to fetch subcategory products');
+      return await response.json();
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
+
+const initialState = {
+  items: [],
+  filteredItems: [],
+  currentProduct: null,
+  status: 'idle',
+  error: null,
+  productsBySubcategory: [],
+  subcategoryProductsStatus: 'idle'
+};
 
 const productsSlice = createSlice({
   name: 'products',
-  initialState: {
-    items: dummyProducts,
-    filteredItems: [],
-    status: 'idle',
-    error: null
-  },
+  initialState,
   reducers: {
     setCurrentProduct: (state, action) => {
       state.currentProduct = action.payload;
-      state.status = 'succeeded';
-    },
-    setProducts: (state, action) => {
-      state.items = action.payload;
-      state.status = 'succeeded'; // Add this to clear loading state
-    },
-    filterByCategory: (state, action) => { 
-      state.filteredItems = state.items.filter(
-        product => product.categoryId === action.payload
-      );
-      state.status = 'succeeded';
     },
     filterByBrand: (state, action) => {
+      const brandId = Number(action.payload);
+      if (!isNaN(brandId)) {
+        state.filteredItems = state.items.filter(
+          product => Number(product.brandId) === brandId
+        );
+      }
+    },
+    filterByCategory: (state, action) => {
+      const categoryId = action.payload;
       state.filteredItems = state.items.filter(
-        product => product.brand=== action.payload
+        product => product.categoryId === categoryId
       );
-      state.status = 'succeeded';
     },
-    setLoading: (state, action) => {
-      state.status = action.payload ? 'loading' : 'idle';
-    },
-    setError: (state, action) => {
-      state.error = action.payload;
-    },
-    resetFilteredItems: (state) => { 
+    resetFilteredItems: (state) => {
       state.filteredItems = [];
     }
+  },
+  extraReducers: (builder) => {
+    builder
+      // fetchAllProducts
+      .addCase(fetchAllProducts.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchAllProducts.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.items = action.payload;
+      })
+      .addCase(fetchAllProducts.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
+      })
+      
+      // fetchProductById
+      .addCase(fetchProductById.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchProductById.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.currentProduct = action.payload;
+      })
+      .addCase(fetchProductById.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
+      })
+      
+      // fetchProductsBySubcategory
+      .addCase(fetchProductsBySubcategory.pending, (state) => {
+        state.subcategoryProductsStatus = 'loading';
+      })
+      .addCase(fetchProductsBySubcategory.fulfilled, (state, action) => {
+        state.subcategoryProductsStatus = 'succeeded';
+        state.productsBySubcategory = action.payload;
+      })
+      .addCase(fetchProductsBySubcategory.rejected, (state, action) => {
+        state.subcategoryProductsStatus = 'failed';
+        state.error = action.payload;
+      });
   }
 });
 
+// Action creators
 export const { 
-  setProducts, 
-  filterByCategory, 
-  filterByBrand, 
-  setLoading, 
-  setError,
   setCurrentProduct,
+  filterByBrand,
+  filterByCategory,
   resetFilteredItems
 } = productsSlice.actions;
+
+// Selectors
+export const selectAllProducts = (state) => state.products.items;
+export const selectFilteredProducts = (state) => state.products.filteredItems;
+export const selectCurrentProduct = (state) => state.products.currentProduct;
+export const selectProductsStatus = (state) => state.products.status;
+export const selectProductsError = (state) => state.products.error;
+export const selectProductsBySubcategory = (state) => state.products.productsBySubcategory;
+export const selectSubcategoryProductsStatus = (state) => state.products.subcategoryProductsStatus;
 
 export default productsSlice.reducer;

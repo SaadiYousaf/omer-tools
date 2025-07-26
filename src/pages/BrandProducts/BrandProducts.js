@@ -1,54 +1,72 @@
-// src/pages/BrandProducts/BrandProducts.js
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { filterByBrand, setLoading } from '../../store/productsSlice';
-import ProductGrid from '../../components/common/ProductGrid/ProductGrid';
-import ScrollToTop from "../../components/common/Scroll/ScrollToTop";
+import { useDispatch, useSelector } from 'react-redux';
+import { filterByBrand, fetchAllProducts } from '../../store/productsSlice';
+import ProductCard from '../../components/common/Card/ProductCard';
+import Loading from '../../components/common/Loading/Loading';
 import './BrandProducts.css';
-//import { brands } from '../../components/common/BrandSlider/BrandSlider';
+import ScrollToTop from '../../components/common/Scroll/ScrollToTop';
 
 const BrandProducts = () => {
-  const { brandSlug } = useParams();
+  const { brandId } = useParams();
   const dispatch = useDispatch();
-  const { filteredItems: products,items,status } = useSelector((state) => state.products);
-  const brand = useSelector((state) => 
-    items.find(product => product.brand === brandSlug)
-  );
+  const { 
+    filteredItems,
+    items,
+    status
+  } = useSelector(state => state.products);
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
   useEffect(() => {
-    if (brandSlug) {
-      dispatch(setLoading(true));
-      setTimeout(() => {
-        dispatch(filterByBrand(brandSlug));
-        
-      }, 500);
+    console.log('Initial load - brandId:', brandId);
+    
+    // Fetch products if none exist
+    if (items.length === 0) {
+      console.log('Fetching all products...');
+      dispatch(fetchAllProducts())
+        .unwrap()
+        .then(() => {
+          console.log('Products fetched, now filtering...');
+          dispatch(filterByBrand(brandId));
+        });
+    } else {
+      console.log('Using existing products, filtering...');
+      dispatch(filterByBrand(brandId));
     }
-  }, [brandSlug, dispatch]);
+  }, [brandId, dispatch, items.length]);
 
-  if (status === 'loading') {
-    return <div className="loading">Loading products...</div>;
-  }
+  console.log('Render - filteredItems:', filteredItems);
+  console.log('Render - all items:', items);
+
+  if (status === 'loading') return <Loading />;
 
   return (
     <div className="brand-products-page">
-         <ScrollToTop />
-      <div className="container">
-        <h1 className="brand-title">{brand?.name || 'Brand Products'}</h1>
-        <p className="brand-description">
-          {brand?.brand || 'Explore our premium collection'}
-        </p>
-        
-        {products.length > 0 ? (
-          <ProductGrid products={products} />
-        ) : (
-          <div className="no-products">
-            No products found for this brand.
+        <ScrollToTop />
+      <h2>Products for Brand #{brandId}</h2>
+      
+      {filteredItems.length > 0 ? (
+        <div className="product-grid">
+          {filteredItems.map(product => (
+            <ProductCard 
+              key={product.id} 
+              product={product}
+              linkTo={`/product/${product.id}`}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="no-products">
+          <p>No products found for brand #{brandId}</p>
+          <div className="debug-info">
+            <p>Total products: {items.length}</p>
+            <p>Product brand IDs: {
+              items.slice(0, 3).map(p => p.brandId).join(', ')
+            }</p>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

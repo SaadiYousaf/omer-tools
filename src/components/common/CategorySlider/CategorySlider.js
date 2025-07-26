@@ -1,14 +1,38 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+// src/components/common/CategorySlider/CategorySlider.js
+import React, { useRef, useEffect, useCallback,useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import {
+  setCategoriesLoading,
+  setCategoriesSuccess,
+  setCategoriesFailed
+} from '../../../store/categoriesSlice';
+import useApi from '../../../api/useApi';
 import './CategorySlider.css';
 
-const CategorySlider = ({ categories, brandImages, activeBrandIndex = 0 }) => {
+const CategorySlider = ({ brandImages, activeBrandIndex = 0 }) => {
+  const dispatch = useDispatch();
+  const { categories, status, error } = useSelector((state) => state.categories);
   const sliderRef = useRef(null);
   const [showArrows, setShowArrows] = useState({ left: false, right: true });
   const scrollTimeoutRef = useRef(null);
+  const { get } = useApi();
 
-  // Memoized scroll position check with debounce
+  useEffect(() => {
+    const fetchCategories = async () => {
+      dispatch(setCategoriesLoading());
+      try {
+        const data = await get('http://localhost:5117/api/categories');
+        dispatch(setCategoriesSuccess(data));
+      } catch (err) {
+        dispatch(setCategoriesFailed(err.message));
+      }
+    };
+
+    fetchCategories();
+  }, [dispatch, get]);
+
   const checkScrollPosition = useCallback(() => {
     if (scrollTimeoutRef.current) {
       clearTimeout(scrollTimeoutRef.current);
@@ -25,7 +49,6 @@ const CategorySlider = ({ categories, brandImages, activeBrandIndex = 0 }) => {
     }, 100);
   }, []);
 
-  // Initial check and setup scroll listener
   useEffect(() => {
     checkScrollPosition();
     
@@ -39,7 +62,7 @@ const CategorySlider = ({ categories, brandImages, activeBrandIndex = 0 }) => {
         clearTimeout(scrollTimeoutRef.current);
       }
     };
-  }, [checkScrollPosition]);
+  }, [checkScrollPosition, categories]); // Added categories to dependency array
 
   const scroll = (direction) => {
     if (sliderRef.current) {
@@ -48,16 +71,49 @@ const CategorySlider = ({ categories, brandImages, activeBrandIndex = 0 }) => {
         left: scrollAmount,
         behavior: 'smooth'
       });
-      
       setTimeout(checkScrollPosition, 300);
     }
   };
 
-  // Get brand image for category (cycle through available images)
   const getBrandImage = (index) => {
     if (!brandImages || brandImages.length === 0) return '/images/categories/default.png';
     return brandImages[(activeBrandIndex + index) % brandImages.length];
   };
+
+  if (status === 'loading') {
+    return (
+      <div className="category-slider-wrapper">
+        <div className="category-slider-container">
+          <div className="category-slider">
+            {[...Array(8)].map((_, index) => (
+              <div key={`skeleton-${index}`} className="category-item">
+                <div 
+                  className="category-image" 
+                  style={{ backgroundColor: '#e0e0e0' }} 
+                />
+                <div 
+                  className="category-name" 
+                  style={{ backgroundColor: '#e0e0e0', width: '80px', height: '16px' }} 
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === 'failed') {
+    return (
+      <div className="category-slider-wrapper">
+        <div className="category-slider-container">
+          <div className="category-slider-error">
+            Error loading categories: {error}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="category-slider-wrapper">
@@ -72,13 +128,10 @@ const CategorySlider = ({ categories, brandImages, activeBrandIndex = 0 }) => {
           </button>
         )}
 
-        <div 
-          className="category-slider" 
-          ref={sliderRef}
-        >
+        <div className="category-slider" ref={sliderRef}>
           {categories.map((category, index) => (
             <Link
-              to={`/category/${category.slug}`}
+              to={`/subcategory/${category.id}`}
               key={category.id}
               className="category-item"
             >
