@@ -1,31 +1,30 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import useApi from '../api/useApi';
 
-// Async thunk to fetch products by category
+const BASE_URL = 'http://localhost:5117';
+
+// Async thunks
+export const fetchCategories = createAsyncThunk(
+  'categories/fetchCategories',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/categories`);
+      if (!response.ok) throw new Error('Failed to fetch categories');
+      return await response.json();
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
+
 export const fetchProductsByCategory = createAsyncThunk(
   'categories/fetchProductsByCategory',
   async (categoryId, { rejectWithValue }) => {
-    const { get } = useApi();
     try {
-      console.log('[fetchProductsByCategory] Fetching products for category ID:', categoryId);
-      const url = `http://localhost:5117/api/Products?categoryId=${categoryId}`;
-      console.log('[fetchProductsByCategory] Request URL:', url);
-      
-      const response = await get(url);
-      console.log('[fetchProductsByCategory] Raw API response:', response);
-      
-      if (!Array.isArray(response)) {
-        throw new Error('Invalid products data format - expected array');
-      }
-      
-      console.log('[fetchProductsByCategory] Received', response.length, 'products');
-      return response;
+      const response = await fetch(`${BASE_URL}/api/products?categoryId=${categoryId}`);
+      if (!response.ok) throw new Error('Failed to fetch category products');
+      return await response.json();
     } catch (err) {
-      console.error('[fetchProductsByCategory] Error:', {
-        message: err.message,
-        stack: err.stack,
-        response: err.response
-      });
       return rejectWithValue(err.message);
     }
   }
@@ -33,11 +32,11 @@ export const fetchProductsByCategory = createAsyncThunk(
 
 const initialState = {
   categories: [],
-  products: [], // Added products array to store category products
+  products: [],
   status: 'idle',
   error: null,
   currentCategory: null,
-  productsStatus: 'idle', // Separate status for products
+  productsStatus: 'idle',
   productsError: null
 };
 
@@ -59,7 +58,6 @@ const categoriesSlice = createSlice({
     },
     setCurrentCategory(state, action) {
       state.currentCategory = action.payload;
-      // Reset products state when category changes
       state.products = [];
       state.productsStatus = 'idle';
       state.productsError = null;
@@ -70,9 +68,19 @@ const categoriesSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchCategories.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchCategories.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.categories = action.payload;
+      })
+      .addCase(fetchCategories.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
+      })
       .addCase(fetchProductsByCategory.pending, (state) => {
         state.productsStatus = 'loading';
-        state.productsError = null;
       })
       .addCase(fetchProductsByCategory.fulfilled, (state, action) => {
         state.productsStatus = 'succeeded';
@@ -85,6 +93,7 @@ const categoriesSlice = createSlice({
   }
 });
 
+// Action creators
 export const { 
   setCategoriesLoading,
   setCategoriesSuccess,
@@ -92,5 +101,13 @@ export const {
   setCurrentCategory,
   resetCategories
 } = categoriesSlice.actions;
+
+// Selectors
+export const selectAllCategories = (state) => state.categories.categories;
+export const selectCategoriesStatus = (state) => state.categories.status;
+export const selectCategoriesError = (state) => state.categories.error;
+export const selectCurrentCategory = (state) => state.categories.currentCategory;
+export const selectCategoryProducts = (state) => state.categories.products;
+export const selectCategoryProductsStatus = (state) => state.categories.productsStatus;
 
 export default categoriesSlice.reducer;

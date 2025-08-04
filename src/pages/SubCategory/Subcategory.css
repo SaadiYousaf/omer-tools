@@ -1,17 +1,17 @@
-.category-subcategories {
-  padding: 2rem;
+.subcategory-page {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 2rem 1rem;
 }
 
 .breadcrumb {
   margin-bottom: 1.5rem;
   font-size: 0.9rem;
-  color: #86868b;
+  color: #666;
 }
 
 .breadcrumb a {
-  color: #06c;
+  color: #0066cc;
   text-decoration: none;
 }
 
@@ -19,42 +19,87 @@
   text-decoration: underline;
 }
 
-.category-subcategories h2 {
+.breadcrumb span {
+  margin: 0 5px;
+}
+
+.subcategory-header {
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.subcategory-hero {
+  width: 100%;
+  height: 300px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.subcategory-hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.subcategory-hero:hover .subcategory-hero-image {
+  transform: scale(1.02);
+}
+
+.subcategory-info {
+  padding: 0 1rem;
+}
+
+.subcategory-info h1 {
   font-size: 2rem;
   margin-bottom: 1rem;
   color: #1d1d1f;
 }
 
-.subcategory-description {
-  color: #86868b;
-  margin-bottom: 2rem;
-  line-height: 1.5;
+.subcategory-info .description {
+  color: #666;
+  line-height: 1.6;
+  max-width: 800px;
 }
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 1.5rem;
+  margin-top: 2rem;
 }
 
 .no-products {
   grid-column: 1 / -1;
   text-align: center;
-  color: #86868b;
   padding: 2rem;
-  font-size: 1.1rem;
+  color: #666;
 }
 
 @media (max-width: 768px) {
-  .category-subcategories {
-    padding: 1rem;
+  .subcategory-hero {
+    height: 200px;
+  }
+  
+  .subcategory-info h1 {
+    font-size: 1.5rem;
   }
   
   .products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .subcategory-hero {
+    height: 150px;
   }
   
-  .category-subcategories h2 {
-    font-size: 1.5rem;
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
 }

@@ -18,12 +18,16 @@ import OrderHistoryPage from "./pages/OrderHistory/OrderHistoryPage";
 import Subcategory from "./pages/SubCategory/Subcategory";
 import CategorySubcategories from "./components/common/Subcategory/CategorySubcategories";
 import SubcategoryWrapper from "./components/common/Subcategory/SubcategoryWrapper";
+import ProductUpload from "./pages/ProductUpload/ProductUpload";
+import ScrollToTop from "./components/common/Scroll/ScrollToTop";
+
 
 function App() {
   return (
     <div className="app">
       <Header />
       <main>
+      <ScrollToTop/>
         <Routes>
           <Route path="/" element={<Home />} />
           
@@ -32,8 +36,8 @@ function App() {
           <Route path="/category/:categoryId/subcategory/:subcategoryId" element={<Subcategory />} />
           <Route path='/category/:categoryId/subcategory/:subcategoryId/product/:productId' element={<Product/>}/>
           <Route path="/subcategory/:categoryId" element={<CategorySubcategories />} />
-          
-          {/* Other Routes */}
+          <Route path="/upload" element={<ProductUpload />} />
+           {/* Other Routes */}
           <Route path="/product/:productId" element={<Product />} />
           <Route path="/login" element={<Login />} />
           <Route path="/clearance" element={<ClearanceSale />} />

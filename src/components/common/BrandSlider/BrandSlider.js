@@ -29,6 +29,11 @@ const BrandSlider = () => {
     fetchBrands();
   }, [dispatch, get]);
 
+  const getBrandImage = (brand) => {
+    if (!brand.logoUrl) return '/images/brands/default.png';
+    return brand.logoUrl;
+  };
+
   if (status === 'loading') {
     return (
       <section className="brand-slider-section">
@@ -51,7 +56,7 @@ const BrandSlider = () => {
         <div className="container">
           <div className="brand-grid">
             <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '2rem' }}>
-              Error loading brands. Please try again later.
+              Error loading brands: {error}
             </div>
           </div>
         </div>
@@ -65,10 +70,16 @@ const BrandSlider = () => {
         <div className="brand-grid">
           {brands.slice(0, 8).map((brand) => (
             <Link to={`/brand/${brand.id}`} key={brand.id} className="brand-item">
-              <div
-                className="brand-card"
-                style={{ backgroundImage: `url(${brand.logoUrl})` }}
-              />
+              <div className="brand-card">
+                <img 
+                  src={getBrandImage(brand)} 
+                  alt={brand.name}
+                  className="brand-image"
+                  onError={(e) => {
+                    e.target.src = '/images/brands/default.png';
+                  }}
+                />
+              </div>
             </Link>
           ))}
         </div>

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import CategorySlider from "../../components/common/CategorySlider/CategorySlider";
 import FeaturedProducts from "../../components/common/FeaturedProducts/FeaturedProducts";
 import HeroSlider from "../../components/common/HeroSlider/HeroSlider";
@@ -7,15 +7,12 @@ import BrandSlider from "../../components/common/BrandSlider/BrandSlider";
 import MemberDeals from "../../components/common/MembersDeal/MemberDeals";
 import ScrollToTop from "../../components/common/Scroll/ScrollToTop";
 import "./Home.css";
+import { fetchFeaturedProducts } from "../../store/productsSlice";
 
 // Import all brand images
-import brand1 from "../../components/common/BrandSlider/brands/brand1.PNG";
-import brand2 from "../../components/common/BrandSlider/brands/brand2.PNG";
-import brand3 from "../../components/common/BrandSlider/brands/brand3.PNG";
-import brand4 from "../../components/common/BrandSlider/brands/brand4.PNG";
-import brand5 from "../../components/common/BrandSlider/brands/brand5.PNG";
 
 const Home = () => {
+  const dispatch = useDispatch();
   const categories = useSelector((state) => state.categories.categories);
   const featuredProducts = useSelector((state) =>
     Array.isArray(state.products?.items)
@@ -25,10 +22,9 @@ const Home = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  // Create an array of brand images to share across components
-  const brandImages = [brand1, brand2, brand3, brand4, brand5];
-
+  useEffect(() => {
+    dispatch(fetchFeaturedProducts());
+  }, [dispatch]);
   return (
     <div className="home-page">
       <ScrollToTop />
@@ -39,7 +35,7 @@ const Home = () => {
 
       {/* Brand Showcase - shares the same brand images */}
       <section className="brand-showcase">
-        <BrandSlider brands={brandImages} />
+        <BrandSlider  />
       </section>
 
       {/* Main Category Navigation */}
@@ -47,7 +43,6 @@ const Home = () => {
         <div className="container">
           <CategorySlider
             categories={categories}
-            brandImages={brandImages}
             activeBrandIndex={0} // Use brand1 as primary
           />
         </div>
@@ -63,7 +58,7 @@ const Home = () => {
           <h2>Popular Collections</h2>
           <CategorySlider
             categories={categories}
-            brandImages={brandImages}
+         
             activeBrandIndex={2} // Use brand3 for this section
           />
         </div>

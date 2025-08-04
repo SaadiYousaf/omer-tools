@@ -154,7 +154,7 @@ const Header = () => {
                   {categories.map((category) => (
                     <Link
                       key={category.id}
-                        to={`/category/${category.slug}`}
+                        to={`/category/${category.id}`}
                       className="dropdown-item"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >

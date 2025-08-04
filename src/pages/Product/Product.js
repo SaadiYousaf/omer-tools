@@ -8,6 +8,8 @@ import ErrorMessage from '../../components/layout/ErrorMessage/ErrorMessage';
 import ScrollToTop from "../../components/common/Scroll/ScrollToTop";
 import './Product.css';
 
+const API_BASE_URL = 'http://localhost:5117'; // Adjust this to match your API base URL
+
 const Product = () => {
   const { productId } = useParams();
   const dispatch = useDispatch();
@@ -25,7 +27,7 @@ const Product = () => {
 
   useEffect(() => {
     if (currentProduct) {
-      setLocalStock(currentProduct.stock ?? 10);
+      setLocalStock(currentProduct.stockQuantity ?? 0);
     }
   }, [currentProduct]);
 
@@ -35,8 +37,8 @@ const Product = () => {
         addItemToCart({
           id: currentProduct.id,
           name: currentProduct.name,
-          price: currentProduct.discountedPrice || currentProduct.price,
-          image: currentProduct.images?.[0] || '/images/default-product.jpg',
+          price: currentProduct.discountPrice || currentProduct.price,
+          image: currentProduct.images?.[0]?.imageUrl || '/images/default-product.jpg',
           quantity: quantity
         })
       );
@@ -56,8 +58,17 @@ const Product = () => {
   if (!currentProduct) return <div className="product-not-found">Product not found</div>;
 
   const hasDiscount = currentProduct.price &&
-    currentProduct.discountedPrice &&
-    currentProduct.discountedPrice < currentProduct.price;
+    currentProduct.discountPrice &&
+    currentProduct.discountPrice < currentProduct.price;
+
+  // Function to get full image URL
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return '/images/default-product.jpg';
+    // If it's already a full URL, return as is
+    if (imagePath.startsWith('http')) return imagePath;
+    // Otherwise, prepend the API base URL
+    return `${API_BASE_URL}${imagePath}`;
+  };
 
   return (
     <div className="product-page">
@@ -66,8 +77,8 @@ const Product = () => {
         <div className="product-gallery">
           <div className="main-image">
             <img
-              src={currentProduct.images?.[selectedImage] || '/images/default-product.jpg'}
-              alt={currentProduct.name}
+              src={getImageUrl(currentProduct.images?.[selectedImage]?.imageUrl)}
+              alt={currentProduct.images?.[selectedImage]?.altText || currentProduct.name}
               onError={(e) => {
                 e.target.src = '/images/default-product.jpg';
               }}
@@ -82,8 +93,8 @@ const Product = () => {
                   onClick={() => setSelectedImage(index)}
                 >
                   <img 
-                    src={img} 
-                    alt={`${currentProduct.name} ${index + 1}`}
+                    src={getImageUrl(img.imageUrl)} 
+                    alt={img.altText || `${currentProduct.name} ${index + 1}`}
                     onError={(e) => {
                       e.target.src = '/images/default-product.jpg';
                     }}
@@ -93,7 +104,7 @@ const Product = () => {
             ) : (
               <div className="thumbnail active">
                 <img
-                  src={currentProduct.image || '/images/default-product.jpg'}
+                  src="/images/default-product.jpg"
                   alt={currentProduct.name}
                 />
               </div>
@@ -118,12 +129,12 @@ const Product = () => {
               </span>
             )}
             <span className="current-price">
-              ${(currentProduct.discountedPrice || currentProduct.price).toFixed(2)}
+              ${(currentProduct.discountPrice || currentProduct.price).toFixed(2)}
             </span>
             {hasDiscount && (
               <span className="discount-badge">
                 Save {Math.round(
-                  ((currentProduct.price - currentProduct.discountedPrice) / currentProduct.price) * 100
+                  ((currentProduct.price - currentProduct.discountPrice) / currentProduct.price) * 100
                 )}%
               </span>
             )}
@@ -169,51 +180,50 @@ const Product = () => {
             </button>
           </div>
 
- <div className="product-specs">
-  <h3>Specifications</h3>
-  <table>
-    <tbody>
-      {currentProduct.specifications ? (
-        // Handle both stringified JSON and proper object formats
-        (() => {
-          try {
-            const specs = typeof currentProduct.specifications === 'string' 
-              ? JSON.parse(currentProduct.specifications)
-              : currentProduct.specifications;
-            
-            return Object.entries(specs).map(([key, value]) => (
-              <tr key={key}>
-                <td>{key}</td>
-                <td>{typeof value === 'object' ? JSON.stringify(value) : value}</td>
-              </tr>
-            ));
-          } catch (e) {
-            return (
-              <tr>
-                <td colSpan="2">Invalid specifications format</td>
-              </tr>
-            );
-          }
-        })()
-      ) : (
-        <>
-          <tr>
-            <td>Brand</td>
-            <td>{currentProduct.brand || 'Generic'}</td>
-          </tr>
-          <tr>
-            <td>Model</td>
-            <td>{currentProduct.model || 'N/A'}</td>
-          </tr>
-          <tr>
-            <td>Weight</td>
-            <td>{currentProduct.weight || 'N/A'}</td>
-          </tr>
-        </>
-      )}
-    </tbody>
-  </table>
-</div>
+          <div className="product-specs">
+            <h3>Specifications</h3>
+            <table>
+              <tbody>
+                {currentProduct.specifications ? (
+                  (() => {
+                    try {
+                      const specs = typeof currentProduct.specifications === 'string' 
+                        ? JSON.parse(currentProduct.specifications)
+                        : currentProduct.specifications;
+                      
+                      return Object.entries(specs).map(([key, value]) => (
+                        <tr key={key}>
+                          <td>{key}</td>
+                          <td>{typeof value === 'object' ? JSON.stringify(value) : value}</td>
+                        </tr>
+                      ));
+                    } catch (e) {
+                      return (
+                        <tr>
+                          <td colSpan="2">Invalid specifications format</td>
+                        </tr>
+                      );
+                    }
+                  })()
+                ) : (
+                  <>
+                    <tr>
+                      <td>Brand</td>
+                      <td>{currentProduct.brand || 'Generic'}</td>
+                    </tr>
+                    <tr>
+                      <td>Model</td>
+                      <td>{currentProduct.model || 'N/A'}</td>
+                    </tr>
+                    <tr>
+                      <td>Weight</td>
+                      <td>{currentProduct.dimensions || 'N/A'}</td>
+                    </tr>
+                  </>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

@@ -13,12 +13,18 @@ const FeaturedProducts = () => {
   // Get all products from Redux store
   const items = useSelector((state) => state.products.items);
 
-  // ✅ Memoize featured products to prevent infinite render loops
+  // Memoize featured products with proper image handling
   const featuredProducts = useMemo(() => {
-    return items.filter(product => product.isFeatured);
+    return items
+      .filter(product => product.isFeatured)
+      .map(product => ({
+        ...product,
+        // Ensure consistent image structure with Subcategory component
+        imageUrl: product.images?.[0]?.imageUrl || '/images/products/default.png'
+      }));
   }, [items]);
 
-  // ✅ Memoize scroll position check function
+  // Rest of your existing code remains the same...
   const checkScrollPosition = useCallback(() => {
     if (sliderRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = sliderRef.current;
@@ -27,7 +33,6 @@ const FeaturedProducts = () => {
     }
   }, []);
 
-  // ✅ Handle resize and initial check
   useEffect(() => {
     const handleResize = () => {
       if (sliderRef.current?.parentElement) {
@@ -41,7 +46,6 @@ const FeaturedProducts = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, [checkScrollPosition]);
 
-  // ✅ Scroll event handler with throttling
   useEffect(() => {
     const slider = sliderRef.current;
     if (!slider) return;
@@ -59,22 +63,18 @@ const FeaturedProducts = () => {
     };
   }, [checkScrollPosition]);
 
-  // ✅ Update arrows when featured products or container size changes
   useEffect(() => {
     checkScrollPosition();
   }, [featuredProducts.length, containerWidth, checkScrollPosition]);
 
-  // ✅ Scroll functionality
   const scroll = (direction) => {
     if (sliderRef.current) {
-      const cardWidth = 250; // Adjust based on card size
+      const cardWidth = 250;
       const scrollAmount = direction === 'left' ? -cardWidth * 2 : cardWidth * 2;
       sliderRef.current.scrollBy({
         left: scrollAmount,
         behavior: 'smooth'
       });
-
-      // Delay to let scroll settle before checking
       setTimeout(checkScrollPosition, 500);
     }
   };
@@ -101,7 +101,11 @@ const FeaturedProducts = () => {
             >
               {featuredProducts.map(product => (
                 <div key={product.id} className="slider-product-item">
-                  <ProductCard product={product} />
+                  <ProductCard 
+                    product={product}
+                    description={product.description}
+                    linkTo={`/product/${product.id}`}
+                  />
                 </div>
               ))}
             </div>

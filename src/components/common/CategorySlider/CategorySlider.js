@@ -1,5 +1,5 @@
 // src/components/common/CategorySlider/CategorySlider.js
-import React, { useRef, useEffect, useCallback,useState } from 'react';
+import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
@@ -11,7 +11,7 @@ import {
 import useApi from '../../../api/useApi';
 import './CategorySlider.css';
 
-const CategorySlider = ({ brandImages, activeBrandIndex = 0 }) => {
+const CategorySlider = () => {
   const dispatch = useDispatch();
   const { categories, status, error } = useSelector((state) => state.categories);
   const sliderRef = useRef(null);
@@ -62,7 +62,7 @@ const CategorySlider = ({ brandImages, activeBrandIndex = 0 }) => {
         clearTimeout(scrollTimeoutRef.current);
       }
     };
-  }, [checkScrollPosition, categories]); // Added categories to dependency array
+  }, [checkScrollPosition, categories]);
 
   const scroll = (direction) => {
     if (sliderRef.current) {
@@ -75,9 +75,10 @@ const CategorySlider = ({ brandImages, activeBrandIndex = 0 }) => {
     }
   };
 
-  const getBrandImage = (index) => {
-    if (!brandImages || brandImages.length === 0) return '/images/categories/default.png';
-    return brandImages[(activeBrandIndex + index) % brandImages.length];
+  const getCategoryImage = (category) => {
+    if (!category.imageUrl) return '/images/categories/default.png';
+    // Assuming your API returns full URLs or relative paths from the public folder
+    return category.imageUrl;
   };
 
   if (status === 'loading') {
@@ -129,14 +130,14 @@ const CategorySlider = ({ brandImages, activeBrandIndex = 0 }) => {
         )}
 
         <div className="category-slider" ref={sliderRef}>
-          {categories.map((category, index) => (
+          {categories.map((category) => (
             <Link
               to={`/subcategory/${category.id}`}
               key={category.id}
               className="category-item"
             >
               <img 
-                src={getBrandImage(index)} 
+                src={getCategoryImage(category)} 
                 alt={category.name}
                 className="category-image"
                 onError={(e) => {

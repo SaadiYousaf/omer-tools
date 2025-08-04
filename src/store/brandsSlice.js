@@ -1,60 +1,76 @@
-// src/store/brandsSlice.js
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+
+const BASE_URL = 'http://localhost:5117';
+
+// Async Thunk
+export const fetchBrands = createAsyncThunk(
+  'brands/fetchBrands',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/brands`);
+      if (!response.ok) throw new Error('Failed to fetch brands');
+      return await response.json();
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
 
 const initialState = {
-  brands: [],         // List of all brands
-  status: 'idle',     // 'idle' | 'loading' | 'succeeded' | 'failed'
-  error: null         // Error message if any
+  brands: [],
+  status: 'idle',
+  error: null
 };
 
 const brandsSlice = createSlice({
   name: 'brands',
   initialState,
   reducers: {
-    /**
-     * Sets loading status while fetching brands
-     */
     setBrandsLoading(state) {
       state.status = 'loading';
       state.error = null;
     },
-
-    /**
-     * Stores the fetched brands on success
-     * @param {Object} state 
-     * @param {Object} action - action.payload: array of brands
-     */
     setBrandsSuccess(state, action) {
       state.status = 'succeeded';
       state.brands = action.payload;
     },
-
-    /**
-     * Stores error if fetching fails
-     * @param {Object} state 
-     * @param {Object} action - action.payload: error message
-     */
     setBrandsFailed(state, action) {
       state.status = 'failed';
       state.error = action.payload;
     },
-
-    /**
-     * Optional: Clears all brand-related state (e.g., on logout)
-     */
     resetBrands(state) {
       state.brands = [];
       state.status = 'idle';
       state.error = null;
     }
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchBrands.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchBrands.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.brands = action.payload;
+      })
+      .addCase(fetchBrands.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
+      });
   }
 });
 
+// Action creators
 export const { 
   setBrandsLoading, 
   setBrandsSuccess, 
   setBrandsFailed, 
   resetBrands 
 } = brandsSlice.actions;
+
+// Selectors
+export const selectAllBrands = (state) => state.brands.brands;
+export const selectBrandsStatus = (state) => state.brands.status;
+export const selectBrandsError = (state) => state.brands.error;
 
 export default brandsSlice.reducer;

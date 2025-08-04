@@ -48,12 +48,17 @@ const BrandProducts = () => {
       
       {filteredItems.length > 0 ? (
         <div className="product-grid">
+          
           {filteredItems.map(product => (
-            <ProductCard 
-              key={product.id} 
-              product={product}
-              linkTo={`/product/${product.id}`}
-            />
+                <ProductCard
+                key={product.id}
+                product={{
+                  ...product,
+                  imageUrl:
+                    product.images?.[0]?.imageUrl ||
+                    "/images/products/default.png",
+                }}
+                linkTo={`/product/${product.id}`}      />
           ))}
         </div>
       ) : (
