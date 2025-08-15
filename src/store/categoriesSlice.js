@@ -30,7 +30,23 @@ export const fetchProductsByCategory = createAsyncThunk(
   }
 );
 
+export const fetchBrandsByCategory = createAsyncThunk(
+  'categories/fetchBrandsByCategory',
+  async (categoryId, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/categories/${categoryId}/brands`);
+      if (!response.ok) throw new Error('Failed to fetch brands');
+      return await response.json();
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
+
 const initialState = {
+  brands: [],
+  brandsStatus: 'idle',
+  brandsError: null,
   categories: [],
   products: [],
   status: 'idle',
@@ -79,6 +95,17 @@ const categoriesSlice = createSlice({
         state.status = 'failed';
         state.error = action.payload;
       })
+      .addCase(fetchBrandsByCategory.pending, (state) => {
+        state.brandsStatus = 'loading';
+      })
+      .addCase(fetchBrandsByCategory.fulfilled, (state, action) => {
+        state.brandsStatus = 'succeeded';
+        state.brands = action.payload;
+      })
+      .addCase(fetchBrandsByCategory.rejected, (state, action) => {
+        state.brandsStatus = 'failed';
+        state.brandsError = action.payload;
+      })
       .addCase(fetchProductsByCategory.pending, (state) => {
         state.productsStatus = 'loading';
       })
@@ -109,5 +136,7 @@ export const selectCategoriesError = (state) => state.categories.error;
 export const selectCurrentCategory = (state) => state.categories.currentCategory;
 export const selectCategoryProducts = (state) => state.categories.products;
 export const selectCategoryProductsStatus = (state) => state.categories.productsStatus;
+export const selectCategoryBrands = (state) => state.categories.brands;
+export const selectBrandsStatus = (state) => state.categories.brandsStatus;
 
 export default categoriesSlice.reducer;

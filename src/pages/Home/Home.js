@@ -9,8 +9,6 @@ import ScrollToTop from "../../components/common/Scroll/ScrollToTop";
 import "./Home.css";
 import { fetchFeaturedProducts } from "../../store/productsSlice";
 
-// Import all brand images
-
 const Home = () => {
   const dispatch = useDispatch();
   const categories = useSelector((state) => state.categories.categories);
@@ -19,32 +17,31 @@ const Home = () => {
       ? state.products.items.filter((product) => product.isFeatured).slice(0, 4)
       : []
   );
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
   useEffect(() => {
     dispatch(fetchFeaturedProducts());
   }, [dispatch]);
+
   return (
     <div className="home-page">
       <ScrollToTop />
+
       {/* Hero Section */}
       <section className="hero-section">
         <HeroSlider />
       </section>
 
-      {/* Brand Showcase - shares the same brand images */}
-      <section className="brand-showcase">
-        <BrandSlider  />
-      </section>
+      {/* Brand Showcase - tight under hero */}
+      <BrandSlider />
 
       {/* Main Category Navigation */}
       <section className="category-navigation main-categories">
         <div className="container">
-          <CategorySlider
-            categories={categories}
-            activeBrandIndex={0} // Use brand1 as primary
-          />
+          <CategorySlider categories={categories} activeBrandIndex={0} />
         </div>
       </section>
 
@@ -53,14 +50,11 @@ const Home = () => {
         <MemberDeals />
       </section>
 
+      {/* Secondary Categories */}
       <section className="category-navigation secondary-categories">
         <div className="container">
           <h2>Popular Collections</h2>
-          <CategorySlider
-            categories={categories}
-         
-            activeBrandIndex={2} // Use brand3 for this section
-          />
+          <CategorySlider categories={categories} activeBrandIndex={2} />
         </div>
       </section>
 

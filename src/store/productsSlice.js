@@ -2,6 +2,18 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 const BASE_URL = "http://localhost:5117";
 
+// export const fetchProductById = createAsyncThunk(
+//   "products/fetchProductById",
+//   async (productId, { rejectWithValue }) => {
+//     try {
+//       const response = await fetch(`${BASE_URL}/api/products/full/${productId}`);
+//       if (!response.ok) throw new Error("Product not found");
+//       return await response.json();
+//     } catch (err) {
+//       return rejectWithValue(err.message);
+//     }
+//   }
+// );
 // Async Thunks
 export const fetchAllProducts = createAsyncThunk(
   "products/fetchAllProducts",
@@ -15,19 +27,33 @@ export const fetchAllProducts = createAsyncThunk(
     }
   }
 );
-
 export const fetchProductById = createAsyncThunk(
   "products/fetchProductById",
   async (productId, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${BASE_URL}/api/products/${productId}`);
-      if (!response.ok) throw new Error("Product not found");
-      return await response.json();
+      // Change to full details endpoint
+      const response = await fetch(`${BASE_URL}/api/products/full/${productId}`);
+      if (!response.ok) throw new Error('Product not found');
+      const data = await response.json();
+      return data;
     } catch (err) {
       return rejectWithValue(err.message);
     }
   }
 );
+
+// export const fetchProductById = createAsyncThunk(
+//   "products/fetchProductById",
+//   async (productId, { rejectWithValue }) => {
+//     try {
+//       const response = await fetch(`${BASE_URL}/api/products/${productId}`);
+//       if (!response.ok) throw new Error("Product not found");
+//       return await response.json();
+//     } catch (err) {
+//       return rejectWithValue(err.message);
+//     }
+//   }
+// );
 
 export const fetchFeaturedProducts = createAsyncThunk(
   'products/fetchFeaturedProducts',

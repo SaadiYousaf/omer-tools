@@ -1,4 +1,3 @@
-// src/components/common/BrandSlider/BrandSlider.js
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -25,7 +24,6 @@ const BrandSlider = () => {
         dispatch(setBrandsFailed(err.message));
       }
     };
-
     fetchBrands();
   }, [dispatch, get]);
 
@@ -37,14 +35,10 @@ const BrandSlider = () => {
   if (status === 'loading') {
     return (
       <section className="brand-slider-section">
-        <div className="container">
-          <div className="brand-grid">
-            {[...Array(8)].map((_, index) => (
-              <div key={`skeleton-${index}`} className="brand-item">
-                <div className="brand-card" style={{ backgroundColor: '#e0e0e0' }} />
-              </div>
-            ))}
-          </div>
+        <div className="container brand-container">
+          {[...Array(4)].map((_, index) => (
+            <div key={`skeleton-${index}`} className="brand-card skeleton" />
+          ))}
         </div>
       </section>
     );
@@ -53,11 +47,9 @@ const BrandSlider = () => {
   if (status === 'failed') {
     return (
       <section className="brand-slider-section">
-        <div className="container">
-          <div className="brand-grid">
-            <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '2rem' }}>
-              Error loading brands: {error}
-            </div>
+        <div className="container brand-container">
+          <div style={{ textAlign: 'center', padding: '1rem', width: '100%' }}>
+            Error loading brands: {error}
           </div>
         </div>
       </section>
@@ -66,23 +58,21 @@ const BrandSlider = () => {
 
   return (
     <section className="brand-slider-section">
-      <div className="container">
-        <div className="brand-grid">
-          {brands.slice(0, 8).map((brand) => (
-            <Link to={`/brand/${brand.id}`} key={brand.id} className="brand-item">
-              <div className="brand-card">
-                <img 
-                  src={getBrandImage(brand)} 
-                  alt={brand.name}
-                  className="brand-image"
-                  onError={(e) => {
-                    e.target.src = '/images/brands/default.png';
-                  }}
-                />
-              </div>
-            </Link>
-          ))}
-        </div>
+      <div className="container brand-container">
+        {brands.slice(0, 8).map((brand) => (
+          <Link to={`/brand/${brand.id}`} key={brand.id} className="brand-link">
+            <div className="brand-card">
+              <img
+                src={getBrandImage(brand)}
+                alt={brand.name}
+                className="brand-image"
+                onError={(e) => {
+                  e.target.src = '/images/brands/default.png';
+                }}
+              />
+            </div>
+          </Link>
+        ))}
       </div>
     </section>
   );

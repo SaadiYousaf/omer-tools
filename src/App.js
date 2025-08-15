@@ -14,12 +14,15 @@ import WelcomePage from "./pages/Membership/WelcomePage";
 import ClearanceSale from "./pages/ClearanceSale/ClearanceSale";
 import ComingSoon from "./pages/CommingSoon/CommingSoon";
 import ProfilePage from "./pages/UserProfile/ProfilePage";
+import Category from "./pages/Category/Category";
 import OrderHistoryPage from "./pages/OrderHistory/OrderHistoryPage";
 import Subcategory from "./pages/SubCategory/Subcategory";
 import CategorySubcategories from "./components/common/Subcategory/CategorySubcategories";
 import SubcategoryWrapper from "./components/common/Subcategory/SubcategoryWrapper";
 import ProductUpload from "./pages/ProductUpload/ProductUpload";
 import ScrollToTop from "./components/common/Scroll/ScrollToTop";
+import SearchResultsPage from './pages/SearchResultPages/SearchResultPage';
+import ShopByBrand from "./pages/ShopbyBrand/ShopByBrand";
 
 
 function App() {
@@ -32,11 +35,13 @@ function App() {
           <Route path="/" element={<Home />} />
           
           {/* Category and Subcategory Routes */}
-          <Route path="/category/:categoryId" element={<CategorySubcategories />} />
+          <Route path="/search" element={<SearchResultsPage />} />
+          <Route path="/category/:categoryId" element={<Category />} />
           <Route path="/category/:categoryId/subcategory/:subcategoryId" element={<Subcategory />} />
           <Route path='/category/:categoryId/subcategory/:subcategoryId/product/:productId' element={<Product/>}/>
           <Route path="/subcategory/:categoryId" element={<CategorySubcategories />} />
           <Route path="/upload" element={<ProductUpload />} />
+          <Route path="/shop-by-brand" element={<ShopByBrand/>} />
            {/* Other Routes */}
           <Route path="/product/:productId" element={<Product />} />
           <Route path="/login" element={<Login />} />

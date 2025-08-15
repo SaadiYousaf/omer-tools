@@ -1,19 +1,20 @@
-// src/components/common/CategorySlider/CategorySlider.js
-import React, { useRef, useEffect, useCallback, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import React, { useRef, useEffect, useCallback, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import {
   setCategoriesLoading,
   setCategoriesSuccess,
-  setCategoriesFailed
-} from '../../../store/categoriesSlice';
-import useApi from '../../../api/useApi';
-import './CategorySlider.css';
+  setCategoriesFailed,
+} from "../../../store/categoriesSlice";
+import useApi from "../../../api/useApi";
+import "./CategorySlider.css";
 
 const CategorySlider = () => {
   const dispatch = useDispatch();
-  const { categories, status, error } = useSelector((state) => state.categories);
+  const { categories, status, error } = useSelector(
+    (state) => state.categories
+  );
   const sliderRef = useRef(null);
   const [showArrows, setShowArrows] = useState({ left: false, right: true });
   const scrollTimeoutRef = useRef(null);
@@ -23,7 +24,7 @@ const CategorySlider = () => {
     const fetchCategories = async () => {
       dispatch(setCategoriesLoading());
       try {
-        const data = await get('http://localhost:5117/api/categories');
+        const data = await get("http://localhost:5117/api/categories");
         dispatch(setCategoriesSuccess(data));
       } catch (err) {
         dispatch(setCategoriesFailed(err.message));
@@ -43,7 +44,7 @@ const CategorySlider = () => {
         const { scrollLeft, scrollWidth, clientWidth } = sliderRef.current;
         setShowArrows({
           left: scrollLeft > 10,
-          right: scrollLeft < scrollWidth - clientWidth - 10
+          right: scrollLeft < scrollWidth - clientWidth - 10,
         });
       }
     }, 100);
@@ -51,13 +52,13 @@ const CategorySlider = () => {
 
   useEffect(() => {
     checkScrollPosition();
-    
+
     const slider = sliderRef.current;
     if (!slider) return;
 
-    slider.addEventListener('scroll', checkScrollPosition);
+    slider.addEventListener("scroll", checkScrollPosition);
     return () => {
-      slider.removeEventListener('scroll', checkScrollPosition);
+      slider.removeEventListener("scroll", checkScrollPosition);
       if (scrollTimeoutRef.current) {
         clearTimeout(scrollTimeoutRef.current);
       }
@@ -66,35 +67,38 @@ const CategorySlider = () => {
 
   const scroll = (direction) => {
     if (sliderRef.current) {
-      const scrollAmount = direction === 'left' ? -300 : 300;
+      const scrollAmount = direction === "left" ? -300 : 300;
       sliderRef.current.scrollBy({
         left: scrollAmount,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
       setTimeout(checkScrollPosition, 300);
     }
   };
 
   const getCategoryImage = (category) => {
-    if (!category.imageUrl) return '/images/categories/default.png';
-    // Assuming your API returns full URLs or relative paths from the public folder
+    if (!category.imageUrl) return "/images/categories/default.png";
     return category.imageUrl;
   };
 
-  if (status === 'loading') {
+  if (status === "loading") {
     return (
       <div className="category-slider-wrapper">
         <div className="category-slider-container">
           <div className="category-slider">
             {[...Array(8)].map((_, index) => (
               <div key={`skeleton-${index}`} className="category-item">
-                <div 
-                  className="category-image" 
-                  style={{ backgroundColor: '#e0e0e0' }} 
+                <div
+                  className="category-image skeleton"
+                  style={{ backgroundColor: "#e0e0e0" }}
                 />
-                <div 
-                  className="category-name" 
-                  style={{ backgroundColor: '#e0e0e0', width: '80px', height: '16px' }} 
+                <div
+                  className="category-name skeleton"
+                  style={{
+                    backgroundColor: "#e0e0e0",
+                    width: "80px",
+                    height: "16px",
+                  }}
                 />
               </div>
             ))}
@@ -104,7 +108,7 @@ const CategorySlider = () => {
     );
   }
 
-  if (status === 'failed') {
+  if (status === "failed") {
     return (
       <div className="category-slider-wrapper">
         <div className="category-slider-container">
@@ -120,9 +124,9 @@ const CategorySlider = () => {
     <div className="category-slider-wrapper">
       <div className="category-slider-container">
         {showArrows.left && (
-          <button 
-            className="slider-arrow left-arrow" 
-            onClick={() => scroll('left')}
+          <button
+            className="slider-arrow left-arrow"
+            onClick={() => scroll("left")}
             aria-label="Scroll left"
           >
             <FiChevronLeft />
@@ -132,16 +136,16 @@ const CategorySlider = () => {
         <div className="category-slider" ref={sliderRef}>
           {categories.map((category) => (
             <Link
-              to={`/subcategory/${category.id}`}
+              to={`/category/${category.id}`}
               key={category.id}
               className="category-item"
             >
-              <img 
-                src={getCategoryImage(category)} 
+              <img
+                src={getCategoryImage(category)}
                 alt={category.name}
                 className="category-image"
                 onError={(e) => {
-                  e.target.src = '/images/categories/default.png';
+                  e.target.src = "/images/categories/default.png";
                 }}
               />
               <span className="category-name">{category.name}</span>
@@ -150,9 +154,9 @@ const CategorySlider = () => {
         </div>
 
         {showArrows.right && (
-          <button 
-            className="slider-arrow right-arrow" 
-            onClick={() => scroll('right')}
+          <button
+            className="slider-arrow right-arrow"
+            onClick={() => scroll("right")}
             aria-label="Scroll right"
           >
             <FiChevronRight />

@@ -13,6 +13,14 @@ const cartSlice = createSlice({
     addItemToCart(state, action) {
       const newItem = action.payload;
       const existingItem = state.items.find(item => item.id === newItem.id);
+      const maxQuantity = newItem.maxQuantity || Infinity;
+      
+      // Prevent adding more than available stock
+      if (existingItem) {
+        if (existingItem.quantity >= maxQuantity) return state;
+      } else {
+        if (maxQuantity < 1) return state;
+      }
       
       if (!existingItem) {
         state.items.push({
@@ -31,6 +39,8 @@ const cartSlice = createSlice({
     removeItemFromCart(state, action) {
       const id = action.payload;
       const existingItem = state.items.find(item => item.id === id);
+      
+      if (!existingItem) return;
       
       if (existingItem.quantity === 1) {
         state.items = state.items.filter(item => item.id !== id);

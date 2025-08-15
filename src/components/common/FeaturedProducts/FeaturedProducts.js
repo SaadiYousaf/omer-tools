@@ -1,14 +1,12 @@
-import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import ProductCard from '../Card/ProductCard';
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import './FeaturedProducts.css';
 
 const FeaturedProducts = () => {
-  const sliderRef = useRef(null);
-  const [showLeftArrow, setShowLeftArrow] = useState(false);
-  const [showRightArrow, setShowRightArrow] = useState(false);
-  const [containerWidth, setContainerWidth] = useState(0);
+  const [visibleProducts, setVisibleProducts] = useState(8);
+  const [isLoading, setIsLoading] = useState(false);
+  const productsPerLoad = 8;
 
   // Get all products from Redux store
   const items = useSelector((state) => state.products.items);
@@ -19,113 +17,84 @@ const FeaturedProducts = () => {
       .filter(product => product.isFeatured)
       .map(product => ({
         ...product,
-        // Ensure consistent image structure with Subcategory component
         imageUrl: product.images?.[0]?.imageUrl || '/images/products/default.png'
       }));
   }, [items]);
 
-  // Rest of your existing code remains the same...
-  const checkScrollPosition = useCallback(() => {
-    if (sliderRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = sliderRef.current;
-      setShowLeftArrow(scrollLeft > 0);
-      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 1);
-    }
-  }, []);
-
+  // Handle infinite scroll
   useEffect(() => {
-    const handleResize = () => {
-      if (sliderRef.current?.parentElement) {
-        setContainerWidth(sliderRef.current.parentElement.clientWidth);
-      }
-      checkScrollPosition();
-    };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [checkScrollPosition]);
-
-  useEffect(() => {
-    const slider = sliderRef.current;
-    if (!slider) return;
-
-    let scrollTimeout;
     const handleScroll = () => {
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(checkScrollPosition, 100);
+      if (isLoading || visibleProducts >= featuredProducts.length) return;
+      
+      // Check if user has scrolled to the bottom
+      const scrollPosition = window.innerHeight + document.documentElement.scrollTop;
+      const pageHeight = document.documentElement.offsetHeight;
+      
+      if (scrollPosition >= pageHeight - 300) {
+        setIsLoading(true);
+        
+        // Simulate API loading delay
+        setTimeout(() => {
+          setVisibleProducts(prev => Math.min(prev + productsPerLoad, featuredProducts.length));
+          setIsLoading(false);
+        }, 500);
+      }
     };
 
-    slider.addEventListener('scroll', handleScroll);
-    return () => {
-      slider.removeEventListener('scroll', handleScroll);
-      clearTimeout(scrollTimeout);
-    };
-  }, [checkScrollPosition]);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [visibleProducts, isLoading, featuredProducts.length]);
 
+  // Reset visible products when featured products change
   useEffect(() => {
-    checkScrollPosition();
-  }, [featuredProducts.length, containerWidth, checkScrollPosition]);
-
-  const scroll = (direction) => {
-    if (sliderRef.current) {
-      const cardWidth = 250;
-      const scrollAmount = direction === 'left' ? -cardWidth * 2 : cardWidth * 2;
-      sliderRef.current.scrollBy({
-        left: scrollAmount,
-        behavior: 'smooth'
-      });
-      setTimeout(checkScrollPosition, 500);
-    }
-  };
+    setVisibleProducts(productsPerLoad);
+  }, [featuredProducts]);
 
   return (
     <div className="featured-products">
-      <h2>Featured Products</h2>
-      <div className="featured-products-container">
-        {featuredProducts.length > 0 ? (
-          <>
-            {showLeftArrow && (
-              <button 
-                className="slider-arrow left-arrow" 
-                onClick={() => scroll('left')}
-                aria-label="Scroll left"
-              >
-                <FiChevronLeft />
-              </button>
-            )}
-
-            <div 
-              className="featured-products-slider" 
-              ref={sliderRef}
-            >
-              {featuredProducts.map(product => (
-                <div key={product.id} className="slider-product-item">
-                  <ProductCard 
-                    product={product}
-                    description={product.description}
-                    linkTo={`/product/${product.id}`}
-                  />
-                </div>
-              ))}
-            </div>
-
-            {showRightArrow && (
-              <button 
-                className="slider-arrow right-arrow" 
-                onClick={() => scroll('right')}
-                aria-label="Scroll right"
-              >
-                <FiChevronRight />
-              </button>
-            )}
-          </>
-        ) : (
-          <div className="no-featured-products">
-            <p>No featured products available at the moment.</p>
-          </div>
+      <div className="header-section">
+     
+        {featuredProducts.length > 0 && (
+          <p className="subtitle">Discover our handpicked selection of premium items</p>
         )}
       </div>
+      
+      {featuredProducts.length > 0 ? (
+        <>
+          <div className="products-grid">
+            {featuredProducts.slice(0, visibleProducts).map(product => (
+              <div key={product.id} className="product-card">
+                <ProductCard 
+                  product={product}
+                  description={product.description}
+                  linkTo={`/product/${product.id}`}
+                />
+              </div>
+            ))}
+          </div>
+          
+          {isLoading && (
+            <div className="loading-indicator">
+              <div className="loader"></div>
+              <p>Loading more products...</p>
+            </div>
+          )}
+          
+          {visibleProducts >= featuredProducts.length && featuredProducts.length > 0 && (
+            <div className="end-of-products">
+              <p>You've viewed all featured products</p>
+              <button className="view-all-btn" onClick={() => alert('View all products clicked!')}>
+                View All Products
+              </button>
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="no-featured-products">
+          <p>No featured products available at the moment</p>
+          <p>Check back later for new arrivals</p>
+        </div>
+      )}
     </div>
   );
 };
