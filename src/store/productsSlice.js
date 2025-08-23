@@ -15,13 +15,37 @@ const BASE_URL = "http://localhost:5117";
 //   }
 // );
 // Async Thunks
+
+
+
+// Async Thunks
 export const fetchAllProducts = createAsyncThunk(
   "products/fetchAllProducts",
-  async (_, { rejectWithValue }) => {
+  async (queryParams = {}, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${BASE_URL}/api/products`);
+      // Build query string from parameters
+      const params = new URLSearchParams();
+      if (queryParams.brandId) params.append('brandId', queryParams.brandId);
+      if (queryParams.subcategoryId) params.append('subcategoryId', queryParams.subcategoryId);
+      if (queryParams.isRedemption !== undefined) params.append('isRedemption', queryParams.isRedemption);
+
+      const response = await fetch(`${BASE_URL}/api/products?${params}`);
       if (!response.ok) throw new Error("Failed to fetch products");
       return await response.json();
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
+
+export const fetchRedemptionProducts = createAsyncThunk(
+  "products/fetchRedemptionProducts",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/products/redemption`);
+      if (!response.ok) throw new Error("Failed to fetch redemption products");
+      const data = await response.json();
+      return data;
     } catch (err) {
       return rejectWithValue(err.message);
     }
@@ -89,13 +113,14 @@ export const fetchProductsBySubcategory = createAsyncThunk(
 const initialState = {
   items: [],
   filteredItems: [],
+  redemptionItems: [], // New state for redemption products
   currentProduct: null,
   status: "idle",
   error: null,
   productsBySubcategory: [],
   subcategoryProductsStatus: "idle",
+  redemptionStatus: "idle", // New status for redemption products
 };
-
 const productsSlice = createSlice({
   name: "products",
   initialState,
@@ -154,7 +179,17 @@ const productsSlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
       })
-
+      .addCase(fetchRedemptionProducts.pending, (state) => {
+        state.redemptionStatus = "loading";
+      })
+      .addCase(fetchRedemptionProducts.fulfilled, (state, action) => {
+        state.redemptionStatus = "succeeded";
+        state.redemptionItems = action.payload;
+      })
+      .addCase(fetchRedemptionProducts.rejected, (state, action) => {
+        state.redemptionStatus = "failed";
+        state.error = action.payload;
+      })
       // fetchFeaturedProducts
       .addCase(fetchFeaturedProducts.pending, (state) => {
         state.status = "loading";
@@ -199,6 +234,8 @@ export const selectFilteredProducts = (state) => state.products.filteredItems;
 export const selectCurrentProduct = (state) => state.products.currentProduct;
 export const selectProductsStatus = (state) => state.products.status;
 export const selectProductsError = (state) => state.products.error;
+export const selectRedemptionProducts = (state) => state.products.redemptionItems;
+export const selectRedemptionStatus = (state) => state.products.redemptionStatus;
 export const selectProductsBySubcategory = (state) =>
   state.products.productsBySubcategory;
 export const selectSubcategoryProductsStatus = (state) =>

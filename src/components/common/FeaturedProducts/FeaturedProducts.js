@@ -51,9 +51,9 @@ const FeaturedProducts = () => {
   }, [featuredProducts]);
 
   return (
-    <div className="featured-products">
+    <div className="featured-products-compact">
       <div className="header-section">
-     
+        <h2>Featured Products</h2>
         {featuredProducts.length > 0 && (
           <p className="subtitle">Discover our handpicked selection of premium items</p>
         )}
@@ -61,9 +61,9 @@ const FeaturedProducts = () => {
       
       {featuredProducts.length > 0 ? (
         <>
-          <div className="products-grid">
+          <div className="products-grid-compact">
             {featuredProducts.slice(0, visibleProducts).map(product => (
-              <div key={product.id} className="product-card">
+              <div key={product.id} className="product-card-compact-wrapper">
                 <ProductCard 
                   product={product}
                   description={product.description}

@@ -1,20 +1,26 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Payment from '../../components/common/Payment/Payment';
 import Confirmation from '../../components/common/Confirmation/Confirmation';
 import ScrollToTop from "../../components/common/Scroll/ScrollToTop";
+import axios from 'axios';
 import './Checkout.css';
 
 const Checkout = () => {
   const [step, setStep] = useState(1);
   const [shippingData, setShippingData] = useState(null);
   const [paymentData, setPaymentData] = useState(null);
+  const [paymentError, setPaymentError] = useState(null);
+  const [orderError, setOrderError] = useState(null);
+  const [orderLoading, setOrderLoading] = useState(false);
   const { items, totalAmount } = useSelector(state => state.cart);
+  const { user } = useSelector(state => state.auth);
   const navigate = useNavigate();
-    useEffect(() => {
-      window.scrollTo(0, 0);
-    }, []);
+  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const calculateShipping = () => {
     return totalAmount > 100 ? 0 : 10;
@@ -33,14 +39,94 @@ const Checkout = () => {
 
   const handlePaymentSubmit = (data) => {
     setPaymentData(data);
+    setPaymentError(null);
     nextStep();
   };
 
-  const handlePlaceOrder = () => {
-    // In a real app, you would process the order here
-    console.log('Order placed:', { shippingData, paymentData, items });
-    nextStep();
+  const handlePaymentError = (error) => {
+    setPaymentError(error);
   };
+
+ // In your Checkout.js component
+ const handlePlaceOrder = async () => {
+  setOrderLoading(true);
+  setOrderError(null);
+  
+  try {
+    const token = localStorage.getItem('token');
+    
+    // Format order data to match backend expectations
+    const orderData = {
+      sessionId: `session_${Date.now()}`,
+      userEmail: shippingData.email,
+      orderItems: items.map(item => ({
+        productId: item.id.toString(),
+        productName: item.name,
+        quantity: item.quantity,
+        unitPrice: item.price,
+        imageUrl: item.image || ''
+      })),
+      paymentMethod: 'credit_card',
+      paymentMethodId: 'pm_card_visa',
+      cardData: paymentData ? {
+        Number: paymentData.cardNumber.replace(/\s/g, ''),
+        Expiry: paymentData.expiryDate,
+        Cvc: paymentData.cvv,
+        Name: paymentData.cardName
+      } : null,
+      shippingAddress: {
+        fullName: shippingData.fullName,
+        addressLine1: shippingData.address,
+        addressLine2: '',
+        city: shippingData.city,
+        state: shippingData.state,
+        postalCode: shippingData.postalCode,
+        country: shippingData.country
+      }
+    };
+
+    console.log('Sending order data:', JSON.stringify(orderData, null, 2));
+
+    // Send order to backend
+    const response = await axios.post('http://localhost:5117/api/orders', orderData, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    console.log('Order response:', response.data);
+
+    if (response.data.status === "succeeded") {
+      console.log('Order created:', response.data);
+      nextStep();
+      
+      // Clear cart after successful order
+      // You might want to dispatch an action to clear the cart here
+    } else {
+      throw new Error(response.data.message || 'Failed to create order');
+    }
+  } catch (error) {
+    console.error('Order creation error:', error);
+    if (error.response?.data) {
+      console.error('Backend error details:', error.response.data);
+      
+      // Log validation errors if they exist
+      if (error.response.data.errors) {
+        console.error('Validation errors:', error.response.data.errors);
+      }
+      
+      setOrderError(error.response.data.title || error.response.data.message || 'Failed to place order. Please try again.');
+    } else if (error.request) {
+      console.error('Request error:', error.request);
+      setOrderError('Network error. Please check your connection and try again.');
+    } else {
+      setOrderError('Failed to place order. Please try again.');
+    }
+  } finally {
+    setOrderLoading(false);
+  }
+};
 
   const renderStep = () => {
     switch (step) {
@@ -57,6 +143,7 @@ const Checkout = () => {
           <Payment 
             onSubmit={handlePaymentSubmit} 
             onBack={prevStep}
+            onError={handlePaymentError}
             total={total}
           />
         );
@@ -69,6 +156,8 @@ const Checkout = () => {
             total={total}
             shippingCost={shippingCost}
             onConfirm={handlePlaceOrder}
+            loading={orderLoading}
+            error={orderError}
           />
         );
       case 4:
@@ -80,7 +169,7 @@ const Checkout = () => {
 
   return (
     <div className="checkout-page">
-         <ScrollToTop />
+      <ScrollToTop />
       <div className="checkout-header">
         <h2>Checkout</h2>
         <div className="checkout-steps">
@@ -90,11 +179,21 @@ const Checkout = () => {
           <span className={step >= 4 ? 'active' : ''}>Complete</span>
         </div>
       </div>
+      
+      {paymentError && (
+        <div className="global-payment-error">
+          <span>⚠️</span>
+          <p>{paymentError}</p>
+        </div>
+      )}
+      
       {renderStep()}
     </div>
   );
 };
 
+// The ShippingForm, OrderSummary, and OrderSuccess components remain the same
+// ... (they should be included in your file)
 const ShippingForm = ({ onSubmit, shippingCost, total }) => {
   const { items, totalAmount } = useSelector(state => state.cart);
   const [formData, setFormData] = useState({
@@ -107,16 +206,49 @@ const ShippingForm = ({ onSubmit, shippingCost, total }) => {
     country: 'US'
   });
 
+  const [errors, setErrors] = useState({});
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
+    
+    // Clear error when user starts typing
+    if (errors[e.target.name]) {
+      setErrors({
+        ...errors,
+        [e.target.name]: ''
+      });
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email is invalid';
+    }
+    if (!formData.address.trim()) newErrors.address = 'Address is required';
+    if (!formData.city.trim()) newErrors.city = 'City is required';
+    if (!formData.state.trim()) newErrors.state = 'State is required';
+    if (!formData.postalCode.trim()) newErrors.postalCode = 'Postal code is required';
+    
+    return newErrors;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    const formErrors = validateForm();
+    
+    if (Object.keys(formErrors).length === 0) {
+      onSubmit(formData);
+    } else {
+      setErrors(formErrors);
+    }
   };
 
   return (
@@ -131,9 +263,10 @@ const ShippingForm = ({ onSubmit, shippingCost, total }) => {
               name="fullName" 
               value={formData.fullName}
               onChange={handleChange}
-              required 
+              className={errors.fullName ? 'error' : ''}
               placeholder="John Doe" 
             />
+            {errors.fullName && <span className="error-text">{errors.fullName}</span>}
           </div>
           <div className="form-group">
             <label>Email</label>
@@ -142,9 +275,10 @@ const ShippingForm = ({ onSubmit, shippingCost, total }) => {
               name="email" 
               value={formData.email}
               onChange={handleChange}
-              required 
+              className={errors.email ? 'error' : ''}
               placeholder="john@example.com" 
             />
+            {errors.email && <span className="error-text">{errors.email}</span>}
           </div>
           <div className="form-group">
             <label>Address</label>
@@ -153,9 +287,10 @@ const ShippingForm = ({ onSubmit, shippingCost, total }) => {
               name="address" 
               value={formData.address}
               onChange={handleChange}
-              required 
+              className={errors.address ? 'error' : ''}
               placeholder="123 Main St" 
             />
+            {errors.address && <span className="error-text">{errors.address}</span>}
           </div>
           <div className="form-group">
             <label>City</label>
@@ -164,9 +299,10 @@ const ShippingForm = ({ onSubmit, shippingCost, total }) => {
               name="city" 
               value={formData.city}
               onChange={handleChange}
-              required 
+              className={errors.city ? 'error' : ''}
               placeholder="New York" 
             />
+            {errors.city && <span className="error-text">{errors.city}</span>}
           </div>
           <div className="form-row">
             <div className="form-group">
@@ -176,9 +312,10 @@ const ShippingForm = ({ onSubmit, shippingCost, total }) => {
                 name="state" 
                 value={formData.state}
                 onChange={handleChange}
-                required 
+                className={errors.state ? 'error' : ''}
                 placeholder="NY" 
               />
+              {errors.state && <span className="error-text">{errors.state}</span>}
             </div>
             <div className="form-group">
               <label>Postal Code</label>
@@ -187,9 +324,10 @@ const ShippingForm = ({ onSubmit, shippingCost, total }) => {
                 name="postalCode" 
                 value={formData.postalCode}
                 onChange={handleChange}
-                required 
+                className={errors.postalCode ? 'error' : ''}
                 placeholder="10001" 
               />
+              {errors.postalCode && <span className="error-text">{errors.postalCode}</span>}
             </div>
           </div>
           <div className="form-group">
@@ -198,7 +336,6 @@ const ShippingForm = ({ onSubmit, shippingCost, total }) => {
               name="country" 
               value={formData.country}
               onChange={handleChange}
-              required
             >
               <option value="US">United States</option>
               <option value="CA">Canada</option>

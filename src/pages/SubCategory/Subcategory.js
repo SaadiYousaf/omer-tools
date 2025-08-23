@@ -49,15 +49,15 @@ const Subcategory = () => {
   }, [categoryId, dispatch]);
 
   useEffect(() => {
-    if (subcategoryId) {
+    if (subcategoryId && subcategories.length > 0) {
       const subcategory = subcategories.find(
-        (sc) => sc.id === Number(subcategoryId)
+        (sc) => sc.id === subcategoryId // Removed Number conversion
       );
       if (subcategory) {
         dispatch(setCurrentSubcategory(subcategory));
       }
       dispatch(fetchProductsBySubcategory(subcategoryId));
-      dispatch(filterBySubcategory(Number(subcategoryId)));
+      dispatch(filterBySubcategory(subcategoryId)); // Removed Number conversion
     }
   }, [subcategoryId, subcategories, dispatch]);
 
@@ -74,8 +74,8 @@ const Subcategory = () => {
     });
     
     return {
-      minPriceAll: Math.min(...prices),
-      maxPriceAll: Math.max(...prices),
+      minPriceAll: prices.length > 0 ? Math.min(...prices) : 0,
+      maxPriceAll: prices.length > 0 ? Math.max(...prices) : 0,
       availableRatings: Array.from(ratings).sort((a, b) => b - a),
     };
   }, [allProducts]);

@@ -25,19 +25,24 @@ const SearchResultsPage = () => {
   const fetchResults = async () => {
     try {
       setLoading(true);
-      const query = new URLSearchParams({
-        term: searchParams.get('term') || '',
-        page,
-        pageSize,
-        sortBy: filters.sortBy,
-        ...(filters.categoryId && { categoryId: filters.categoryId }),
-        ...(filters.brandId && { brandId: filters.brandId }),
-        ...(filters.minPrice && { minPrice: filters.minPrice }),
-        ...(filters.maxPrice && { maxPrice: filters.maxPrice }),
-      });
-
-      const response = await fetch(`http://localhost:5117/api/search?${query}`);
       
+      // Build query parameters correctly
+      const params = {
+        term: searchParams.get('term') || '',
+        page: page,
+        pageSize: pageSize,
+        sortBy: filters.sortBy
+      };
+  
+      // Add optional parameters only if they have non-empty values
+      if (filters.categoryId) params.categoryId = filters.categoryId;
+      if (filters.brandId) params.brandId = filters.brandId;
+      if (filters.minPrice) params.minPrice = filters.minPrice;
+      if (filters.maxPrice) params.maxPrice = filters.maxPrice;
+  
+      const queryString = new URLSearchParams(params).toString();
+      const response = await fetch(`http://localhost:5117/api/search?${queryString}`);
+       
       if (!response.ok) throw new Error('Network response was not ok');
       
       const data = await response.json();
@@ -59,11 +64,13 @@ const SearchResultsPage = () => {
   const handleFilterChange = (filterType, value) => {
     setFilters(prev => ({
       ...prev,
-      [filterType]: value
+      [filterType]: 
+        filterType === 'minPrice' || filterType === 'maxPrice' 
+          ? Number(value) 
+          : value
     }));
-    setPage(1); // Reset to first page when filters change
+    setPage(1);
   };
-
   // Handle pagination
   const handlePageChange = (newPage) => {
     setPage(newPage);

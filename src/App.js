@@ -16,6 +16,8 @@ import ComingSoon from "./pages/CommingSoon/CommingSoon";
 import ProfilePage from "./pages/UserProfile/ProfilePage";
 import Category from "./pages/Category/Category";
 import OrderHistoryPage from "./pages/OrderHistory/OrderHistoryPage";
+import OrderHistory from "./components/common/OrderSummary/OrderSummary";
+import Register from "./components/common/Registration/Register";
 import Subcategory from "./pages/SubCategory/Subcategory";
 import CategorySubcategories from "./components/common/Subcategory/CategorySubcategories";
 import SubcategoryWrapper from "./components/common/Subcategory/SubcategoryWrapper";
@@ -23,6 +25,8 @@ import ProductUpload from "./pages/ProductUpload/ProductUpload";
 import ScrollToTop from "./components/common/Scroll/ScrollToTop";
 import SearchResultsPage from './pages/SearchResultPages/SearchResultPage';
 import ShopByBrand from "./pages/ShopbyBrand/ShopByBrand";
+import RedemptionProducts from "./pages/Redemption/RedemptionProducts";
+import OmerToolsStoreLocator from "./components/common/Map/OmerToolsStoreLocator";
 
 
 function App() {
@@ -48,16 +52,31 @@ function App() {
           <Route path="/clearance" element={<ClearanceSale />} />
           <Route path="/create-your-kit" element={<ComingSoon />} />
           <Route path="/brand/:brandId" element={<BrandProducts />} />
+          <Route path="/redemption" element={<RedemptionProducts />} />
+          <Route path="/store-locations" element={<OmerToolsStoreLocator/>} />
+
+    
+          <Route path="/cart" element={<Cart/>}/>
           
+          <Route path="/orders" element={
+            <ProtectedRoute>
+              <OrderHistory />
+            </ProtectedRoute>
+          } />
+             <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/checkout" element={
+            <ProtectedRoute>
+              <Checkout />
+            </ProtectedRoute>
+          } />
           {/* Protected Routes */}
-          <Route element={<ProtectedRoute />}>
+          {/* <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/orders" element={<OrderHistoryPage />} />
             <Route path="/membership" element={<MembershipPage />} />
             <Route path="/welcome" element={<WelcomePage />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/checkout" element={<Checkout />} />
-          </Route>
+            
+          </Route> */}
         </Routes>
       </main>
       <Footer />

@@ -1,11 +1,20 @@
+// ProtectedRoute.js
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
-const ProtectedRoute = () => {
-  const { isAuthenticated } = useSelector((state) => state.auth);
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useSelector(state => state.auth);
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
 };
 
 export default ProtectedRoute;

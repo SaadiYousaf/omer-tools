@@ -35,10 +35,13 @@ const BrandSlider = () => {
   if (status === 'loading') {
     return (
       <section className="brand-slider-section">
-        <div className="container brand-container">
-          {[...Array(4)].map((_, index) => (
-            <div key={`skeleton-${index}`} className="brand-card skeleton" />
-          ))}
+        <div className="container">
+          <h2 className="brands-heading">Our Brands</h2>
+          <div className="brand-container">
+            {[...Array(8)].map((_, index) => (
+              <div key={`skeleton-${index}`} className="brand-card skeleton" />
+            ))}
+          </div>
         </div>
       </section>
     );
@@ -47,8 +50,8 @@ const BrandSlider = () => {
   if (status === 'failed') {
     return (
       <section className="brand-slider-section">
-        <div className="container brand-container">
-          <div style={{ textAlign: 'center', padding: '1rem', width: '100%' }}>
+        <div className="container">
+          <div style={{ textAlign: 'center', padding: '2rem' }}>
             Error loading brands: {error}
           </div>
         </div>
@@ -58,21 +61,24 @@ const BrandSlider = () => {
 
   return (
     <section className="brand-slider-section">
-      <div className="container brand-container">
-        {brands.slice(0, 8).map((brand) => (
-          <Link to={`/brand/${brand.id}`} key={brand.id} className="brand-link">
-            <div className="brand-card">
-              <img
-                src={getBrandImage(brand)}
-                alt={brand.name}
-                className="brand-image"
-                onError={(e) => {
-                  e.target.src = '/images/brands/default.png';
-                }}
-              />
-            </div>
-          </Link>
-        ))}
+      <div className="container">
+        <h2 className="brands-heading">Our Brands</h2>
+        <div className="brand-container">
+          {brands.slice(0, 8).map((brand) => (
+            <Link to={`/brand/${brand.id}`} key={brand.id} className="brand-link">
+              <div className="brand-card">
+                <img
+                  src={getBrandImage(brand)}
+                  alt={brand.name}
+                  className="brand-image"
+                  onError={(e) => {
+                    e.target.src = '/images/brands/default.png';
+                  }}
+                />
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
     </section>
   );
