@@ -1,8 +1,8 @@
 // src/components/common/HeroSlider/HeroSlider.js
 import React, { useState, useEffect } from 'react';
 import './HeroSlider.css';
-import slide1 from '../../../assets/images/hero-slide1.jpg';
-import slide2 from '../../../assets/images/new-arrivals.jpg';
+import slide1 from '../../../assets/images/pb.jpg';
+import slide2 from '../../../assets/images/dew2.jpg';
 import slide3 from '../../../assets/images/free-shipping.jpg';
 
 const slides = [

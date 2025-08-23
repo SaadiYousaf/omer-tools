@@ -295,7 +295,7 @@ body {
 .current-price {
   font-size: 20px;
   font-weight: 800;
-  color: var(--primary);
+  color: #072c62;
   line-height: 1;
 }
 
@@ -444,12 +444,12 @@ body {
 }
 
 .cart-btn {
-  background: var(--primary);
+  background: #072c62;
   color: white;
 }
 
 .cart-btn:hover {
-  background: var(--primary-dark);
+  background: #0f8bf9;
   transform: translateY(-3px);
   box-shadow: 0 8px 20px rgba(0, 102, 204, 0.3);
 }

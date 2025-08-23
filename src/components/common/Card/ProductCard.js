@@ -154,6 +154,7 @@ const ProductCard = ({ product, linkTo }) => {
             <span className="current-price">${price.toFixed(2)}</span>
           )}
         </div>
+          <div style={{ flexGrow: 1 }}></div>
         
         <div className="product-actions">
           <button 

@@ -18,7 +18,7 @@
 
 /* Top Bar */
 .top-bar {
-  background-color: #0056b3;
+  background-color: #072c62;
   padding: 8px 0;
   font-size: 13px;
   color: white;
@@ -99,7 +99,7 @@
 
 .search-input-container {
   display: flex;
-  border: 2px solid #0056b3;
+  border: 2px solid #072c62;
   border-radius: 30px;
   overflow: hidden;
   background: #fff;
@@ -109,7 +109,7 @@
 
 .search-input-container:focus-within {
   box-shadow: 0 2px 12px rgba(0, 86, 179, 0.3);
-  border-color: #003d7a;
+  border-color: #072c62;
 }
 
 .search-input {
@@ -143,7 +143,7 @@
 }
 
 .search-btn {
-  background: #0056b3;
+  background: #072c62;
   color: #fff;
   border: none;
   width: 50px;
@@ -156,7 +156,7 @@
 }
 
 .search-btn:hover {
-  background: #003d7a;
+  background: #072c62;
 }
 
 /* Suggestions Dropdown */
@@ -188,7 +188,7 @@
 
 .suggestion-count {
   background: #eef5ff;
-  color: #0056b3;
+  color: #072c62;
   padding: 2px 8px;
   border-radius: 20px;
   font-size: 12px;
@@ -262,7 +262,7 @@
 .suggestion-type {
   font-size: 12px;
   background: #eef5ff;
-  color: #0056b3;
+  color: #072c62;
   padding: 2px 8px;
   border-radius: 20px;
   font-weight: 600;
@@ -290,7 +290,7 @@
   width: 20px;
   height: 20px;
   border: 3px solid #f3f3f3;
-  border-top: 3px solid #0056b3;
+  border-top: 3px solid #072c62;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -383,7 +383,7 @@
 
 .user-dropdown-menu .dropdown-item:hover {
   background-color: #f5f5f5;
-  color: #0056b3;
+  color: #072c62;
 }
 
 .cart-container {
@@ -426,7 +426,7 @@
 
 /* Navigation */
 .navbar {
-  background-color: #0056b3;
+  background-color: #072c62;
   padding: 0;
 }
 
@@ -459,7 +459,7 @@
 
 .nav-item a:hover,
 .nav-item .dropdown-toggle:hover {
-  background-color: #003d7a;
+  background-color: #0f8bf9;
 }
 
 /* Coming Soon Badge */
@@ -480,7 +480,7 @@
   position: absolute;
   top: 100%;
   left: 0;
-  background: white;
+  background: #072c62;
   min-width: 220px;
   box-shadow: 0 8px 16px rgba(0,0,0,0.2);
   z-index: 1100;

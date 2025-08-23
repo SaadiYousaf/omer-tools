@@ -123,6 +123,7 @@
 /* Product Info */
 .product-info {
   padding: 16px;
+  border-radius: 0%;
 }
 
 .brand-tag {
@@ -213,23 +214,23 @@
 /* Product Actions */
 .add-to-cart-btn {
   width: 100%;
-  background: #e01e3c;
+  background: #072c62;
   color: white;
   border: none;
   border-radius: 4px;
   padding: 10px 16px;
   font-weight: 200;
-  font-size: 8px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   transition: all 0.2s ease;
+  
 }
 
 .add-to-cart-btn:hover:not(.disabled) {
-  background: #c11a34;
+  background: #0f8bf9;
 }
 
 .add-to-cart-btn.disabled {
