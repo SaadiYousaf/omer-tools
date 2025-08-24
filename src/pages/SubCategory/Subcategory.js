@@ -85,10 +85,17 @@ const Subcategory = () => {
     let filtered = [...allProducts];
     
     // Brand filter
-    if (filters.brandIds.length > 0) {
-      filtered = filtered.filter(
-        (product) => product.brand && filters.brandIds.includes(product.brand.id)
-      );
+    // if (filters.brandIds.length > 0) {
+    //   filtered = filtered.filter(
+    //     (product) => product.brand && filters.brandIds.includes(product.brand.id)
+    //   );
+    // }
+
+        if (filters.brandIds.length > 0) {
+      filtered = filtered.filter(product => {
+        const brandId = product?.brandId?.toString().trim();
+        return filters.brandIds.includes(brandId);
+      });
     }
     
     // Price range filter
