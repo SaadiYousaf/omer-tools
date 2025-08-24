@@ -82,7 +82,7 @@ const Category = () => {
               brands.map(brand => (
                 <div key={brand.id} className="brand-item">
                   <Link 
-                    to={`/brands/${brand.id}`}
+                    to={`/brand/${brand.id}`}
                     className="brand-link"
                   >
                     <img 
