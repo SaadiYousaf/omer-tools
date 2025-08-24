@@ -129,12 +129,12 @@ const productsSlice = createSlice({
       state.currentProduct = action.payload;
     },
     filterByBrand: (state, action) => {
-      const brandId = Number(action.payload);
-      if (!isNaN(brandId)) {
+      const brandId = (action.payload);
+    
         state.filteredItems = state.items.filter(
-          (product) => Number(product.brandId) === brandId
+          (product) => (product.brandId) === brandId
         );
-      }
+      
     },
     filterByCategory: (state, action) => {
       const categoryId = action.payload;

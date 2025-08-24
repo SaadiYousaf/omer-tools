@@ -35,15 +35,15 @@ const BrandProducts = () => {
       dispatch(fetchAllProducts())
         .unwrap()
         .then(() => {
-          dispatch(filterByBrand(Number(brandId)));
+          dispatch(filterByBrand(brandId));
         });
     } else {
-      dispatch(filterByBrand(Number(brandId)));
+      dispatch(filterByBrand(brandId));
     }
   }, [brandId, dispatch, items.length]);
 
   // Find brand details
-  const brand = brands.find(b => b.id === Number(brandId));
+  const brand = brands.find(b => b.id === (brandId));
   const brandName = brand?.name || `Brand #${brandId}`;
   const brandDescription = brand?.description || 'Premium tools for professionals';
 
