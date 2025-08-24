@@ -195,20 +195,26 @@
 
 /* Price */
 .price-container {
-  margin-bottom: 16px;
+   margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 4px; /* Add some spacing between prices */
+  min-height: 16px; /* Make sure it doesn't shift height */
 }
 
 .current-price {
-  font-size: 8px;
+font-size: 8px;
   font-weight: 800;
   color: #272727;
+  line-height: 1; /* Keeps vertical spacing tight */
 }
 
 .original-price {
-  font-size: 8px;
+   font-size: 20px;
+   font-weight: 300;
   color: #999;
   text-decoration: line-through;
-  margin-left: 8px;
+  line-height: 1;
 }
 
 /* Product Actions */
@@ -226,7 +232,7 @@
   justify-content: center;
   gap: 8px;
   transition: all 0.2s ease;
-  
+
 }
 
 .add-to-cart-btn:hover:not(.disabled) {
@@ -294,12 +300,12 @@
   .image-container {
     height: 180px;
   }
-  
+
   .product-title {
     font-size: 15px;
     height: 18px;
   }
-    
+
   .current-price {
     font-size: 8px;
   }

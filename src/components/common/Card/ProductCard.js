@@ -147,14 +147,13 @@ const ProductCard = ({ product, linkTo }) => {
         <div className="price-container">
           {hasDiscount ? (
             <>
-              <span className="current-price">${discountPrice.toFixed(2)}</span>
-              <span className="original-price">${price.toFixed(2)}</span>
+            <span className="current-price">${discountPrice.toFixed(2)}</span>
+            <span className="original-price">${price.toFixed(2)}</span>
             </>
           ) : (
             <span className="current-price">${price.toFixed(2)}</span>
           )}
         </div>
-          <div style={{ flexGrow: 1 }}></div>
         
         <div className="product-actions">
           <button 
