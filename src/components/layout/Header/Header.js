@@ -161,6 +161,10 @@ const Header = () => {
     dispatch(logout());
     navigate("/");
   };
+  const handleuserProfile = () => {
+    navigate("/profile");
+  };
+  
 
   const toggleDropdown = (dropdownName) => {
     setActiveDropdown(activeDropdown === dropdownName ? null : dropdownName);
@@ -317,6 +321,10 @@ const Header = () => {
                     <button onClick={handleLogout} className="dropdown-item">
                       Logout
                     </button>
+                    <button onClick={handleuserProfile} className="dropdown-item">
+                      User Profile
+                    </button>
+
                   </div>
                 </div>
               ) : (

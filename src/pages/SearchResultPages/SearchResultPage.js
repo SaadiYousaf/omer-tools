@@ -89,7 +89,6 @@ const SearchResultsPage = () => {
       images: [{ imageUrl: product.imageUrl }],
       brand: product.brand,
       stockStatus: product.stockStatus,
-      stockQuantity:product.stockQuantity,
       sku: product.SKU,
       category: product.category,
       isFeatured: product.isFeatured

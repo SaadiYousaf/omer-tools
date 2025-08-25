@@ -1,3 +1,4 @@
+// src/store/slices/authSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
@@ -54,18 +55,14 @@ export const verifyToken = createAsyncThunk(
         return rejectWithValue('No token found');
       }
 
-      const response = await axios.get('http://localhost:5117/api/auth/verify', {
+      // Use the profile endpoint to verify the token
+      const response = await axios.get('http://localhost:5117/api/users/profile', {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      if (response.data.valid) {
-        const user = JSON.parse(localStorage.getItem('user'));
-        return user;
-      } else {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        return rejectWithValue('Token is invalid');
-      }
+      // If we get here, the token is valid
+      const user = JSON.parse(localStorage.getItem('user'));
+      return user;
     } catch (err) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');

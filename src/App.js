@@ -1,4 +1,6 @@
-import React from "react";
+// App.js
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Routes, Route } from "react-router-dom";
 import Header from "./components/layout/Header/Header";
 import Footer from "./components/layout/Footer/Footer";
@@ -27,14 +29,33 @@ import SearchResultsPage from './pages/SearchResultPages/SearchResultPage';
 import ShopByBrand from "./pages/ShopbyBrand/ShopByBrand";
 import RedemptionProducts from "./pages/Redemption/RedemptionProducts";
 import OmerToolsStoreLocator from "./components/common/Map/OmerToolsStoreLocator";
-
+import AddressBookPage from "./pages/UserProfile/AddressBook/AddressBookPage";
+import AccountSettingsPage from "./pages/UserProfile/AccountSetting/AccountSettings";
+import PaymentMethodsPage from "./pages/UserProfile/PaymentMethod/PaymentMethod";
+import { verifyToken } from "./store/authSlice";
+import OrderDetailsPage from "./pages/OrderDetails/OrderDetailsPage";
 
 function App() {
+  const dispatch = useDispatch();
+  const { isAuthenticated, loading } = useSelector(state => state.auth);
+
+  // Check if user is logged in on app load
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      dispatch(verifyToken());
+    }
+  }, [dispatch]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="app">
       <Header />
       <main>
-      <ScrollToTop/>
+        <ScrollToTop/>
         <Routes>
           <Route path="/" element={<Home />} />
           
@@ -46,7 +67,8 @@ function App() {
           <Route path="/subcategory/:categoryId" element={<CategorySubcategories />} />
           <Route path="/upload" element={<ProductUpload />} />
           <Route path="/shop-by-brand" element={<ShopByBrand/>} />
-           {/* Other Routes */}
+          
+          {/* Other Routes */}
           <Route path="/product/:productId" element={<Product />} />
           <Route path="/login" element={<Login />} />
           <Route path="/clearance" element={<ClearanceSale />} />
@@ -54,29 +76,45 @@ function App() {
           <Route path="/brand/:brandId" element={<BrandProducts />} />
           <Route path="/redemption" element={<RedemptionProducts />} />
           <Route path="/store-locations" element={<OmerToolsStoreLocator/>} />
-
-    
           <Route path="/cart" element={<Cart/>}/>
+          <Route path="/orders" element={<OrderHistoryPage />} />
+          <Route path="/orders/:orderId" element={<OrderHistory />} />
+        <Route path="/addresses" element={<AddressBookPage />} />
+        <Route path="/payment-methods" element={<PaymentMethodsPage />} />
+        <Route path="/account-settings" element={<AccountSettingsPage />} />
+        <Route path="/orders/:orderId" element={<OrderDetailsPage />} />
           
           <Route path="/orders" element={
             <ProtectedRoute>
               <OrderHistory />
             </ProtectedRoute>
           } />
-             <Route path="/login" element={<Login />} />
+          
+          <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          
           <Route path="/checkout" element={
             <ProtectedRoute>
               <Checkout />
             </ProtectedRoute>
           } />
+          
           {/* Protected Routes */}
-          {/* <Route element={<ProtectedRoute />}>
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/membership" element={<MembershipPage />} />
-            <Route path="/welcome" element={<WelcomePage />} />
-            
-          </Route> */}
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          } />
+          <Route path="/membership" element={
+            <ProtectedRoute>
+              <MembershipPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/welcome" element={
+            <ProtectedRoute>
+              <WelcomePage />
+            </ProtectedRoute>
+          } />
         </Routes>
       </main>
       <Footer />

@@ -1,23 +1,16 @@
-// src/api/axiosConfig.js
+// utils/axiosConfig.js
 import axios from 'axios';
 
-// Create axios instance with base configuration
-const api = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL || 'http://localhost:5117/api',
-  headers: {
-    'Content-Type': 'application/json',
-    // You can add any default headers here
-  },
-});
+// Set base URL
+axios.defaults.baseURL = 'http://localhost:5117';
 
-// Add request interceptor
-api.interceptors.request.use(
+// Add a request interceptor to include the token
+axios.interceptors.request.use(
   (config) => {
-    // You can modify requests here (e.g., add auth token)
-    // const token = localStorage.getItem('token');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {
@@ -25,32 +18,18 @@ api.interceptors.request.use(
   }
 );
 
-// Add response interceptor
-api.interceptors.response.use(
-  (response) => {
-    // You can modify responses here
-    return response;
-  },
+// Add a response interceptor to handle token expiration
+axios.interceptors.response.use(
+  (response) => response,
   (error) => {
-    // Handle errors globally
-    if (error.response) {
-      // The request was made and the server responded with a status code
-      console.error('API Error:', error.response.status, error.response.data);
-      
-      // You can add specific error handling here
-      // if (error.response.status === 401) {
-      //   // Handle unauthorized
-      // }
-    } else if (error.request) {
-      // The request was made but no response was received
-      console.error('API Error: No response received', error.request);
-    } else {
-      // Something happened in setting up the request
-      console.error('API Error:', error.message);
+    if (error.response?.status === 401) {
+      // Token is invalid or expired
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
     }
-    
     return Promise.reject(error);
   }
 );
 
-export default api;
+export default axios;

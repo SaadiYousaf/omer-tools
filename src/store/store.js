@@ -5,6 +5,7 @@ import categoriesReducer from './categoriesSlice';
 import authReducer, { verifyToken } from './authSlice'; // Import verifyToken directly
 import brandsReducer from './brandsSlice';
 import subcategoriesReducer from './subcategoriesSlice';
+import profileReducer from './profileSlice';
 import { setupListeners } from '@reduxjs/toolkit/query';
 
 const store = configureStore({
@@ -12,6 +13,7 @@ const store = configureStore({
     cart: cartReducer,
     products: productsReducer,
     categories: categoriesReducer,
+    profile: profileReducer,
     auth: authReducer,
     brands: brandsReducer,
     subcategories: subcategoriesReducer
