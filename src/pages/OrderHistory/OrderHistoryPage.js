@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import Loading from '../../components/common/Loading/Loading';
 import axios from 'axios';
 import './OrderHistoryPage.css';
 
@@ -72,7 +73,7 @@ const OrderHistoryPage = () => {
     return (
       <div className="order-history-container">
         <div className="loading">
-          <p>Loading your orders...</p>
+        <Loading size="medium" variant="spinner" color="primary" />
         </div>
       </div>
     );

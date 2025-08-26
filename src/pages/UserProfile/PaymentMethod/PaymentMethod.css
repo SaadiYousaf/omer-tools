@@ -1,0 +1,167 @@
+/* src/pages/PaymentMethodsPage.css */
+
+.payment-methods-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: Arial, sans-serif;
+  }
+  
+  .page-header {
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  
+  .page-header h1 {
+    font-size: 2rem;
+    margin: 0;
+    color: #333;
+  }
+  
+  .page-header p {
+    font-size: 1rem;
+    color: #666;
+  }
+  .add-to-cart-btn {
+    width: 100%;
+    background: #072c62;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 16px;
+    font-weight: 200;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+  
+  }
+  
+  .add-to-cart-btn:hover:not(.disabled) {
+    background: #0f8bf9;
+  }
+  
+  .add-to-cart-btn.disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+  .loading,
+  .error {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #555;
+  }
+  
+  .btn {
+    display: inline-block;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+  }
+  
+  .btn-primary {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  .btn-primary:hover {
+    background-color: #0056b3;
+  }
+  
+  .btn-text {
+    background: none;
+    border: none;
+    color: #007bff;
+    padding: 0.4rem 0.6rem;
+    cursor: pointer;
+  }
+  
+  .btn-text:hover {
+    text-decoration: underline;
+  }
+  
+  .add-method-btn {
+    margin-bottom: 1.5rem;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 2rem;
+    border: 1px dashed #ccc;
+    border-radius: 12px;
+    background-color: #f9f9f9;
+  }
+  
+  .empty-state h2 {
+    margin: 0;
+    color: #333;
+  }
+  
+  .empty-state p {
+    color: #666;
+  }
+  
+  .payment-methods-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .payment-method-card {
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 1.2rem;
+    background-color: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .payment-method-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  }
+  
+  .payment-method-card.default {
+    border: 2px solid #28a745;
+  }
+  
+  .default-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: #28a745;
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: bold;
+    padding: 0.4rem 0.7rem;
+    border-radius: 8px;
+  }
+  
+  .method-details {
+    margin-bottom: 1rem;
+  }
+  
+  .method-details h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+    color: #333;
+  }
+  
+  .method-details p {
+    margin: 0.3rem 0;
+    font-size: 0.9rem;
+    color: #555;
+  }
+  
+  .method-actions {
+    display: flex;
+    justify-content: flex-start;
+    gap: 0.8rem;
+  }
+  

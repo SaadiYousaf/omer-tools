@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { userService } from '../../../services';
 import PaymentMethodForm from '../../../components/common/PaymentMethodForm/PaymentMethodForm';
-//import './PaymentMethodsPage.css';
+import Loading from '../../../components/common/Loading/Loading';
+import './PaymentMethod.css';
 
 const PaymentMethodsPage = () => {
   const [paymentMethods, setPaymentMethods] = useState([]);
@@ -87,7 +88,7 @@ const PaymentMethodsPage = () => {
     setEditingMethod(null);
   };
 
-  if (loading) return <div className="loading">Loading payment methods...</div>;
+  if (loading) return  <Loading size="medium" variant="spinner" color="primary" />;;
   if (error) return <div className="error">Error: {error}</div>;
 
   return (
@@ -105,7 +106,7 @@ const PaymentMethodsPage = () => {
         />
       ) : (
         <>
-          <button className="btn btn-primary add-method-btn" onClick={handleAddMethod}>
+          <button className="add-to-cart-btn add-method-btn" onClick={handleAddMethod}>
             Add New Payment Method
           </button>
 

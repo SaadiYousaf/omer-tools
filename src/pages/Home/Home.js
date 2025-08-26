@@ -75,7 +75,7 @@ const Home = () => {
       {/* Featured Products */}
       <section className="featured-products-section">
         <div className="container">
-          <h2>Featured Products</h2>
+        
           <FeaturedProducts products={featuredProducts} />
         </div>
       </section>

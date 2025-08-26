@@ -1,6 +1,6 @@
 // src/components/PaymentMethodForm.js
 import React, { useState, useEffect } from 'react';
-//import './PaymentMethodForm.css';
+import './PaymentMethodForm.css';
 
 const PaymentMethodForm = ({ method, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -160,7 +160,7 @@ const PaymentMethodForm = ({ method, onSubmit, onCancel }) => {
           <button type="button" className="btn btn-secondary" onClick={onCancel}>
             Cancel
           </button>
-          <button type="submit" className="btn btn-primary">
+          <button type="submit" className="add-to-cart-btn">
             {method ? 'Update Payment Method' : 'Add Payment Method'}
           </button>
         </div>

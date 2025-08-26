@@ -192,7 +192,7 @@ const Subcategory = () => {
     return subcategory.imageUrl;
   };
 
-  if (status === "loading") return <Loading fullPage />;
+  if (status === "loading") return <Loading size="medium" variant="spinner" color="primary" />;
   if (status === "failed") return <ErrorMessage message={error} />;
   if (!currentSubcategory) return <Loading fullPage />;
 

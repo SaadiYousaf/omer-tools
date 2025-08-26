@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { fetchUserProfile, fetchUserOrders } from '../../store/profileSlice';
+import Loading from '../../components/common/Loading/Loading';
 import './ProfilePage.css';
 
 const ProfilePage = () => {
@@ -16,7 +17,7 @@ const ProfilePage = () => {
   }, [dispatch]);
 
   if (loading) {
-    return <div className="loading">Loading...</div>;
+    return <Loading size="medium" variant="spinner" color="primary" />;
   }
 
   if (error) {

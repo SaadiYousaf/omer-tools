@@ -75,7 +75,8 @@ const Category = () => {
             {isLoading ? (
               // Show skeleton loaders while loading
               Array.from({ length: 8 }).map((_, index) => (
-                <BrandSkeleton key={`brand-skeleton-${index}`} />
+                // <BrandSkeleton key={`brand-skeleton-${index}`} />
+                <Loading size="medium" variant="spinner" color="primary" />
               ))
             ) : (
               // Show actual brands when loaded
@@ -109,7 +110,7 @@ const Category = () => {
           {isLoading ? (
             // Show skeleton loaders while loading
             Array.from({ length: 6 }).map((_, index) => (
-              <SubcategorySkeleton key={`subcategory-skeleton-${index}`} />
+              <Loading size="medium" variant="spinner" color="primary" />
             ))
           ) : subcategories.length === 0 ? (
             <p className="no-subcategories">No subcategories found for this category.</p>

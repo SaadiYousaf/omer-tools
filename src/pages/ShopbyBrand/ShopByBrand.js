@@ -5,7 +5,7 @@ import { fetchBrands, selectAllBrands, selectBrandsStatus, selectBrandsError } f
 import BrandCard from '../../components/common/BrandSlider/BrandCard/BrandCard';
 import ProductGrid from '../../components/common/ProductGrid/ProductGrid';
 import BrandFilter from '../../components/common/BrandSlider/BrandFilter/BrandFilter';
-import LoadingSpinner from '../../components/common/Loading/Loading';
+import Loading from '../../components/common/Loading/Loading';
 import './ShopByBrand.css';
 
 const ShopByBrand = () => {
@@ -89,7 +89,7 @@ const ShopByBrand = () => {
           </div>
           {isLoading ? (
             <div className="loading-container">
-              <LoadingSpinner />
+             <Loading size="medium" variant="spinner" color="primary" />
             </div>
           ) : (
             <div className="brands-grid">
@@ -123,7 +123,7 @@ const ShopByBrand = () => {
           
           {isLoading ? (
             <div className="loading-container">
-              <LoadingSpinner />
+              <Loading size="medium" variant="spinner" color="primary" />
             </div>
           ) : products.length === 0 ? (
             <div className="no-products">

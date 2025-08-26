@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import Loading from '../../components/common/Loading/Loading';
 import ProductGrid from '../../components/common/ProductGrid/ProductGrid';
 import './SearchResultPage.css';
 
@@ -95,7 +96,7 @@ const SearchResultsPage = () => {
     }));
   };
 
-  if (loading) return <div className="search-loading">Loading results...</div>;
+  if (loading) return <Loading size="medium" variant="spinner" color="primary" />;
   if (error) return <div className="search-error">Error: {error}</div>;
 
   return (

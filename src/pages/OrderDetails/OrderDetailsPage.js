@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Container, Row, Col, Card, Badge, Button, Table, Alert, Spinner } from 'react-bootstrap';
 import axios from 'axios';
+import Loading from '../../components/common/Loading/Loading';
 import './OrderDetailsPage.css';
 
 const OrderDetailsPage = () => {
@@ -58,7 +59,7 @@ const OrderDetailsPage = () => {
       <Container className="order-details-container">
         <div className="text-center py-5">
           <Spinner animation="border" role="status" className="mb-3" />
-          <p>Loading order details...</p>
+          <Loading size="medium" variant="spinner" color="primary" />
         </div>
       </Container>
     );

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import Loading from '../../components/common/Loading/Loading';
 import {
   fetchRedemptionProducts,
   selectRedemptionProducts,
@@ -78,7 +79,7 @@ const RedemptionProducts = () => {
         </div>
         <div className="loading-indicator">
           <div className="loader"></div>
-          <p>Loading redemption products...</p>
+          <Loading size="medium" variant="spinner" color="primary" />
         </div>
       </div>
     );

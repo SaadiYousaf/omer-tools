@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { userService } from '../../../services';
 import AddressForm from '../../../components/common/AddressForm/AddressForm';
+import Loading from '../../../components/common/Loading/Loading';
 import './AddressBookPage.css';
 
 const AddressBookPage = () => {
@@ -87,7 +88,7 @@ const AddressBookPage = () => {
     setEditingAddress(null);
   };
 
-  if (loading) return <div className="loading">Loading addresses...</div>;
+  if (loading) return <Loading size="medium" variant="spinner" color="primary" />;
   if (error) return <div className="error">Error: {error}</div>;
 
   return (

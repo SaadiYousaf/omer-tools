@@ -2,6 +2,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams,Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import Loading from '../../components/common/Loading/Loading';
 import {
   fetchProductById,
   fetchAllProducts,
@@ -221,11 +222,7 @@ const Product = () => {
 
   // Render states
   if (status === 'loading') {
-    return (
-      <div className="loading-container">
-        <div className="loading-spinner"></div>
-      </div>
-    );
+    return <Loading size="medium" variant="spinner" color="primary" />
   }
   if (status === 'failed') {
     return <div className="error-message">{error || 'Failed to load product'}</div>;
