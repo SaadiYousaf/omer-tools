@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { fetchUserProfile, fetchUserOrders } from '../../store/profileSlice';
-
+import './ProfilePage.css';
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
