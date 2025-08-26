@@ -112,6 +112,18 @@
   gap: 8px;
   transition: all 0.2s ease;
 }
+.inline-message {
+  margin-top: 12px;
+  font-size: 0.95rem;
+  color: #27ae60; /* success green */
+  font-weight: 500;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
 .view-all-btn:hover {
   background: #2980b9;

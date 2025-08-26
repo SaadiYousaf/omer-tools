@@ -6,6 +6,7 @@ import './FeaturedProducts.css';
 const FeaturedProducts = () => {
   const [visibleProducts, setVisibleProducts] = useState(8);
   const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState(""); // ✅ state for user messages
   const productsPerLoad = 8;
 
   // Get all products from Redux store
@@ -26,14 +27,12 @@ const FeaturedProducts = () => {
     const handleScroll = () => {
       if (isLoading || visibleProducts >= featuredProducts.length) return;
       
-      // Check if user has scrolled to the bottom
       const scrollPosition = window.innerHeight + document.documentElement.scrollTop;
       const pageHeight = document.documentElement.offsetHeight;
       
       if (scrollPosition >= pageHeight - 300) {
         setIsLoading(true);
         
-        // Simulate API loading delay
         setTimeout(() => {
           setVisibleProducts(prev => Math.min(prev + productsPerLoad, featuredProducts.length));
           setIsLoading(false);
@@ -49,6 +48,15 @@ const FeaturedProducts = () => {
   useEffect(() => {
     setVisibleProducts(productsPerLoad);
   }, [featuredProducts]);
+
+  // ✅ Handle "View All Products" button
+  const handleViewAll = () => {
+    setMessage("Redirecting to all products page...");
+    setTimeout(() => {
+      // Later replace with navigation e.g. navigate("/products")
+      setMessage("All products loaded successfully!");
+    }, 1500);
+  };
 
   return (
     <div className="featured-products-compact">
@@ -83,9 +91,12 @@ const FeaturedProducts = () => {
           {visibleProducts >= featuredProducts.length && featuredProducts.length > 0 && (
             <div className="end-of-products">
               <p>You've viewed all featured products</p>
-              <button className="view-all-btn" onClick={() => alert('View all products clicked!')}>
+              <button className="view-all-btn" onClick={handleViewAll}>
                 View All Products
               </button>
+
+              {/* ✅ Inline message instead of alert */}
+              {message && <p className="inline-message">{message}</p>}
             </div>
           )}
         </>
