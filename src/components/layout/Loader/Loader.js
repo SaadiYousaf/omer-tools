@@ -8,43 +8,30 @@ const Loader = ({
   color = 'primary',
   className = ''
 }) => {
-  const sizeClasses = {
-    small: 'w-6 h-6',
-    medium: 'w-8 h-8',
-    large: 'w-12 h-12'
-  };
-
-  const colorClasses = {
-    primary: 'text-blue-600',
-    secondary: 'text-purple-600',
-    light: 'text-gray-200',
-    dark: 'text-gray-700'
-  };
-
   const renderLoader = () => {
     switch (variant) {
       case 'dots':
         return (
-          <div className={`flex space-x-2 ${sizeClasses[size]}`}>
-            <div className={`w-2 h-2 rounded-full animate-bounce ${colorClasses[color]}`} style={{ animationDelay: '0s' }} />
-            <div className={`w-2 h-2 rounded-full animate-bounce ${colorClasses[color]}`} style={{ animationDelay: '0.2s' }} />
-            <div className={`w-2 h-2 rounded-full animate-bounce ${colorClasses[color]}`} style={{ animationDelay: '0.4s' }} />
+          <div className={`loader-dots dot-${size} loader-${color}`}>
+            <div className="loader-dot"></div>
+            <div className="loader-dot"></div>
+            <div className="loader-dot"></div>
           </div>
         );
       case 'pulse':
         return (
-          <div className={`rounded-full animate-pulse ${sizeClasses[size]} ${colorClasses[color]}`} />
+          <div className={`loader-pulse loader-${size} loader-${color}`}></div>
         );
       case 'spinner':
       default:
         return (
-          <div className={`animate-spin rounded-full border-b-2 border-t-2 ${colorClasses[color]} ${sizeClasses[size]}`} style={{ borderColor: 'currentColor' }} />
+          <div className={`loader-spinner loader-${size} loader-${color}`}></div>
         );
     }
   };
 
   return (
-    <div className={`flex items-center justify-center ${className}`} role="status" aria-live="polite">
+    <div className={`loader-container ${className}`} role="status" aria-live="polite">
       <span className="sr-only">Loading...</span>
       {renderLoader()}
     </div>

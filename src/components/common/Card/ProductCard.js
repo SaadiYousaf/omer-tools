@@ -21,16 +21,13 @@ const renderRating = (rating = 0) => {
   for (let i = 0; i < fullStars; i++) {
     stars.push(<FaStar key={`full-${i}`} className="star" />);
   }
-
   if (hasHalfStar) {
     stars.push(<FaStarHalfAlt key="half" className="star" />);
   }
-
   const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
   for (let i = 0; i < emptyStars; i++) {
     stars.push(<FaRegStar key={`empty-${i}`} className="star" />);
   }
-
   return stars;
 };
 
@@ -38,8 +35,7 @@ const ProductCard = ({ product, linkTo }) => {
   const dispatch = useDispatch();
   const cartItems = useSelector(state => state.cart.items);
   const [isWishlisted, setIsWishlisted] = useState(false);
-  
-  // Memoized image URL handler
+
   const getImageUrl = useCallback((path) => {
     if (!path) return "/images/products/default.png";
     if (path.startsWith("http") || path.startsWith("/")) return path;
@@ -48,30 +44,25 @@ const ProductCard = ({ product, linkTo }) => {
 
   if (!product) return null;
 
-  // Calculate pricing info
   const price = parseFloat(product.price) || 0;
   const discountPrice = parseFloat(product.discountPrice) || null;
   const hasDiscount = discountPrice !== null && discountPrice < price;
 
-  // Stock status handling
   const stockQuantity = product.stockQuantity || 0;
   const cartItem = cartItems.find(item => item.id === product.id);
   const cartQuantity = cartItem ? cartItem.quantity : 0;
-  
-  // Calculate available stock considering items already in cart
+
   const availableStock = Math.max(0, stockQuantity - cartQuantity);
   const isOutOfStock = availableStock < 1;
 
-  // Cart functionality
   const handleAddToCart = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
     if (isOutOfStock) return;
-    
+
     const mainImage = getImageUrl(product.images?.[0]?.imageUrl);
     const priceToUse = hasDiscount ? discountPrice : price;
-    
+
     dispatch(addItemToCart({
       id: product.id,
       name: product.name,
@@ -82,7 +73,6 @@ const ProductCard = ({ product, linkTo }) => {
     }));
   };
 
-  // Wishlist functionality
   const toggleWishlist = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -91,22 +81,26 @@ const ProductCard = ({ product, linkTo }) => {
 
   return (
     <article 
-      className="product-card-compact"
+      className="product-card-milwaukee"
       aria-label={`Product: ${product.name}`}
     >
       {/* Discount ribbon */}
       {hasDiscount && (
-        <div 
-          className="discount-ribbon" 
-          aria-label={`Discount`}
-        >
+        <div className="discount-ribbon" aria-label="Discount">
           Sale
+        </div>
+      )}
+
+      {/* Tagline ribbon */}
+      {product.tagLine && (
+        <div className="tagline-ribbon" aria-label="Tagline">
+          {product.tagLine}
         </div>
       )}
 
       {/* Wishlist button */}
       <button 
-        className={`wishlist-btn ${isWishlisted ? 'active' : ''}`}
+        className={`wishlist-btn ${isWishlisted ? "active" : ""}`}
         onClick={toggleWishlist}
         aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
       >
@@ -147,8 +141,8 @@ const ProductCard = ({ product, linkTo }) => {
         <div className="price-container">
           {hasDiscount ? (
             <>
-            <span className="current-price">${discountPrice.toFixed(2)}</span>
-            <span className="original-price">${price.toFixed(2)}</span>
+              <span className="current-price">${discountPrice.toFixed(2)}</span>
+              <span className="original-price">${price.toFixed(2)}</span>
             </>
           ) : (
             <span className="current-price">${price.toFixed(2)}</span>
@@ -157,13 +151,13 @@ const ProductCard = ({ product, linkTo }) => {
         
         <div className="product-actions">
           <button 
-            className={`add-to-cart-btn ${isOutOfStock ? 'disabled' : ''}`}
+            className={`add-to-cart-btn ${isOutOfStock ? "disabled" : ""}`}
             onClick={handleAddToCart}
             disabled={isOutOfStock}
             aria-label={isOutOfStock ? "Out of stock" : "Add to cart"}
           >
             <FaCartPlus className="cart-icon" aria-hidden="true" />
-            <span>{isOutOfStock ? 'Out of Stock' : 'Add to Cart'}</span>
+            <span>{isOutOfStock ? "Out of Stock" : "Add to Cart"}</span>
           </button>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { clearCart } from '../../store/cartSlice';
 import Payment from '../../components/common/Payment/Payment';
 import Confirmation from '../../components/common/Confirmation/Confirmation';
 import ScrollToTop from "../../components/common/Scroll/ScrollToTop";
@@ -16,6 +17,7 @@ const Checkout = () => {
   const [orderLoading, setOrderLoading] = useState(false);
   const { items, totalAmount } = useSelector(state => state.cart);
   const { user } = useSelector(state => state.auth);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -99,6 +101,7 @@ const Checkout = () => {
 
     if (response.data.status === "succeeded") {
       console.log('Order created:', response.data);
+      dispatch(clearCart());
       nextStep();
       
       // Clear cart after successful order

@@ -11,7 +11,7 @@ const Register = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    phoneNumber: '',
+    PhoneNumber: '',
     address: ''
   });
   const [errors, setErrors] = useState({});
@@ -51,7 +51,7 @@ const Register = () => {
     
     if (!formData.firstName) newErrors.firstName = 'First name is required';
     if (!formData.lastName) newErrors.lastName = 'Last name is required';
-    if (!formData.phoneNumber) newErrors.phoneNumber = 'Phone number is required';
+    if (!formData.PhoneNumber) newErrors.PhoneNumber = 'Phone number is required';
     if (!formData.address) newErrors.address = 'Address is required';
     
     setErrors(newErrors);
@@ -167,18 +167,18 @@ const Register = () => {
               </div>
               
               <div className="form-group">
-                <label htmlFor="phoneNumber">Phone Number</label>
+                <label htmlFor="PhoneNumber">Phone Number</label>
                 <input
-                  id="phoneNumber"
-                  name="phoneNumber"
+                  id="PhoneNumber"
+                  name="PhoneNumber"
                   type="tel"
-                  value={formData.phoneNumber}
+                  value={formData.PhoneNumber}
                   onChange={handleChange}
                   placeholder="Enter your phone number"
                   required
-                  className={errors.phoneNumber ? 'error' : ''}
+                  className={errors.PhoneNumber ? 'error' : ''}
                 />
-                {errors.phoneNumber && <span className="field-error">{errors.phoneNumber}</span>}
+                {errors.PhoneNumber && <span className="field-error">{errors.PhoneNumber}</span>}
               </div>
               
               <div className="form-group">

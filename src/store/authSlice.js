@@ -115,8 +115,17 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        let payload = action.payload;
+        if (typeof payload === 'object') {
+          // Flatten into readable string
+          state.error = payload.message 
+            || payload.error 
+            || (Array.isArray(payload.errors) ? payload.errors.join(', ') : JSON.stringify(payload));
+        } else {
+          state.error = payload;
+        }
       })
+      
       // Register
       .addCase(registerUser.pending, (state) => {
         state.loading = true;

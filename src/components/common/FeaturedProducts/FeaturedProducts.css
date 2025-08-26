@@ -98,15 +98,19 @@
 }
 
 .view-all-btn {
-  background: #3498db;
+  width: 100%;
+  background: #072c62;
   color: white;
   border: none;
-  padding: 10px 25px;
-  font-size: 0.9rem;
-  border-radius: 50px;
+  border-radius: 4px;
+  padding: 10px 16px;
+  font-weight: 200;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 3px 8px rgba(52, 152, 219, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
 }
 
 .view-all-btn:hover {

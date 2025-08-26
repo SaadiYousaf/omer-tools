@@ -60,7 +60,7 @@ const BrandProducts = () => {
     return 0; // Default sorting (featured)
   });
 
-  if (status === 'loading' || brandsStatus === 'loading') return <Loading />;
+  if (status === 'loading' || brandsStatus === 'loading') return <Loading size="medium" variant="spinner" color="primary" />;
 
   return (
     <div className="brand-products-page">

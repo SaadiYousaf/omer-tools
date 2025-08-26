@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { userService } from '../../../services';
 import { logout } from '../../../store/authSlice';
-//import './AccountSettingsPage.css';
+import './AccountSetting.css';
 
 const AccountSettingsPage = () => {
   const dispatch = useDispatch();
