@@ -298,13 +298,21 @@ body {
   color: #072c62;
   line-height: 1;
 }
-
 .original-price {
   display: flex;
   align-items: center;
   gap: 5px;
   font-size: 12px;
   color: var(--gray);
+}
+
+@media (max-width: 600px) {
+  .current-price {
+    font-size: small
+  }
+  .original-price{
+    font-size: x-small
+  }
 }
 
 .was {

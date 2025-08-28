@@ -150,6 +150,12 @@
   text-decoration: line-through;
 }
 
+@media (max-width: 600px){
+  .original-price {
+    font-size: x-small;
+  }
+}
+
 .item-quantity {
   text-align: center;
 }

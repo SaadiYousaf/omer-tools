@@ -280,7 +280,7 @@ const Product = () => {
               className="products-image"
             />
           </div>
-          <div className="image-actions">
+          {/* <div className="image-actions">
             <button className="action-btn">
               <FaHeart className="action-icon" />
               <span>Save to Wishlist</span>
@@ -289,7 +289,7 @@ const Product = () => {
               <FaShareAlt className="action-icon" />
               <span>Share Product</span>
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
 
@@ -392,7 +392,7 @@ const Product = () => {
           </div>
         </div>
 
-        <div className="payment-options">
+        {/* <div className="payment-options">
           <div className="payment-card">
             <div className="payment-logo">Afterpay</div>
             <div className="payment-price">${(currentPrice / 4).toFixed(2)}</div>
@@ -403,7 +403,7 @@ const Product = () => {
             <div className="payment-price">${(currentPrice / 10).toFixed(2)}/wk</div>
             <div className="payment-desc">Flexible payments</div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
 

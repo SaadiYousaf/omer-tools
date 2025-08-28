@@ -29,7 +29,6 @@
   letter-spacing: 0.5px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
-
 /* Ribbons */
 .discount-ribbon {
   position: absolute;
@@ -43,6 +42,21 @@
   z-index: 2;
   border-radius: 0 4px 4px 0;
 }
+@media (max-width: 600px){
+  .tagline-ribbon {
+    position: relative;
+    font-size: xx-small;
+  }
+  .discount-ribbon {
+     position: relative;
+     font-size: xx-small;
+  }
+  .wishlist-btn{
+    visibility: hidden;
+  }
+}
+
+
 
 .new-ribbon {
   position: absolute;
