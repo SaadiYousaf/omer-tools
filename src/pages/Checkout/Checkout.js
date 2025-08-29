@@ -7,6 +7,7 @@ import Confirmation from '../../components/common/Confirmation/Confirmation';
 import ScrollToTop from "../../components/common/Scroll/ScrollToTop";
 import axios from 'axios';
 import './Checkout.css';
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const Checkout = () => {
   const [step, setStep] = useState(1);
@@ -90,7 +91,7 @@ const Checkout = () => {
     console.log('Sending order data:', JSON.stringify(orderData, null, 2));
 
     // Send order to backend
-    const response = await axios.post('http://localhost:5117/api/orders', orderData, {
+    const response = await axios.post(`${BASE_URL}/orders`, orderData, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'

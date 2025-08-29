@@ -17,6 +17,7 @@ import {
   FaTag,
   FaLayerGroup,
 } from "react-icons/fa";
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -52,7 +53,7 @@ const Header = () => {
         
         const timestamp = Date.now();
         const response = await fetch(
-          `http://localhost:5117/api/search/autocomplete?term=${encodeURIComponent(
+          `${BASE_URL}/search/autocomplete?term=${encodeURIComponent(
             trimmedTerm
           )}&t=${timestamp}`,
           { signal }

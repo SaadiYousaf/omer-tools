@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Loading from '../../components/common/Loading/Loading';
 import ProductGrid from '../../components/common/ProductGrid/ProductGrid';
 import './SearchResultPage.css';
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const SearchResultsPage = () => {
   const location = useLocation();
@@ -42,7 +43,7 @@ const SearchResultsPage = () => {
       if (filters.maxPrice) params.maxPrice = filters.maxPrice;
   
       const queryString = new URLSearchParams(params).toString();
-      const response = await fetch(`http://localhost:5117/api/search?${queryString}`);
+      const response = await fetch(`${BASE_URL}/search?${queryString}`);
        
       if (!response.ok) throw new Error('Network response was not ok');
       

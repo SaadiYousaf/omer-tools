@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { FaSearch, FaTimes } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const SearchComponent = () => {
   const [query, setQuery] = useState('');
@@ -26,7 +27,7 @@ const SearchComponent = () => {
     }
     
     try {
-      const response = await fetch(`/api/search/autocomplete?term=${encodeURIComponent(searchTerm)}`);
+      const response = await fetch(`${BASE_URL}/search/autocomplete?term=${encodeURIComponent(searchTerm)}`);
       const data = await response.json();
       setSuggestions(data);
     } catch (error) {

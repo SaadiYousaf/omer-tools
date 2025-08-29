@@ -1,14 +1,14 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import useApi from '../api/useApi';
 
-const BASE_URL = 'http://localhost:5117';
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 // Async thunks
 export const fetchCategories = createAsyncThunk(
   'categories/fetchCategories',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${BASE_URL}/api/categories`);
+      const response = await fetch(`${BASE_URL}/categories`);
       if (!response.ok) throw new Error('Failed to fetch categories');
       return await response.json();
     } catch (err) {
@@ -21,7 +21,7 @@ export const fetchProductsByCategory = createAsyncThunk(
   'categories/fetchProductsByCategory',
   async (categoryId, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${BASE_URL}/api/products?categoryId=${categoryId}`);
+      const response = await fetch(`${BASE_URL}/products?categoryId=${categoryId}`);
       if (!response.ok) throw new Error('Failed to fetch category products');
       return await response.json();
     } catch (err) {
@@ -34,7 +34,7 @@ export const fetchBrandsByCategory = createAsyncThunk(
   'categories/fetchBrandsByCategory',
   async (categoryId, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${BASE_URL}/api/categories/${categoryId}/brands`);
+      const response = await fetch(`${BASE_URL}/categories/${categoryId}/brands`);
       if (!response.ok) throw new Error('Failed to fetch brands');
       return await response.json();
     } catch (err) {

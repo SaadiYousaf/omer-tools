@@ -1,3 +1,4 @@
+// Home.js
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import CategorySlider from "../../components/common/CategorySlider/CategorySlider";
@@ -8,6 +9,13 @@ import MemberDeals from "../../components/common/MembersDeal/MemberDeals";
 import ScrollToTop from "../../components/common/Scroll/ScrollToTop";
 import "./Home.css";
 import { fetchFeaturedProducts } from "../../store/productsSlice";
+
+// Import slider images
+import slide1 from "../../assets/images/pb.jpg";
+import slide2 from "../../assets/images/dew2.jpg";
+import slide3 from "../../assets/images/free-shipping.jpg";
+import slide4 from "../../assets/images/dew2.jpg";
+import slide5 from "../../assets/images/pb.jpg";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -26,19 +34,36 @@ const Home = () => {
     dispatch(fetchFeaturedProducts());
   }, [dispatch]);
 
+  // Define slide sets
+  const heroSlides1 = [
+    { id: 1, image: slide1, cta: "Shop Now", link: "/category/power-tools" },
+    { id: 2, image: slide2, cta: "Explore", link: "/new-arrivals" },
+  ];
+
+  const heroSlides2 = [
+    { id: 1, image: slide3, cta: "Learn More", link: "/shipping-info" },
+    { id: 2, image: slide4, cta: "Buy Now", link: "/category/hand-tools" },
+  ];
+
+  const heroSlides3 = [
+    { id: 1, image: slide5, cta: "Hot Deals", link: "/deals" },
+    { id: 2, image: slide2, cta: "New Arrivals", link: "/new-arrivals" },
+    { id: 3, image: slide3, cta: "Free Shipping", link: "/shipping-info" },
+  ];
+
   return (
     <div className="home-page">
       <ScrollToTop />
 
       {/* Hero Section */}
       <section className="hero-section">
-        <HeroSlider />
+        <HeroSlider slides={heroSlides1} />
       </section>
 
-      {/* Brand Showcase - tight under hero */}
+      {/* Brand Showcase */}
       <BrandSlider />
 
-      {/* Main Category Navigation */}
+      {/* Categories */}
       <section className="category-navigation main-categories">
         <div className="container">
           <CategorySlider categories={categories} activeBrandIndex={0} />
@@ -63,10 +88,10 @@ const Home = () => {
         <div className="container">
           <div className="dual-hero-container">
             <div className="hero-column">
-              <HeroSlider />
+              <HeroSlider slides={heroSlides2} />
             </div>
             <div className="hero-column">
-              <HeroSlider />
+              <HeroSlider slides={heroSlides3} />
             </div>
           </div>
         </div>
@@ -75,7 +100,6 @@ const Home = () => {
       {/* Featured Products */}
       <section className="featured-products-section">
         <div className="container">
-        
           <FeaturedProducts products={featuredProducts} />
         </div>
       </section>

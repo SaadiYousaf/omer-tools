@@ -1,12 +1,13 @@
 // src/store/slices/authSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 export const loginUser = createAsyncThunk(
   'auth/login',
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await axios.post('http://localhost:5117/api/auth/login', {
+      const response = await axios.post(`${BASE_URL}/auth/login`, {
         email,
         password
       });
@@ -31,7 +32,7 @@ export const registerUser = createAsyncThunk(
   'auth/register',
   async ({ firstName, lastName, email, password,PhoneNumber }, { rejectWithValue }) => {
     try {
-      const response = await axios.post('http://localhost:5117/api/auth/register', {
+      const response = await axios.post(`${BASE_URL}/auth/register`, {
         firstName,
         lastName,
         email,
@@ -57,7 +58,7 @@ export const verifyToken = createAsyncThunk(
       }
 
       // Use the profile endpoint to verify the token
-      const response = await axios.get('http://localhost:5117/api/users/profile', {
+      const response = await axios.get(`${BASE_URL}/users/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       

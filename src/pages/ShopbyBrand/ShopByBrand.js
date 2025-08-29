@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchBrands, selectAllBrands, selectBrandsStatus, selectBrandsError } from '../../store/brandsSlice';
-
+import { 
+  setBrandsLoading, 
+  setBrandsSuccess, 
+  setBrandsFailed 
+} from '../../store/brandsSlice';
+import useApi from '../../api/useApi';
 import BrandCard from '../../components/common/BrandSlider/BrandCard/BrandCard';
 import ProductGrid from '../../components/common/ProductGrid/ProductGrid';
 import BrandFilter from '../../components/common/BrandSlider/BrandFilter/BrandFilter';
@@ -10,14 +14,42 @@ import './ShopByBrand.css';
 
 const ShopByBrand = () => {
   const dispatch = useDispatch();
+  const { get } = useApi();
+  const BASE_URL = process.env.REACT_APP_BASE_URL;
   
-  const brands = useSelector(selectAllBrands);
-  const brandsStatus = useSelector(selectBrandsStatus);
-  const brandsError = useSelector(selectBrandsError);
+  // Get brands from Redux store
+  const { brands, status, error } = useSelector((state) => state.brands);
   
   const [products, setProducts] = useState([]);
   const [productsLoading, setProductsLoading] = useState(false);
   const [productsError, setProductsError] = useState(null);
+
+  // Function to get brand image (same as in BrandSlider)
+  const getBrandImage = (brand) => {
+    // First, try to get the primary image from the images array
+    if (brand.images && brand.images.length > 0) {
+      // Find the primary image or use the first one
+      const primaryImage = brand.images.find(img => img.isPrimary) || brand.images[0];
+      return primaryImage.imageUrl;
+    }
+    
+    // Fall back to the legacy imageUrl property
+    if (brand.imageUrl) return brand.imageUrl;
+    
+    // Default image if no images are available
+    return "/images/categories/default.png";
+  };
+
+  // Fetch brands function (same as in BrandSlider)
+  const fetchBrands = useCallback(async () => {
+    dispatch(setBrandsLoading());
+    try {
+      const data = await get(`${BASE_URL}/brands?includeImages=true`);
+      dispatch(setBrandsSuccess(data));
+    } catch (err) {
+      dispatch(setBrandsFailed(err.message));
+    }
+  }, [dispatch, get, BASE_URL]);
 
   // Fetch products function
   const fetchProducts = useCallback(async () => {
@@ -25,7 +57,7 @@ const ShopByBrand = () => {
       setProductsLoading(true);
       setProductsError(null);
       
-      const response = await fetch('http://localhost:5117/api/products?featured=true&limit=12');
+      const response = await fetch(`${BASE_URL}/products?featured=true&limit=12`);
       
       if (!response.ok) {
         throw new Error('Failed to load products');
@@ -39,28 +71,28 @@ const ShopByBrand = () => {
     } finally {
       setProductsLoading(false);
     }
-  }, []);
+  }, [BASE_URL]);
 
   useEffect(() => {
-    if (brandsStatus === 'idle') {
-      dispatch(fetchBrands());
+    if (status === 'idle') {
+      fetchBrands();
     }
     fetchProducts();
-  }, [brandsStatus, dispatch, fetchProducts]);
+  }, [status, fetchBrands, fetchProducts]);
 
-  const isLoading = brandsStatus === 'loading' || productsLoading;
-  const error = brandsError || productsError;
+  const isLoading = status === 'loading' || productsLoading;
+  const hasError = error || productsError;
 
-  if (error) {
+  if (hasError) {
     return (
       <div className="shop-by-brand-container">
         <div className="error-message">
           <div className="error-icon">⚠️</div>
-          <h2>{error}</h2>
+          <h2>{hasError}</h2>
           <button 
             className="retry-button"
             onClick={() => {
-              if (brandsError) dispatch(fetchBrands());
+              if (error) fetchBrands();
               if (productsError) fetchProducts();
             }}
           >
@@ -89,16 +121,24 @@ const ShopByBrand = () => {
           </div>
           {isLoading ? (
             <div className="loading-container">
-             <Loading size="medium" variant="spinner" color="primary" />
+              <Loading size="medium" variant="spinner" color="primary" />
             </div>
           ) : (
             <div className="brands-grid">
-              {brands.slice(0, 8).map(brand => (
-                <BrandCard 
-                  key={brand.id} 
-                  brand={brand} 
-                />
-              ))}
+              {brands.slice(0, 8).map(brand => {
+                const imageUrl = getBrandImage(brand);
+                console.log('Brand:', brand.name, 'Image URL:', imageUrl); // For debugging
+                
+                return (
+                  <BrandCard 
+                    key={brand.id} 
+                    brand={{
+                      ...brand,
+                      imageUrl: imageUrl // Ensure this is passed correctly
+                    }} 
+                  />
+                );
+              })}
             </div>
           )}
         </section>
@@ -110,7 +150,10 @@ const ShopByBrand = () => {
             <div className="header-divider"></div>
           </div>
           <BrandFilter 
-            brands={brands} 
+            brands={brands.map(brand => ({
+              ...brand,
+              imageUrl: getBrandImage(brand)
+            }))} 
           />
         </section>
 

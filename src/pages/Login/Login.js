@@ -120,10 +120,7 @@ const Login = () => {
                 <span className="social-icon">G</span>
                 Google
               </button>
-              <button type="button" className="social-login-btn facebook-login">
-                <span className="social-icon">f</span>
-                Facebook
-              </button>
+         
             </div>
 
             <div className="signup-redirect">

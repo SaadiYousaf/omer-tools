@@ -1,8 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { filterByBrand, fetchAllProducts } from '../../store/productsSlice';
-import { fetchBrands, selectAllBrands, selectBrandsStatus } from '../../store/brandsSlice';
+import { 
+  setBrandsLoading, 
+  setBrandsSuccess, 
+  setBrandsFailed 
+} from '../../store/brandsSlice';
+import useApi from '../../api/useApi';
 import ProductCard from '../../components/common/Card/ProductCard';
 import Loading from '../../components/common/Loading/Loading';
 import ScrollToTop from '../../components/common/Scroll/ScrollToTop';
@@ -11,18 +16,52 @@ import './BrandProducts.css';
 const BrandProducts = () => {
   const { brandId } = useParams();
   const dispatch = useDispatch();
+  const { get } = useApi();
+  const BASE_URL = process.env.REACT_APP_BASE_URL;
+  
   const [sortOption, setSortOption] = useState('featured');
   
   const { filteredItems, items, status } = useSelector(state => state.products);
-  const brands = useSelector(selectAllBrands);
-  const brandsStatus = useSelector(selectBrandsStatus);
+  const { brands, status: brandsStatus, error: brandsError } = useSelector(state => state.brands);
+
+  // Function to get brand image (same as in BrandSlider)
+  const getBrandImage = useCallback((brand) => {
+    if (!brand) return "/images/brands/default.png";
+    
+    // First, try to get the primary image from the images array
+    if (brand.images && brand.images.length > 0) {
+      // Find the primary image or use the first one
+      const primaryImage = brand.images.find(img => img.isPrimary) || brand.images[0];
+      return primaryImage.imageUrl;
+    }
+    
+    // Fall back to the legacy imageUrl property
+    if (brand.imageUrl) return brand.imageUrl;
+    
+    // Fall back to logoUrl if exists
+    if (brand.logoUrl) return brand.logoUrl;
+    
+    // Default image if no images are available
+    return "/images/brands/default.png";
+  }, []);
+
+  // Fetch brands function (same as in BrandSlider)
+  const fetchBrands = useCallback(async () => {
+    dispatch(setBrandsLoading());
+    try {
+      const data = await get(`${BASE_URL}/brands?includeImages=true`);
+      dispatch(setBrandsSuccess(data));
+    } catch (err) {
+      dispatch(setBrandsFailed(err.message));
+    }
+  }, [dispatch, get, BASE_URL]);
 
   // Fetch brands if not already fetched
   useEffect(() => {
     if (brandsStatus === 'idle') {
-      dispatch(fetchBrands());
+      fetchBrands();
     }
-  }, [brandsStatus, dispatch]);
+  }, [brandsStatus, fetchBrands]);
 
   // Scroll to top on mount
   useEffect(() => {
@@ -42,10 +81,11 @@ const BrandProducts = () => {
     }
   }, [brandId, dispatch, items.length]);
 
-  // Find brand details
-  const brand = brands.find(b => b.id === (brandId));
+  // Get the current brand
+  const brand = brands.find(b => b.id === brandId);
   const brandName = brand?.name || `Brand #${brandId}`;
   const brandDescription = brand?.description || 'Premium tools for professionals';
+  const brandImage = getBrandImage(brand);
 
   // Handle sorting
   const handleSortChange = (e) => {
@@ -60,7 +100,28 @@ const BrandProducts = () => {
     return 0; // Default sorting (featured)
   });
 
-  if (status === 'loading' || brandsStatus === 'loading') return <Loading size="medium" variant="spinner" color="primary" />;
+  if (status === 'loading' || brandsStatus === 'loading') {
+    return (
+      <div className="loading-container">
+        <Loading size="medium" variant="spinner" color="primary" />
+      </div>
+    );
+  }
+
+  if (brandsError) {
+    return (
+      <div className="error-message">
+        <div className="error-icon">⚠️</div>
+        <h2>{brandsError}</h2>
+        <button 
+          className="retry-button"
+          onClick={fetchBrands}
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="brand-products-page">
@@ -74,17 +135,13 @@ const BrandProducts = () => {
             <p>{brandDescription}</p>
           </div>
           <div className="brand-image">
-            {brand?.logoUrl ? (
-              <img 
-                src={brand.logoUrl} 
-                alt={brandName} 
-                onError={(e) => {
-                  e.target.src = '/images/brands/default.png';
-                }}
-              />
-            ) : (
-              <div className="brand-placeholder"></div>
-            )}
+            <img 
+              src={brandImage} 
+              alt={brandName}
+              onError={(e) => {
+                e.target.src = '/images/brands/default.png';
+              }}
+            />
           </div>
         </div>
       </div>

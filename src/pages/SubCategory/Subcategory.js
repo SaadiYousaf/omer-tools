@@ -9,7 +9,11 @@ import {
   fetchProductsBySubcategory,
   filterBySubcategory,
 } from "../../store/productsSlice";
-import { selectAllBrands } from "../../store/brandsSlice";
+import { 
+  selectAllBrands, 
+  selectBrandsStatus,
+  fetchBrands 
+} from "../../store/brandsSlice";
 import ProductCard from "../../components/common/Card/ProductCard";
 import Loading from "../../components/common/Loading/Loading";
 import ErrorMessage from "../../components/layout/ErrorMessage/ErrorMessage";
@@ -33,14 +37,20 @@ const Subcategory = () => {
     (state) => state.subcategories
   );
 
-  const {
-    filteredItems: allProducts,
-    subcategoryProductsStatus,
-    error: productsError,
-  } = useSelector((state) => state.products);
+  // Get all products from Redux, not just filtered ones
+  const { items: allProducts, subcategoryProductsStatus, error: productsError } = 
+    useSelector((state) => state.products);
 
   // Get all brands from Redux
   const allBrands = useSelector(selectAllBrands);
+  const brandsStatus = useSelector(selectBrandsStatus);
+
+  // Fetch brands if not already loaded
+  useEffect(() => {
+    if (brandsStatus === 'idle') {
+      dispatch(fetchBrands());
+    }
+  }, [brandsStatus, dispatch]);
 
   useEffect(() => {
     if (categoryId) {
@@ -51,13 +61,12 @@ const Subcategory = () => {
   useEffect(() => {
     if (subcategoryId && subcategories.length > 0) {
       const subcategory = subcategories.find(
-        (sc) => sc.id === subcategoryId // Removed Number conversion
+        (sc) => sc.id === subcategoryId
       );
       if (subcategory) {
         dispatch(setCurrentSubcategory(subcategory));
       }
       dispatch(fetchProductsBySubcategory(subcategoryId));
-      dispatch(filterBySubcategory(subcategoryId)); // Removed Number conversion
     }
   }, [subcategoryId, subcategories, dispatch]);
 
@@ -66,12 +75,14 @@ const Subcategory = () => {
     const prices = [];
     const ratings = new Set();
     
-    allProducts.forEach((product) => {
-      prices.push(product.price);
-      if (product.averageRating) {
-        ratings.add(Math.floor(product.averageRating));
-      }
-    });
+    if (allProducts && allProducts.length > 0) {
+      allProducts.forEach((product) => {
+        prices.push(product.price);
+        if (product.averageRating) {
+          ratings.add(Math.floor(product.averageRating));
+        }
+      });
+    }
     
     return {
       minPriceAll: prices.length > 0 ? Math.min(...prices) : 0,
@@ -82,15 +93,19 @@ const Subcategory = () => {
 
   // Apply filters and sorting
   const getFilteredProducts = () => {
+    if (!allProducts || !Array.isArray(allProducts) || allProducts.length === 0) {
+      return [];
+    }
+
     let filtered = [...allProducts];
-    
+
     // Brand filter
     if (filters.brandIds.length > 0) {
-      filtered = filtered.filter(
-        (product) => product.brand && filters.brandIds.includes(product.brand.id)
-      );
+      filtered = filtered.filter(product => {
+        return product.brandId && filters.brandIds.includes(product.brandId);
+      });
     }
-    
+
     // Price range filter
     if (filters.minPrice) {
       filtered = filtered.filter(
@@ -140,6 +155,14 @@ const Subcategory = () => {
 
   const filteredProducts = getFilteredProducts();
   
+  // Get unique brands from the current products
+  const availableBrands = useMemo(() => {
+    if (!allProducts || allProducts.length === 0) return [];
+    
+    const brandIds = [...new Set(allProducts.map(product => product.brandId))];
+    return allBrands.filter(brand => brandIds.includes(brand.id));
+  }, [allProducts, allBrands]);
+
   // Pagination
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
@@ -188,11 +211,21 @@ const Subcategory = () => {
   };
 
   const getSubcategoryImage = (subcategory) => {
-    if (!subcategory.imageUrl) return "/images/subcategories/default.png";
-    return subcategory.imageUrl;
+    // First, try to get the primary image from the images array
+    if (subcategory.images && subcategory.images.length > 0) {
+      // Find the primary image or use the first one
+      const primaryImage = subcategory.images.find(img => img.isPrimary) || subcategory.images[0];
+      return primaryImage.imageUrl;
+    }
+    
+    // Fall back to the legacy imageUrl property
+    if (subcategory.imageUrl) return subcategory.imageUrl;
+    
+    // Default image if no images are available
+    return '/images/subcategories/default.png';
   };
 
-  if (status === "loading") return <Loading size="medium" variant="spinner" color="primary" />;
+  if (status === "loading") return <Loading fullPage />;
   if (status === "failed") return <ErrorMessage message={error} />;
   if (!currentSubcategory) return <Loading fullPage />;
 
@@ -238,21 +271,35 @@ const Subcategory = () => {
         <div className="subcategory-filters">
           <div className="filter-section">
             <h3>Brands</h3>
-            <div className="scrollable-filter">
-              {allBrands.map((brand) => (
-                <div key={brand.id} className="filter-item">
-                  <input
-                    type="checkbox"
-                    id={`brand-${brand.id}`}
-                    checked={filters.brandIds.includes(brand.id)}
-                    onChange={() => handleBrandToggle(brand.id)}
-                  />
-                  <label htmlFor={`brand-${brand.id}`}>
-                    {brand.name}
-                  </label>
-                </div>
-              ))}
-            </div>
+            {brandsStatus === 'loading' ? (
+              <div>Loading brands...</div>
+            ) : (
+              <div className="scrollable-filter">
+                {availableBrands.map((brand) => {
+                  const productCount = allProducts.filter(
+                    product => product.brandId === brand.id
+                  ).length;
+                  
+                  return (
+                    <div key={brand.id} className="filter-item">
+                      <input
+                        type="checkbox"
+                        id={`brand-${brand.id}`}
+                        checked={filters.brandIds.includes(brand.id)}
+                        onChange={() => handleBrandToggle(brand.id)}
+                        disabled={productCount === 0}
+                      />
+                      <label 
+                        htmlFor={`brand-${brand.id}`} 
+                        className={productCount === 0 ? 'disabled' : ''}
+                      >
+                        {brand.name} ({productCount})
+                      </label>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           <div className="filter-section">

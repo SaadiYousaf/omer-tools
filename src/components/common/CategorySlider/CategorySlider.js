@@ -19,12 +19,15 @@ const CategorySlider = () => {
   const [showArrows, setShowArrows] = useState({ left: false, right: true });
   const scrollTimeoutRef = useRef(null);
   const { get } = useApi();
+  const API_BASE_URL = process.env.REACT_APP_BASE_URL;
+  console.log("Base URL:", process.env.REACT_APP_BASE_URL);
 
   useEffect(() => {
     const fetchCategories = async () => {
       dispatch(setCategoriesLoading());
       try {
-        const data = await get("http://localhost:5117/api/categories");
+        // Update the API endpoint to include images
+        const data = await get(`${API_BASE_URL}/categories?includeImages=true`);
         dispatch(setCategoriesSuccess(data));
       } catch (err) {
         dispatch(setCategoriesFailed(err.message));
@@ -77,8 +80,18 @@ const CategorySlider = () => {
   };
 
   const getCategoryImage = (category) => {
-    if (!category.imageUrl) return "/images/categories/default.png";
-    return category.imageUrl;
+    // First, try to get the primary image from the images array
+    if (category.images && category.images.length > 0) {
+      // Find the primary image or use the first one
+      const primaryImage = category.images.find(img => img.isPrimary) || category.images[0];
+      return primaryImage.imageUrl;
+    }
+    
+    // Fall back to the legacy imageUrl property
+    if (category.imageUrl) return category.imageUrl;
+    
+    // Default image if no images are available
+    return "/images/categories/default.png";
   };
 
   if (status === "loading") {

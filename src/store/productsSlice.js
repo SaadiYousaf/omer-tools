@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-const BASE_URL = "http://localhost:5117";
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 // export const fetchProductById = createAsyncThunk(
 //   "products/fetchProductById",
@@ -29,7 +29,7 @@ export const fetchAllProducts = createAsyncThunk(
       if (queryParams.subcategoryId) params.append('subcategoryId', queryParams.subcategoryId);
       if (queryParams.isRedemption !== undefined) params.append('isRedemption', queryParams.isRedemption);
 
-      const response = await fetch(`${BASE_URL}/api/products?${params}`);
+      const response = await fetch(`${BASE_URL}/products?${params}`);
       if (!response.ok) throw new Error("Failed to fetch products");
       return await response.json();
     } catch (err) {
@@ -42,7 +42,7 @@ export const fetchRedemptionProducts = createAsyncThunk(
   "products/fetchRedemptionProducts",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${BASE_URL}/api/products/redemption`);
+      const response = await fetch(`${BASE_URL}/products/redemption`);
       if (!response.ok) throw new Error("Failed to fetch redemption products");
       const data = await response.json();
       return data;
@@ -56,7 +56,7 @@ export const fetchProductById = createAsyncThunk(
   async (productId, { rejectWithValue }) => {
     try {
       // Change to full details endpoint
-      const response = await fetch(`${BASE_URL}/api/products/full/${productId}`);
+      const response = await fetch(`${BASE_URL}/products/full/${productId}`);
       if (!response.ok) throw new Error('Product not found');
       const data = await response.json();
       return data;
@@ -83,7 +83,7 @@ export const fetchFeaturedProducts = createAsyncThunk(
   'products/fetchFeaturedProducts',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${BASE_URL}/api/products/featured`);
+      const response = await fetch(`${BASE_URL}/products/featured`);
       if (!response.ok) throw new Error('Failed to fetch featured products');
       const data = await response.json();
       console.log('Featured products data:', data); // Debug log
@@ -100,7 +100,7 @@ export const fetchProductsBySubcategory = createAsyncThunk(
   async (subcategoryId, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        `${BASE_URL}/api/products?subcategoryId=${subcategoryId}`
+        `${BASE_URL}/products?subcategoryId=${subcategoryId}`
       );
       if (!response.ok) throw new Error("Failed to fetch subcategory products");
       return await response.json();

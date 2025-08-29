@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Table, Container, Spinner, Alert, Button, Card, Row, Col } from 'react-bootstrap';
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
@@ -16,7 +17,7 @@ const OrderHistory = () => {
     const fetchOrders = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5117/api/orders/user', {
+        const response = await axios.get(`${BASE_URL}/orders/user`, {
           headers: {
             Authorization: `Bearer ${token}`
           }

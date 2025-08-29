@@ -4,6 +4,7 @@ import { Container, Row, Col, Card, Badge, Button, Table, Alert, Spinner } from 
 import axios from 'axios';
 import Loading from '../../components/common/Loading/Loading';
 import './OrderDetailsPage.css';
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const OrderDetailsPage = () => {
   const { orderId } = useParams();
@@ -16,7 +17,7 @@ const OrderDetailsPage = () => {
       try {
         setLoading(true);
         const token = localStorage.getItem('token');
-        const response = await axios.get(`http://localhost:5117/api/orders/${orderId}`, {
+        const response = await axios.get(`${BASE_URL}/orders/${orderId}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }

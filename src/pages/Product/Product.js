@@ -17,7 +17,8 @@ import { FaTruck, FaShieldAlt, FaHeart, FaShareAlt, FaChevronRight } from 'react
 import './Product.css';
 
 // IMPORTANT: must match your API base used in the slice
-const API_BASE = 'http://localhost:5117';
+
+const API_BASE = process.env.REACT_APP_BASE_URL;
 
 const Product = () => {
   const { productId } = useParams();

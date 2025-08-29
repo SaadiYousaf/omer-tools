@@ -8,6 +8,7 @@ import {
 } from '../../../store/brandsSlice';
 import useApi from '../../../api/useApi';
 import './BrandSlider.css';
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const BrandSlider = () => {
   const dispatch = useDispatch();
@@ -18,7 +19,7 @@ const BrandSlider = () => {
     const fetchBrands = async () => {
       dispatch(setBrandsLoading());
       try {
-        const data = await get('http://localhost:5117/api/brands');
+        const data = await get(`${BASE_URL}/brands?includeImages=true`);
         dispatch(setBrandsSuccess(data));
       } catch (err) {
         dispatch(setBrandsFailed(err.message));
@@ -28,9 +29,19 @@ const BrandSlider = () => {
   }, [dispatch, get]);
 
   const getBrandImage = (brand) => {
-    if (!brand.logoUrl) return '/images/brands/default.png';
-    return brand.logoUrl;
-  };
+      // First, try to get the primary image from the images array
+      if (brand.images && brand.images.length > 0) {
+        // Find the primary image or use the first one
+        const primaryImage = brand.images.find(img => img.isPrimary) || brand.images[0];
+        return primaryImage.imageUrl;
+      }
+      
+      // Fall back to the legacy imageUrl property
+      if (brand.imageUrl) return brand.imageUrl;
+      
+      // Default image if no images are available
+      return "/images/categories/default.png";
+     };
 
   if (status === 'loading') {
     return (

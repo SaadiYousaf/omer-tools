@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import Loading from '../../components/common/Loading/Loading';
 import axios from 'axios';
 import './OrderHistoryPage.css';
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const OrderHistoryPage = () => {
   const { user } = useSelector((state) => state.auth);
@@ -18,7 +19,7 @@ const OrderHistoryPage = () => {
       try {
         setLoading(true);
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5117/api/orders/user', {
+        const response = await axios.get(`${BASE_URL}/orders/user`, {
           headers: {
             Authorization: `Bearer ${token}`
           }

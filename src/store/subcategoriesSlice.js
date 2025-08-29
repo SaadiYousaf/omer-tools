@@ -1,13 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-
-const BASE_URL = 'http://localhost:5117';
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 // Async Thunks
+
 export const fetchSubcategories = createAsyncThunk(
   'subcategories/fetchSubcategories',
   async (categoryId, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${BASE_URL}/api/subcategories?categoryId=${categoryId}`);
+      const response = await fetch(`${BASE_URL}/subcategories?categoryId=${categoryId}&includeImages=true`);
       if (!response.ok) throw new Error('Failed to fetch subcategories');
       return await response.json();
     } catch (err) {
@@ -22,7 +22,7 @@ export const fetchSubcategory = createAsyncThunk(
   'subcategories/fetchSubcategory',
   async (subcategoryId, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${BASE_URL}/api/subcategories/${subcategoryId}`);
+      const response = await fetch(`${BASE_URL}/subcategories/${subcategoryId}`);
       if (!response.ok) throw new Error('Subcategory not found');
       return await response.json();
     } catch (err) {
@@ -35,7 +35,7 @@ export const fetchSubcategoryProducts = createAsyncThunk(
   'subcategories/fetchSubcategoryProducts',
   async (subcategoryId, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${BASE_URL}/api/products?subcategoryId=${subcategoryId}`);
+      const response = await fetch(`${BASE_URL}/products?subcategoryId=${subcategoryId}`);
       if (!response.ok) throw new Error('Failed to fetch subcategory products');
       return await response.json();
     } catch (err) {

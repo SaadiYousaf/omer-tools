@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
@@ -26,6 +26,45 @@ const Category = () => {
   const brands = useSelector(selectCategoryBrands);
   const brandsStatus = useSelector(selectBrandsStatus);
 
+  // Function to get brand image (consistent with other components)
+  const getBrandImage = useCallback((brand) => {
+    if (!brand) return "/images/brands/default.png";
+    
+    // First, try to get the primary image from the images array
+    if (brand.images && brand.images.length > 0) {
+      // Find the primary image or use the first one
+      const primaryImage = brand.images.find(img => img.isPrimary) || brand.images[0];
+      return primaryImage.imageUrl;
+    }
+    
+    // Fall back to the legacy imageUrl property
+    if (brand.imageUrl) return brand.imageUrl;
+    
+    // Fall back to logoUrl if exists
+    if (brand.logoUrl) return brand.logoUrl;
+    
+    // Default image if no images are available
+    return "/images/brands/default.png";
+  }, []);
+
+  // Function to get subcategory image
+  const getSubcategoryImage = useCallback((subcategory) => {
+    if (!subcategory) return "/images/subcategories/default.png";
+    
+    // First, try to get the primary image from the images array
+    if (subcategory.images && subcategory.images.length > 0) {
+      // Find the primary image or use the first one
+      const primaryImage = subcategory.images.find(img => img.isPrimary) || subcategory.images[0];
+      return primaryImage.imageUrl;
+    }
+    
+    // Fall back to the legacy imageUrl property
+    if (subcategory.imageUrl) return subcategory.imageUrl;
+    
+    // Default image if no images are available
+    return "/images/subcategories/default.png";
+  }, []);
+
   // Load brands and subcategories when categoryId changes
   useEffect(() => {
     if (categoryId) {
@@ -37,31 +76,6 @@ const Category = () => {
   // Combined loading state
   const isLoading = brandsStatus === 'loading' || subcategoriesStatus === 'loading';
   const hasError = brandsStatus === 'failed' || subcategoriesStatus === 'failed';
-
-  // Handle image loading errors
-  const handleImageError = (e) => {
-    e.target.src = '/images/subcategories/default.png';
-  };
-
-  // Skeleton loader for brands
-  const BrandSkeleton = () => (
-    <div className="brand-item loading">
-      <div className="brand-logo-skeleton" />
-    </div>
-  );
-
-  // Skeleton loader for subcategories
-  const SubcategorySkeleton = () => (
-    <div className="subcategory-card-wrapper">
-      <div className="subcategory-card loading">
-        <div className="subcategory-image-container-skeleton" />
-        <div className="subcategory-info-skeleton">
-          <div className="subcategory-name-skeleton" />
-          <div className="subcategory-desc-skeleton" />
-        </div>
-      </div>
-    </div>
-  );
 
   if (hasError) return <ErrorMessage message="Failed to load category data" />;
 
@@ -75,29 +89,33 @@ const Category = () => {
             {isLoading ? (
               // Show skeleton loaders while loading
               Array.from({ length: 8 }).map((_, index) => (
-                // <BrandSkeleton key={`brand-skeleton-${index}`} />
-                <Loading size="medium" variant="spinner" color="primary" />
+                <div key={`brand-skeleton-${index}`} className="brand-item-skeleton">
+                  <Loading size="small" variant="spinner" color="primary" />
+                </div>
               ))
             ) : (
               // Show actual brands when loaded
-              brands.map(brand => (
-                <div key={brand.id} className="brand-item">
-                  <Link 
-                    to={`/brand/${brand.id}`}
-                    className="brand-link"
-                  >
-                    <img 
-                      src={brand.logoUrl} 
-                      alt={brand.name} 
-                      className="brand-logo"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = '/images/brands/default.png';
-                      }}
-                    />
-                  </Link>
-                </div>
-              ))
+              brands.map(brand => {
+                const brandImage = getBrandImage(brand);
+                return (
+                  <div key={brand.id} className="brand-item">
+                    <Link 
+                      to={`/brand/${brand.id}`}
+                      className="brand-link"
+                    >
+                      <img 
+                        src={brandImage} 
+                        alt={brand.name} 
+                        className="brand-logo"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = '/images/brands/default.png';
+                        }}
+                      />
+                    </Link>
+                  </div>
+                );
+              })
             )}
           </div>
         </div>
@@ -110,37 +128,45 @@ const Category = () => {
           {isLoading ? (
             // Show skeleton loaders while loading
             Array.from({ length: 6 }).map((_, index) => (
-              <Loading size="medium" variant="spinner" color="primary" />
+              <div key={`subcat-skeleton-${index}`} className="subcategory-card-skeleton">
+                <Loading size="medium" variant="spinner" color="primary" />
+              </div>
             ))
           ) : subcategories.length === 0 ? (
             <p className="no-subcategories">No subcategories found for this category.</p>
           ) : (
             // Show actual subcategories when loaded
-            subcategories.map(subcategory => (
-              <div key={subcategory.id} className="subcategory-card-wrapper">
-                <Link 
-                  to={`/category/${categoryId}/subcategory/${subcategory.id}`}
-                  className="subcategory-link"
-                >
-                  <div className="subcategory-card">
-                    <div className="subcategory-image-container">
-                      <img
-                        src={subcategory.imageUrl || '/images/subcategories/default.png'}
-                        alt={subcategory.name}
-                        className="subcategory-image"
-                        onError={handleImageError}
-                      />
+            subcategories.map(subcategory => {
+              const subcategoryImage = getSubcategoryImage(subcategory);
+              return (
+                <div key={subcategory.id} className="subcategory-card-wrapper">
+                  <Link 
+                    to={`/category/${categoryId}/subcategory/${subcategory.id}`}
+                    className="subcategory-link"
+                  >
+                    <div className="subcategory-card">
+                      <div className="subcategory-image-container">
+                        <img
+                          src={subcategoryImage}
+                          alt={subcategory.name}
+                          className="subcategory-image"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = '/images/subcategories/default.png';
+                          }}
+                        />
+                      </div>
+                      <div className="subcategory-info">
+                        <h3>{subcategory.name}</h3>
+                        {subcategory.description && (
+                          <p>{subcategory.description}</p>
+                        )}
+                      </div>
                     </div>
-                    <div className="subcategory-info">
-                      <h3>{subcategory.name}</h3>
-                      {subcategory.description && (
-                        <p>{subcategory.description}</p>
-                      )}
-                    </div>
-                  </div>
-                </Link>
-              </div>
-            ))
+                  </Link>
+                </div>
+              );
+            })
           )}
         </div>
       </section>

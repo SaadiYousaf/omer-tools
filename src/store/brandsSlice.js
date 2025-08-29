@@ -1,13 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-const BASE_URL = 'http://localhost:5117';
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 // Async Thunk
 export const fetchBrands = createAsyncThunk(
   'brands/fetchBrands',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${BASE_URL}/api/brands`);
+      const response = await fetch(`${BASE_URL}/brands?includeImages=true`);
       if (!response.ok) throw new Error('Failed to fetch brands');
       return await response.json();
     } catch (err) {
