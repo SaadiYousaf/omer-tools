@@ -19,6 +19,8 @@ import Loading from "../../components/common/Loading/Loading";
 import ErrorMessage from "../../components/layout/ErrorMessage/ErrorMessage";
 import "./Subcategory.css";
 
+const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
+
 const Subcategory = () => {
   const { categoryId, subcategoryId } = useParams();
   const dispatch = useDispatch();
@@ -215,7 +217,7 @@ const Subcategory = () => {
     if (subcategory.images && subcategory.images.length > 0) {
       // Find the primary image or use the first one
       const primaryImage = subcategory.images.find(img => img.isPrimary) || subcategory.images[0];
-      return primaryImage.imageUrl;
+      return BASE_IMG_URL + primaryImage.imageUrl;
     }
     
     // Fall back to the legacy imageUrl property

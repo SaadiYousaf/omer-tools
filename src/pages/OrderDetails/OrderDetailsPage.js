@@ -5,6 +5,7 @@ import axios from 'axios';
 import Loading from '../../components/common/Loading/Loading';
 import './OrderDetailsPage.css';
 const BASE_URL = process.env.REACT_APP_BASE_URL;
+const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
 
 const OrderDetailsPage = () => {
   const { orderId } = useParams();
@@ -162,7 +163,7 @@ const OrderDetailsPage = () => {
                       <td>
                         <div className="d-flex align-items-center">
                           <img 
-                            src={item.imageUrl} 
+                            src={`${BASE_IMG_URL}${item.imageUrl}`}
                             alt={item.productName}
                             className="order-item-image"
                             onError={(e) => {

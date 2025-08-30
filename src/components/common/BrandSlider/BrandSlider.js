@@ -9,6 +9,7 @@ import {
 import useApi from '../../../api/useApi';
 import './BrandSlider.css';
 const BASE_URL = process.env.REACT_APP_BASE_URL;
+const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
 
 const BrandSlider = () => {
   const dispatch = useDispatch();
@@ -33,7 +34,7 @@ const BrandSlider = () => {
       if (brand.images && brand.images.length > 0) {
         // Find the primary image or use the first one
         const primaryImage = brand.images.find(img => img.isPrimary) || brand.images[0];
-        return primaryImage.imageUrl;
+        return BASE_IMG_URL + primaryImage.imageUrl;
       }
       
       // Fall back to the legacy imageUrl property

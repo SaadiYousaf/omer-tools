@@ -19,6 +19,8 @@ import './Product.css';
 // IMPORTANT: must match your API base used in the slice
 
 const API_BASE = process.env.REACT_APP_BASE_URL;
+const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
+
 
 const Product = () => {
   const { productId } = useParams();
@@ -147,7 +149,7 @@ const Product = () => {
     if (/^https?:\/\//i.test(url)) return url;
     // Normalize backslashes if any
     const clean = url.replace(/\\/g, '/');
-    return `${API_BASE}${clean.startsWith('/') ? '' : '/'}${clean}`;
+    return `${BASE_IMG_URL}${clean.startsWith('/') ? '' : '/'}${clean}`;
     // e.g. http://localhost:5117/uploads/abc.jpg
   };
 

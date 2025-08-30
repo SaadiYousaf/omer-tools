@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import ProductCard from '../Card/ProductCard';
 import './FeaturedProducts.css';
+const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
 
 const FeaturedProducts = () => {
   const [visibleProducts, setVisibleProducts] = useState(8);
@@ -18,7 +19,7 @@ const FeaturedProducts = () => {
       .filter(product => product.isFeatured)
       .map(product => ({
         ...product,
-        imageUrl: product.images?.[0]?.imageUrl || '/images/products/default.png'
+        imageUrl: BASE_IMG_URL+ product.images?.[0]?.imageUrl || '/images/products/default.png'
       }));
   }, [items]);
 

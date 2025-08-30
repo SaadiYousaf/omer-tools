@@ -11,6 +11,7 @@ import {
   FaStarHalfAlt
 } from "react-icons/fa";
 import "./ProductCard.css";
+const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
 
 const renderRating = (rating = 0) => {
   const stars = [];
@@ -38,8 +39,9 @@ const ProductCard = ({ product, linkTo }) => {
 
   const getImageUrl = useCallback((path) => {
     if (!path) return "/images/products/default.png";
-    if (path.startsWith("http") || path.startsWith("/")) return path;
-    return `/uploads/${path}`;
+    // if (path.startsWith("http") || path.startsWith("/")) return path;
+    if (path.startsWith("/")) return `${BASE_IMG_URL}${path}`;
+    return `${BASE_IMG_URL}${path}`;
   }, []);
 
   if (!product) return null;

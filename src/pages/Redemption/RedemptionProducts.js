@@ -10,6 +10,7 @@ import {
 } from '../../store/productsSlice';
 import ProductCard from '../../components/common/Card/ProductCard';
 import './RedemptionProducts.css';
+const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
 
 const RedemptionProducts = () => {
   const [visibleProducts, setVisibleProducts] = useState(8);
@@ -34,7 +35,7 @@ const RedemptionProducts = () => {
   const redemptionProducts = useMemo(() => {
     return redemptionItems.map(product => ({
       ...product,
-      imageUrl: product.images?.[0]?.imageUrl || '/images/products/default.png'
+      imageUrl: BASE_IMG_URL + product.images?.[0]?.imageUrl || '/images/products/default.png'
     }));
   }, [redemptionItems]);
 

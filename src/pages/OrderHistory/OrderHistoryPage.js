@@ -5,6 +5,7 @@ import Loading from '../../components/common/Loading/Loading';
 import axios from 'axios';
 import './OrderHistoryPage.css';
 const BASE_URL = process.env.REACT_APP_BASE_URL;
+const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
 
 const OrderHistoryPage = () => {
   const { user } = useSelector((state) => state.auth);
@@ -159,7 +160,7 @@ const OrderHistoryPage = () => {
                         <div key={item.id} className="order-item">
                           <div className="item-image-container">
                             <img 
-                              src={item.imageUrl} 
+                              src={`${BASE_IMG_URL}${item.imageUrl}`} 
                               alt={item.productName} 
                               className="item-image" 
                               onError={(e) => {

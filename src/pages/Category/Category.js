@@ -13,7 +13,8 @@ import {
 import Loading from '../../components/common/Loading/Loading';
 import ErrorMessage from '../../components/layout/ErrorMessage/ErrorMessage';
 import './Category.css';
-
+const BASE_URL=process.env.REACT_APP_BASE_URL;
+const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
 const Category = () => {
   const { categoryId } = useParams();
   const dispatch = useDispatch();
@@ -34,7 +35,7 @@ const Category = () => {
     if (brand.images && brand.images.length > 0) {
       // Find the primary image or use the first one
       const primaryImage = brand.images.find(img => img.isPrimary) || brand.images[0];
-      return primaryImage.imageUrl;
+      return BASE_IMG_URL + primaryImage.imageUrl;
     }
     
     // Fall back to the legacy imageUrl property
@@ -55,7 +56,7 @@ const Category = () => {
     if (subcategory.images && subcategory.images.length > 0) {
       // Find the primary image or use the first one
       const primaryImage = subcategory.images.find(img => img.isPrimary) || subcategory.images[0];
-      return primaryImage.imageUrl;
+      return BASE_IMG_URL + primaryImage.imageUrl;
     }
     
     // Fall back to the legacy imageUrl property
@@ -96,7 +97,9 @@ const Category = () => {
             ) : (
               // Show actual brands when loaded
               brands.map(brand => {
-                const brandImage = getBrandImage(brand);
+                const  buildImgePath= getBrandImage(brand);
+                const brandImage =buildImgePath;
+                
                 return (
                   <div key={brand.id} className="brand-item">
                     <Link 

@@ -20,6 +20,7 @@ const CategorySlider = () => {
   const scrollTimeoutRef = useRef(null);
   const { get } = useApi();
   const API_BASE_URL = process.env.REACT_APP_BASE_URL;
+    const BASE_URL = process.env.REACT_APP_BASE_IMG_URL;
   console.log("Base URL:", process.env.REACT_APP_BASE_URL);
 
   useEffect(() => {
@@ -84,7 +85,7 @@ const CategorySlider = () => {
     if (category.images && category.images.length > 0) {
       // Find the primary image or use the first one
       const primaryImage = category.images.find(img => img.isPrimary) || category.images[0];
-      return primaryImage.imageUrl;
+      return BASE_URL + primaryImage.imageUrl;
     }
     
     // Fall back to the legacy imageUrl property

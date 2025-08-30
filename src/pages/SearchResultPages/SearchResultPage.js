@@ -4,6 +4,7 @@ import Loading from '../../components/common/Loading/Loading';
 import ProductGrid from '../../components/common/ProductGrid/ProductGrid';
 import './SearchResultPage.css';
 const BASE_URL = process.env.REACT_APP_BASE_URL;
+const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
 
 const SearchResultsPage = () => {
   const location = useLocation();
@@ -88,7 +89,7 @@ const SearchResultsPage = () => {
       name: product.name,
       price: product.price,
       discountPrice: product.discountPrice,
-      images: [{ imageUrl: product.imageUrl }],
+      images: [{ imageUrl: BASE_IMG_URL + product.imageUrl }],
       brand: product.brand,
       stockStatus: product.stockStatus,
       sku: product.SKU,

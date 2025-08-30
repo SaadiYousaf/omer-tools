@@ -12,6 +12,7 @@ import ProductCard from '../../components/common/Card/ProductCard';
 import Loading from '../../components/common/Loading/Loading';
 import ScrollToTop from '../../components/common/Scroll/ScrollToTop';
 import './BrandProducts.css';
+const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
 
 const BrandProducts = () => {
   const { brandId } = useParams();
@@ -32,7 +33,7 @@ const BrandProducts = () => {
     if (brand.images && brand.images.length > 0) {
       // Find the primary image or use the first one
       const primaryImage = brand.images.find(img => img.isPrimary) || brand.images[0];
-      return primaryImage.imageUrl;
+      return BASE_IMG_URL + primaryImage.imageUrl;
     }
     
     // Fall back to the legacy imageUrl property
@@ -85,8 +86,8 @@ const BrandProducts = () => {
   const brand = brands.find(b => b.id === brandId);
   const brandName = brand?.name || `Brand #${brandId}`;
   const brandDescription = brand?.description || 'Premium tools for professionals';
-  const brandImage = getBrandImage(brand);
-
+  const buildImgePath =getBrandImage(brand); 
+  const brandImage =buildImgePath;
   // Handle sorting
   const handleSortChange = (e) => {
     setSortOption(e.target.value);

@@ -7,6 +7,7 @@ import Loading from '../Loading/Loading';
 import './CategorySubcategories.css';
 import ScrollToTop from '../Scroll/ScrollToTop';
 
+const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
 const CategorySubcategories = () => {
   const { categoryId } = useParams();
   const dispatch = useDispatch();
@@ -25,7 +26,7 @@ const CategorySubcategories = () => {
 
   const getSubcategoryImage = (subcategory) => {
     if (!subcategory.imageUrl) return '/images/subcategories/default.png';
-    return subcategory.imageUrl;
+    return BASE_IMG_URL + subcategory.imageUrl;
   };
 
   if (status === 'loading') {

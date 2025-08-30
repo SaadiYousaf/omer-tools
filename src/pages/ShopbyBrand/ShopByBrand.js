@@ -12,6 +12,8 @@ import BrandFilter from '../../components/common/BrandSlider/BrandFilter/BrandFi
 import Loading from '../../components/common/Loading/Loading';
 import './ShopByBrand.css';
 
+const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
+
 const ShopByBrand = () => {
   const dispatch = useDispatch();
   const { get } = useApi();
@@ -30,7 +32,7 @@ const ShopByBrand = () => {
     if (brand.images && brand.images.length > 0) {
       // Find the primary image or use the first one
       const primaryImage = brand.images.find(img => img.isPrimary) || brand.images[0];
-      return primaryImage.imageUrl;
+      return BASE_IMG_URL + primaryImage.imageUrl;
     }
     
     // Fall back to the legacy imageUrl property
