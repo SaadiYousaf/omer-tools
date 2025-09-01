@@ -34,7 +34,7 @@ export const fetchBrandsByCategory = createAsyncThunk(
   'categories/fetchBrandsByCategory',
   async (categoryId, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${BASE_URL}/categories/${categoryId}/brands`);
+      const response = await fetch(`${BASE_URL}/brands?categoryId=${categoryId}&includeImages=true`);
       if (!response.ok) throw new Error('Failed to fetch brands');
       return await response.json();
     } catch (err) {

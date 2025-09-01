@@ -19,7 +19,7 @@ import { FaStar, FaRegStar, FaStarHalfAlt, FaHeart as FaSolidHeart } from "react
 import { fetchAllProducts, selectAllProducts, selectProductsStatus } from "../../../store/productsSlice";
 import { addItemToCart } from "../../../store/cartSlice";
 import "./ProductSlider.css";
-
+const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
 const ProductSlider = ({ 
   title = "Premium Collections", 
   subtitle = "Discover our enterprise-grade solutions designed for professionals",
@@ -105,7 +105,7 @@ const ProductSlider = ({
   const getProductImage = (product) => {
     if (product.images && product.images.length > 0) {
       const primaryImage = product.images.find(img => img.isPrimary) || product.images[0];
-      return primaryImage.imageUrl;
+      return BASE_IMG_URL + primaryImage.imageUrl;
     }
     
     if (product.imageUrl) return product.imageUrl;
