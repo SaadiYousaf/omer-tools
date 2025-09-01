@@ -16,6 +16,7 @@ import slide2 from "../../assets/images/dew2.jpg";
 import slide3 from "../../assets/images/free-shipping.jpg";
 import slide4 from "../../assets/images/dew2.jpg";
 import slide5 from "../../assets/images/pb.jpg";
+import ProductSlider from "../../components/common/ProductSlider/ProductSlider";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -79,7 +80,10 @@ const Home = () => {
       <section className="category-navigation secondary-categories">
         <div className="container">
           <h2>Popular Collections</h2>
-          <CategorySlider categories={categories} activeBrandIndex={2} />
+          {/* <CategorySlider categories={categories} activeBrandIndex={2} /> */}
+
+          <ProductSlider />
+      
         </div>
       </section>
 
