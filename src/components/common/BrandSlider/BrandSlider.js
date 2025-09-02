@@ -74,7 +74,7 @@ const BrandSlider = () => {
   return (
     <section className="brand-slider-section">
       <div className="container">
-        <h2 className="brands-heading">Our Brands</h2>
+        <h2 className="brands-heading">Shop By Brand</h2>
         <div className="brand-container">
           {brands.slice(0, 8).map((brand) => (
             <Link to={`/brand/${brand.id}`} key={brand.id} className="brand-link">

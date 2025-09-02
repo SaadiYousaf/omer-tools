@@ -67,19 +67,16 @@ const Home = () => {
       {/* Categories */}
       <section className="category-navigation main-categories">
         <div className="container">
+          <h2 className="category-heading">Shop by Category</h2>
           <CategorySlider categories={categories} activeBrandIndex={0} />
         </div>
       </section>
 
-      {/* Member Deals */}
-      <section className="member-deals-section">
-        <MemberDeals />
-      </section>
 
       {/* Secondary Categories */}
       <section className="category-navigation secondary-categories">
         <div className="container">
-          <h2>Popular Collections</h2>
+          {/* <h2>Popular Collections</h2> */}
           {/* <CategorySlider categories={categories} activeBrandIndex={2} /> */}
 
           <ProductSlider />
@@ -106,6 +103,10 @@ const Home = () => {
         <div className="container">
           <FeaturedProducts products={featuredProducts} />
         </div>
+      </section>
+      {/* Member Deals */}
+      <section className="member-deals-section">
+        <MemberDeals />
       </section>
     </div>
   );

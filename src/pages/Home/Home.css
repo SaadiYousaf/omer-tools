@@ -61,7 +61,14 @@
 }
 
 .category-navigation.main-categories {
-  background-color: #f8f8f8;
+  background-color: #ffffff;
+}
+.category-heading {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #333;
 }
 
 .category-navigation.secondary-categories {

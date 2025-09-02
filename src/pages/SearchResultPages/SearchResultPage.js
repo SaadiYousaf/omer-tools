@@ -89,12 +89,14 @@ const SearchResultsPage = () => {
       name: product.name,
       price: product.price,
       discountPrice: product.discountPrice,
-      images: [{ imageUrl: BASE_IMG_URL + product.imageUrl }],
+      images: [{ imageUrl: product.imageUrl }],
       brand: product.brand,
       stockStatus: product.stockStatus,
       sku: product.SKU,
       category: product.category,
-      isFeatured: product.isFeatured
+      isFeatured: product.isFeatured,
+      stockStatus:product.stockStatus,
+      stockQuantity:product.stockQuantity,
     }));
   };
 
