@@ -1,25 +1,14 @@
-import React, { useRef, useEffect, useCallback, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { 
-  FiChevronLeft, 
-  FiChevronRight, 
-  FiArrowRight, 
-  FiStar, 
-  FiAward, 
-  FiZap, 
-  FiTrendingUp,
-  FiCheckCircle,
-  FiShield,
-  FiHeart,
-  FiEye,
-  FiShoppingCart
-} from "react-icons/fi";
-import { FaStar, FaRegStar, FaStarHalfAlt, FaHeart as FaSolidHeart } from "react-icons/fa";
+import { FiChevronLeft, FiChevronRight, FiHeart, FiShoppingCart } from "react-icons/fi";
+import { FaHeart as FaSolidHeart } from "react-icons/fa";
 import { fetchAllProducts, selectAllProducts, selectProductsStatus } from "../../../store/productsSlice";
 import { addItemToCart } from "../../../store/cartSlice";
 import "./ProductSlider.css";
+
 const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
+
 const ProductSlider = ({ 
   title = "Premium Collections", 
   subtitle = "Discover our enterprise-grade solutions designed for professionals",
@@ -30,21 +19,30 @@ const ProductSlider = ({
   const status = useSelector(selectProductsStatus);
   const cartItems = useSelector(state => state.cart.items);
   const sliderRef = useRef(null);
-  const [showArrows, setShowArrows] = useState({ left: false, right: true });
-  const [visibleItems, setVisibleItems] = useState(4);
   const [wishlistedItems, setWishlistedItems] = useState({});
-  const scrollTimeoutRef = useRef(null);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [visibleItems, setVisibleItems] = useState(4);
+  const autoSlideRef = useRef(null);
 
   // Filter products with non-null tagline and limit to maxItems
-  const taggedProducts = products
-    .filter(product => product.tagLine && product.tagLine.trim() !== "")
-    .slice(0, maxItems);
+  const taggedProducts = React.useMemo(() => {
+    return products
+      .filter(product => 
+        product.tagLine && 
+        product.tagLine.trim() !== "" &&
+        !product.isFeatured &&
+        !product.isRedemption
+      )
+      .slice(0, maxItems);
+  }, [products, maxItems]);
 
   useEffect(() => {
-    if (status === "idle") {
+    // Only fetch products if they haven't been loaded yet
+    if (status === "idle" || products.length === 0) {
       dispatch(fetchAllProducts());
     }
-
+    
     // Calculate visible items based on container width
     const updateVisibleItems = () => {
       const width = window.innerWidth;
@@ -58,48 +56,88 @@ const ProductSlider = ({
     window.addEventListener('resize', updateVisibleItems);
     
     return () => window.removeEventListener('resize', updateVisibleItems);
-  }, [status, dispatch]);
-
-  const checkScrollPosition = useCallback(() => {
-    if (scrollTimeoutRef.current) {
-      clearTimeout(scrollTimeoutRef.current);
-    }
-
-    scrollTimeoutRef.current = setTimeout(() => {
-      if (sliderRef.current) {
-        const { scrollLeft, scrollWidth, clientWidth } = sliderRef.current;
-        setShowArrows({
-          left: scrollLeft > 10,
-          right: scrollLeft < scrollWidth - clientWidth - 10,
-        });
-      }
-    }, 100);
-  }, []);
+  }, [status, dispatch, products.length]);
 
   useEffect(() => {
-    checkScrollPosition();
+    // Reset initial load flag once products are loaded
+    if (status === "succeeded" && isInitialLoad) {
+      setIsInitialLoad(false);
+    }
+  }, [status, isInitialLoad]);
 
-    const slider = sliderRef.current;
-    if (!slider) return;
-
-    slider.addEventListener("scroll", checkScrollPosition);
+  // Auto slide functionality
+  useEffect(() => {
+    if (taggedProducts.length <= visibleItems) return;
+    
+    const startAutoSlide = () => {
+      autoSlideRef.current = setInterval(() => {
+        setCurrentIndex(prevIndex => {
+          if (prevIndex >= taggedProducts.length - visibleItems) {
+            return 0; // Loop back to start
+          }
+          return prevIndex + 1;
+        });
+      }, 3000);
+    };
+    
+    startAutoSlide();
+    
     return () => {
-      slider.removeEventListener("scroll", checkScrollPosition);
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
+      if (autoSlideRef.current) {
+        clearInterval(autoSlideRef.current);
       }
     };
-  }, [checkScrollPosition, taggedProducts]);
+  }, [taggedProducts.length, visibleItems]);
 
-  const scroll = (direction) => {
-    if (sliderRef.current) {
-      const scrollAmount = direction === "left" ? -sliderRef.current.offsetWidth : sliderRef.current.offsetWidth;
-      sliderRef.current.scrollBy({
-        left: scrollAmount,
-        behavior: "smooth",
-      });
-      setTimeout(checkScrollPosition, 300);
+  // Handle manual navigation
+  const handlePrev = () => {
+    if (autoSlideRef.current) {
+      clearInterval(autoSlideRef.current);
     }
+    
+    setCurrentIndex(prevIndex => {
+      if (prevIndex === 0) {
+        return Math.max(0, taggedProducts.length - visibleItems);
+      }
+      return prevIndex - 1;
+    });
+    
+    // Restart auto slide
+    setTimeout(() => {
+      autoSlideRef.current = setInterval(() => {
+        setCurrentIndex(prevIndex => {
+          if (prevIndex >= taggedProducts.length - visibleItems) {
+            return 0;
+          }
+          return prevIndex + 1;
+        });
+      }, 3000);
+    }, 5000);
+  };
+
+  const handleNext = () => {
+    if (autoSlideRef.current) {
+      clearInterval(autoSlideRef.current);
+    }
+    
+    setCurrentIndex(prevIndex => {
+      if (prevIndex >= taggedProducts.length - visibleItems) {
+        return 0;
+      }
+      return prevIndex + 1;
+    });
+    
+    // Restart auto slide
+    setTimeout(() => {
+      autoSlideRef.current = setInterval(() => {
+        setCurrentIndex(prevIndex => {
+          if (prevIndex >= taggedProducts.length - visibleItems) {
+            return 0;
+          }
+          return prevIndex + 1;
+        });
+      }, 3000);
+    }, 5000);
   };
 
   const getProductImage = (product) => {
@@ -111,40 +149,6 @@ const ProductSlider = ({
     if (product.imageUrl) return product.imageUrl;
     
     return "/images/products/default.png";
-  };
-
-  // Function to determine tagline style based on content
-  const getTaglineStyle = (tagline) => {
-    const lowerTagline = tagline.toLowerCase();
-    
-    if (lowerTagline.includes('sale') || lowerTagline.includes('deal') || lowerTagline.includes('offer')) {
-      return "sale";
-    } else if (lowerTagline.includes('new') || lowerTagline.includes('launch')) {
-      return "new";
-    } else if (lowerTagline.includes('featured') || lowerTagline.includes('popular')) {
-      return "featured";
-    } else if (lowerTagline.includes('premium') || lowerTagline.includes('exclusive')) {
-      return "premium";
-    } else if (lowerTagline.includes('limited')) {
-      return "limited";
-    } else if (lowerTagline.includes('enterprise') || lowerTagline.includes('business')) {
-      return "enterprise";
-    }
-    
-    return "default";
-  };
-
-  // Function to get icon based on tagline style
-  const getTaglineIcon = (style) => {
-    switch(style) {
-      case "sale": return <FiAward className="tagline-icon" />;
-      case "new": return <FiZap className="tagline-icon" />;
-      case "featured": return <FiStar className="tagline-icon" />;
-      case "premium": return <FiTrendingUp className="tagline-icon" />;
-      case "limited": return <FiAward className="tagline-icon" />;
-      case "enterprise": return <FiShield className="tagline-icon" />;
-      default: return <FiCheckCircle className="tagline-icon" />;
-    }
   };
 
   const toggleWishlist = (productId, e) => {
@@ -175,35 +179,17 @@ const ProductSlider = ({
     }));
   };
 
-  const renderRating = (rating = 0) => {
-    const stars = [];
-    const normalizedRating = Math.min(Math.max(rating, 0), 5);
-    const fullStars = Math.floor(normalizedRating);
-    const hasHalfStar = normalizedRating % 1 >= 0.5;
-
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(<FaStar key={`full-${i}`} className="star" />);
-    }
-    if (hasHalfStar) {
-      stars.push(<FaStarHalfAlt key="half" className="star" />);
-    }
-    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-    for (let i = 0; i < emptyStars; i++) {
-      stars.push(<FaRegStar key={`empty-${i}`} className="star" />);
-    }
-    return stars;
-  };
-
-  if (status === "loading") {
+  // Show loading state if products are being fetched or if it's the initial load
+  if (status === "loading" || isInitialLoad) {
     return (
-      <section className="enterprise-product-slider">
-        <div className="slider-header">
+      <section className="product-carousel-container">
+        <div className="carousel-header">
           <div className="header-content">
-            <h2 className="slider-title">{title}</h2>
-            <p className="slider-subtitle">{subtitle}</p>
+            <h2 className="carousel-title">{title}</h2>
+            <p className="carousel-subtitle">{subtitle}</p>
           </div>
-          <div className="slider-controls">
-            <div className="slider-dots">
+          <div className="carousel-controls">
+            <div className="carousel-dots">
               {[...Array(Math.ceil(maxItems / visibleItems))].map((_, i) => (
                 <div key={i} className="dot"></div>
               ))}
@@ -211,18 +197,14 @@ const ProductSlider = ({
           </div>
         </div>
         
-        <div className="slider-container">
-          <div className="product-grid">
+        <div className="carousel-wrapper">
+          <div className="product-carousel">
             {[...Array(visibleItems)].map((_, index) => (
-              <div key={`skeleton-${index}`} className="product-card-milwaukee skeleton">
-                <div className="image-container"></div>
+              <div key={`skeleton-${index}`} className="carousel-product-card skeleton">
+                <div className="product-image-container"></div>
                 <div className="product-info">
-                  <div className="product-rating">
-                    <div className="star-placeholder"></div>
-                  </div>
                   <div className="title-placeholder"></div>
-                  <div className="price-placeholder"></div>
-                  <div className="button-placeholder"></div>
+                  <div className="tagline-placeholder"></div>
                 </div>
               </div>
             ))}
@@ -234,11 +216,11 @@ const ProductSlider = ({
 
   if (status === "failed") {
     return (
-      <section className="enterprise-product-slider">
-        <div className="slider-header">
+      <section className="product-carousel-container">
+        <div className="carousel-header">
           <div className="header-content">
-            <h2 className="slider-title">{title}</h2>
-            <p className="slider-subtitle">{subtitle}</p>
+            <h2 className="carousel-title">{title}</h2>
+            <p className="carousel-subtitle">{subtitle}</p>
           </div>
         </div>
         
@@ -255,46 +237,50 @@ const ProductSlider = ({
   }
 
   if (taggedProducts.length === 0) {
-    return null;
+    return (
+      <section className="product-carousel-container">
+        <div className="carousel-header">
+          <div className="header-content">
+            <h2 className="carousel-title">{title}</h2>
+            <p className="carousel-subtitle">{subtitle}</p>
+          </div>
+        </div>
+        
+        <div className="no-products-message">
+          <p>No products available at the moment.</p>
+        </div>
+      </section>
+    );
   }
 
   return (
-    <section className="enterprise-product-slider">
-      <div className="slider-header">
+    <section className="product-carousel-container">
+      <div className="carousel-header">
         <div className="header-content">
-          <h2 className="slider-title">{title}</h2>
-          <p className="slider-subtitle">{subtitle}</p>
+          <h2 className="carousel-title">{title}</h2>
+          <p className="carousel-subtitle">{subtitle}</p>
         </div>
-        <div className="slider-controls">
-          <div className="slider-dots">
+        <div className="carousel-controls">
+          <div className="carousel-dots">
             {[...Array(Math.ceil(taggedProducts.length / visibleItems))].map((_, i) => (
               <button 
                 key={i} 
-                className="dot"
-                onClick={() => {
-                  if (sliderRef.current) {
-                    sliderRef.current.scrollTo({
-                      left: i * sliderRef.current.offsetWidth,
-                      behavior: 'smooth'
-                    });
-                  }
-                }}
+                className={`dot ${Math.floor(currentIndex / visibleItems) === i ? 'active' : ''}`}
+                aria-label={`Go to slide ${i + 1}`}
               ></button>
             ))}
           </div>
           <div className="arrow-controls">
             <button
-              className={`slider-arrow left-arrow ${!showArrows.left ? 'disabled' : ''}`}
-              onClick={() => scroll("left")}
-              disabled={!showArrows.left}
+              className="carousel-arrow left-arrow"
+              onClick={handlePrev}
               aria-label="Previous products"
             >
               <FiChevronLeft />
             </button>
             <button
-              className={`slider-arrow right-arrow ${!showArrows.right ? 'disabled' : ''}`}
-              onClick={() => scroll("right")}
-              disabled={!showArrows.right}
+              className="carousel-arrow right-arrow"
+              onClick={handleNext}
               aria-label="Next products"
             >
               <FiChevronRight />
@@ -303,52 +289,22 @@ const ProductSlider = ({
         </div>
       </div>
       
-      <div className="slider-container">
-        <div className="product-grid" ref={sliderRef}>
+      <div className="carousel-wrapper">
+        <div 
+          className="product-carousel" 
+          ref={sliderRef}
+          style={{ 
+            transform: `translateX(-${currentIndex * (100 / visibleItems)}%)`,
+            transition: 'transform 0.5s ease-in-out'
+          }}
+        >
           {taggedProducts.map((product) => {
-            const taglineStyle = getTaglineStyle(product.tagLine);
-            const price = parseFloat(product.price) || 0;
-            const discountPrice = parseFloat(product.discountPrice) || null;
-            const hasDiscount = discountPrice !== null && discountPrice < price;
-            
-            // Check stock status
-            const stockQuantity = product.stockQuantity || 0;
-            const cartItem = cartItems.find(item => item.id === product.id);
-            const cartQuantity = cartItem ? cartItem.quantity : 0;
-            const availableStock = Math.max(0, stockQuantity - cartQuantity);
-            const isOutOfStock = availableStock < 1;
-            
-            let stockStatus = "in-stock";
-            let stockText = "In Stock";
-            
-            if (isOutOfStock) {
-              stockStatus = "out-of-stock";
-              stockText = "Out of Stock";
-            } else if (availableStock < 5) {
-              stockStatus = "low-stock";
-              stockText = "Low Stock";
-            }
-            
             return (
               <Link
                 to={`/product/${product.id}`}
                 key={product.id}
-                className="product-card-milwaukee"
+                className="carousel-product-card"
               >
-                {/* Discount ribbon */}
-                {hasDiscount && (
-                  <div className="discount-ribbon" aria-label="Discount">
-                    Sale
-                  </div>
-                )}
-
-                {/* Tagline ribbon */}
-                {product.tagLine && (
-                  <div className="tagline-ribbon" aria-label="Tagline">
-                    {product.tagLine}
-                  </div>
-                )}
-
                 {/* Wishlist button */}
                 <button 
                   className={`wishlist-btn ${wishlistedItems[product.id] ? "active" : ""}`}
@@ -359,7 +315,7 @@ const ProductSlider = ({
                 </button>
 
                 {/* Product image */}
-                <div className="image-container">
+                <div className="product-image-container">
                   <img
                     src={getProductImage(product)}
                     alt={product.name}
@@ -368,43 +324,11 @@ const ProductSlider = ({
                       e.target.src = "/images/products/default.png";
                     }}
                   />
-                  <div className="image-overlay">
-                    <div className="overlay-content">View Details</div>
-                  </div>
                 </div>
                 
                 <div className="product-info">
-                  <div className="product-rating">
-                    {renderRating(product.rating || 4.5)}
-                    <span className="rating-count">({product.reviewCount || 42})</span>
-                  </div>
-                  
                   <h3 className="product-title">{product.name}</h3>
-                  
-                  <div className="stock-status-container">
-                    <span className={`stock-status ${stockStatus}`}>{stockText}</span>
-                  </div>
-                  
-                  <div className="price-container">
-                    {hasDiscount ? (
-                      <>
-                        <span className="current-price">${discountPrice.toFixed(2)}</span>
-                        <span className="original-price">${price.toFixed(2)}</span>
-                      </>
-                    ) : (
-                      <span className="current-price">${price.toFixed(2)}</span>
-                    )}
-                  </div>
-                  
-                  <button 
-                    className={`add-to-cart-btn ${isOutOfStock ? "disabled" : ""}`}
-                    onClick={(e) => handleAddToCart(product, e)}
-                    disabled={isOutOfStock}
-                    aria-label={isOutOfStock ? "Out of stock" : "Add to cart"}
-                  >
-                    <FiShoppingCart className="cart-icon" aria-hidden="true" />
-                    <span>{isOutOfStock ? "Out of Stock" : "Add to Cart"}</span>
-                  </button>
+                  <p className="product-tagline">{product.tagLine}</p>
                 </div>
               </Link>
             );
