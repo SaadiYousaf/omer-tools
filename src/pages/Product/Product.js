@@ -274,8 +274,14 @@ const Product = () => {
             </div>
           ))}
         </div>
-        
         <div className="main-image-container">
+            {/* Add tagline ribbon here */}
+            {prod.tagLine && (
+              <div className="main-tagline-ribbon">
+                {prod.tagLine}
+              </div>
+            )}
+            
           <div className="main-image">
             <img 
               src={mainImageSrc} 

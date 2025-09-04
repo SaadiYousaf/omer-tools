@@ -14,7 +14,44 @@
   --radius: 12px;
   --transition: all 0.3s ease;
 }
+/* Product.css */
+.main-tagline-ribbon {
+  position: absolute;
+  top: 16px;
+  right: 0;
+  background: #072c62;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 8px 16px;
+  z-index: 2;
+  border-radius: 4px 0 0 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
 
+.main-image-container {
+  position: relative;
+  /* ... other existing styles ... */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .main-tagline-ribbon {
+    font-size: 12px;
+    padding: 6px 12px;
+    top: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-tagline-ribbon {
+    font-size: 10px;
+    padding: 4px 8px;
+    top: 8px;
+  }
+}
 * {
   box-sizing: border-box;
   margin: 0;
