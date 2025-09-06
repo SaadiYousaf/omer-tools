@@ -2,12 +2,13 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import ProductCard from '../Card/ProductCard';
 import './FeaturedProducts.css';
+
 const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
 
 const FeaturedProducts = () => {
   const [visibleProducts, setVisibleProducts] = useState(8);
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState(""); // ✅ state for user messages
+  const [message, setMessage] = useState("");
   const productsPerLoad = 8;
 
   // Get all products from Redux store
@@ -19,7 +20,7 @@ const FeaturedProducts = () => {
       .filter(product => product.isFeatured)
       .map(product => ({
         ...product,
-        imageUrl: BASE_IMG_URL+ product.images?.[0]?.imageUrl || '/images/products/default.png'
+        imageUrl: BASE_IMG_URL + product.images?.[0]?.imageUrl || '/images/products/default.png'
       }));
   }, [items]);
 
@@ -50,17 +51,16 @@ const FeaturedProducts = () => {
     setVisibleProducts(productsPerLoad);
   }, [featuredProducts]);
 
-  // ✅ Handle "View All Products" button
+  // Handle "View All Products" button
   const handleViewAll = () => {
     setMessage("Redirecting to all products page...");
     setTimeout(() => {
-      // Later replace with navigation e.g. navigate("/products")
       setMessage("All products loaded successfully!");
     }, 1500);
   };
 
   return (
-    <div className="featured-products-compact">
+    <div className="featured-products">
       <div className="header-section">
         <h2>Featured Products</h2>
         {featuredProducts.length > 0 && (
@@ -70,9 +70,9 @@ const FeaturedProducts = () => {
       
       {featuredProducts.length > 0 ? (
         <>
-          <div className="products-grid-compact">
+          <div className="products-grid">
             {featuredProducts.slice(0, visibleProducts).map(product => (
-              <div key={product.id} className="product-card-compact-wrapper">
+              <div key={product.id} className="product-card-wrapper">
                 <ProductCard 
                   product={product}
                   description={product.description}
@@ -96,7 +96,6 @@ const FeaturedProducts = () => {
                 View All Products
               </button>
 
-              {/* ✅ Inline message instead of alert */}
               {message && <p className="inline-message">{message}</p>}
             </div>
           )}

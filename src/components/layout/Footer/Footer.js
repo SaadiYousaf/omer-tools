@@ -1,6 +1,7 @@
-import React from 'react';
-import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from 'react-icons/fa';
-import './Footer.css';
+import React from "react";
+import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import "./Footer.css";
 
 const Footer = () => {
   // Dummy click handlers for social media icons
@@ -16,26 +17,28 @@ const Footer = () => {
         <div className="footer-content">
           <div className="footer-section">
             <h3>About Us</h3>
-            <p>Omer Tools is your one-stop shop for quality tools and equipment.</p>
+            <p>
+              Omer Tools is your one-stop shop for quality tools and equipment.
+            </p>
             <div className="social-icons">
-              <FaFacebook 
-                className="social-icon" 
-                onClick={() => handleSocialClick('Facebook')} 
+              <FaFacebook
+                className="social-icon"
+                onClick={() => handleSocialClick("Facebook")}
                 aria-label="Facebook"
               />
-              <FaTwitter 
-                className="social-icon" 
-                onClick={() => handleSocialClick('Twitter')} 
+              <FaTwitter
+                className="social-icon"
+                onClick={() => handleSocialClick("Twitter")}
                 aria-label="Twitter"
               />
-              <FaInstagram 
-                className="social-icon" 
-                onClick={() => handleSocialClick('Instagram')} 
+              <FaInstagram
+                className="social-icon"
+                onClick={() => handleSocialClick("Instagram")}
                 aria-label="Instagram"
               />
-              <FaLinkedin 
-                className="social-icon" 
-                onClick={() => handleSocialClick('LinkedIn')} 
+              <FaLinkedin
+                className="social-icon"
+                onClick={() => handleSocialClick("LinkedIn")}
                 aria-label="LinkedIn"
               />
             </div>
@@ -43,9 +46,18 @@ const Footer = () => {
           <div className="footer-section">
             <h3>Quick Links</h3>
             <ul>
-              <li><a href="/">Home</a></li>
-              <li><a href="/products">Products</a></li>
-              <li><a href="/contact">Contact</a></li>
+              <li>
+                <Link to="/">Home</Link>
+              </li>
+              <li>
+                <Link to="/shop-by-brand">Products</Link>
+              </li>
+              <li>
+                <Link to="/contact">Contact</Link>
+              </li>
+              <li>
+                <Link to="/store-locations">Store Locations</Link>
+              </li>
             </ul>
           </div>
           <div className="footer-section">
@@ -55,7 +67,9 @@ const Footer = () => {
           </div>
         </div>
         <div className="footer-bottom">
-          <p>&copy; {new Date().getFullYear()} Omer Tools. All rights reserved.</p>
+          <p>
+            &copy; {new Date().getFullYear()} Omer Tools. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
