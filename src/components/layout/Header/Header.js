@@ -209,11 +209,7 @@ const Header = () => {
 
       <div className="main-header">
         <div className="container">
-          <div className="main-header-content">
-            <Link to="/" className="logo">
-              <img src={logoImage} alt="Omer Tools" />
-            </Link>
-
+          <div className="main-header-grid">
             <button
               className="mobile-menu-toggle"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -221,6 +217,10 @@ const Header = () => {
             >
               <FaBars />
             </button>
+
+            <Link to="/" className="logo">
+              <img src={logoImage} alt="Omer Tools" />
+            </Link>
 
             <div className="search-container-wrapper" ref={searchRef}>
               <form
@@ -311,7 +311,6 @@ const Header = () => {
                 </div>
               )}
             </div>
-
             <div className="user-cart-container">
               {isAuthenticated ? (
                 <div className="user-dropdown">
@@ -325,7 +324,6 @@ const Header = () => {
                     <button onClick={handleuserProfile} className="dropdown-item">
                       User Profile
                     </button>
-
                   </div>
                 </div>
               ) : (
@@ -342,6 +340,7 @@ const Header = () => {
                 <span className="cart-text">Cart</span>
               </Link>
             </div>
+
           </div>
         </div>
       </div>
