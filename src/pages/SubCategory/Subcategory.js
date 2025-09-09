@@ -39,9 +39,15 @@ const Subcategory = () => {
     (state) => state.subcategories
   );
 
-  // Get all products from Redux, not just filtered ones
+  // Get all products from Redux and filter by subcategory
   const { items: allProducts, subcategoryProductsStatus, error: productsError } = 
     useSelector((state) => state.products);
+
+  // Filter products by current subcategory
+  const productsInThisSubcategory = useMemo(() => {
+    if (!allProducts || !subcategoryId) return [];
+    return allProducts.filter(product => product.subcategoryId === subcategoryId);
+  }, [allProducts, subcategoryId]);
 
   // Get all brands from Redux
   const allBrands = useSelector(selectAllBrands);
@@ -72,13 +78,13 @@ const Subcategory = () => {
     }
   }, [subcategoryId, subcategories, dispatch]);
 
-  // Calculate available filters
+  // Calculate available filters based on products in this subcategory
   const { minPriceAll, maxPriceAll, availableRatings } = useMemo(() => {
     const prices = [];
     const ratings = new Set();
     
-    if (allProducts && allProducts.length > 0) {
-      allProducts.forEach((product) => {
+    if (productsInThisSubcategory && productsInThisSubcategory.length > 0) {
+      productsInThisSubcategory.forEach((product) => {
         prices.push(product.price);
         if (product.averageRating) {
           ratings.add(Math.floor(product.averageRating));
@@ -91,15 +97,15 @@ const Subcategory = () => {
       maxPriceAll: prices.length > 0 ? Math.max(...prices) : 0,
       availableRatings: Array.from(ratings).sort((a, b) => b - a),
     };
-  }, [allProducts]);
+  }, [productsInThisSubcategory]);
 
-  // Apply filters and sorting
+  // Apply filters and sorting to products in this subcategory
   const getFilteredProducts = () => {
-    if (!allProducts || !Array.isArray(allProducts) || allProducts.length === 0) {
+    if (!productsInThisSubcategory || productsInThisSubcategory.length === 0) {
       return [];
     }
 
-    let filtered = [...allProducts];
+    let filtered = [...productsInThisSubcategory];
 
     // Brand filter
     if (filters.brandIds.length > 0) {
@@ -157,13 +163,13 @@ const Subcategory = () => {
 
   const filteredProducts = getFilteredProducts();
   
-  // Get unique brands from the current products
+  // Get unique brands from the current subcategory's products
   const availableBrands = useMemo(() => {
-    if (!allProducts || allProducts.length === 0) return [];
+    if (!productsInThisSubcategory || productsInThisSubcategory.length === 0) return [];
     
-    const brandIds = [...new Set(allProducts.map(product => product.brandId))];
+    const brandIds = [...new Set(productsInThisSubcategory.map(product => product.brandId))];
     return allBrands.filter(brand => brandIds.includes(brand.id));
-  }, [allProducts, allBrands]);
+  }, [productsInThisSubcategory, allBrands]);
 
   // Pagination
   const indexOfLastProduct = currentPage * productsPerPage;
@@ -278,7 +284,7 @@ const Subcategory = () => {
             ) : (
               <div className="scrollable-filter">
                 {availableBrands.map((brand) => {
-                  const productCount = allProducts.filter(
+                  const productCount = productsInThisSubcategory.filter(
                     product => product.brandId === brand.id
                   ).length;
                   

@@ -50,7 +50,7 @@ const Header = () => {
       try {
         setIsLoading(true);
         setApiError("");
-        
+
         const timestamp = Date.now();
         const response = await fetch(
           `${BASE_URL}/search/autocomplete?term=${encodeURIComponent(
@@ -66,13 +66,13 @@ const Header = () => {
         }
 
         const data = await response.json();
-        
+
         // Normalize API response to ensure consistent casing
-        const normalizedData = data.map(item => ({
+        const normalizedData = data.map((item) => ({
           Type: item.type || item.Type,
           Value: item.value || item.Value,
           Category: item.category || item.Category,
-          ReferenceId: item.referenceId || item.ReferenceId
+          ReferenceId: item.referenceId || item.ReferenceId,
         }));
 
         if (isMounted) {
@@ -126,7 +126,7 @@ const Header = () => {
 
   const handleSuggestionClick = (suggestion) => {
     if (!suggestion) return;
-    
+
     // Use normalized properties
     switch (suggestion.Type) {
       case "Product":
@@ -141,7 +141,7 @@ const Header = () => {
       default:
         navigate(`/search?term=${encodeURIComponent(suggestion.Value)}`);
     }
-    
+
     setShowSuggestions(false);
   };
 
@@ -165,7 +165,6 @@ const Header = () => {
   const handleuserProfile = () => {
     navigate("/profile");
   };
-  
 
   const toggleDropdown = (dropdownName) => {
     setActiveDropdown(activeDropdown === dropdownName ? null : dropdownName);
@@ -197,10 +196,13 @@ const Header = () => {
             <div className="top-bar-left"></div>
             <div className="top-bar-right">
               <span>
-                <FaPhone /> 1300 360 603
+                <a href="tel:1300360603" className="phone-link">
+                  <FaPhone /> 1300 360 603
+                </a>
               </span>
               <span>
-                <FaMapMarkerAlt /> Store Locations
+                <FaMapMarkerAlt />{" "}
+                <Link to="/store-locations">Store Locations</Link>
               </span>
             </div>
           </div>
@@ -321,7 +323,10 @@ const Header = () => {
                     <button onClick={handleLogout} className="dropdown-item">
                       Logout
                     </button>
-                    <button onClick={handleuserProfile} className="dropdown-item">
+                    <button
+                      onClick={handleuserProfile}
+                      className="dropdown-item"
+                    >
                       User Profile
                     </button>
                   </div>
@@ -340,7 +345,6 @@ const Header = () => {
                 <span className="cart-text">Cart</span>
               </Link>
             </div>
-
           </div>
         </div>
       </div>
