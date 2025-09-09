@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../../../store/authSlice";
+import { fetchCategories } from "../../../store/categoriesSlice"; // Import the fetch action
 import "./Header.css";
 import logoImage from "../../../assets/images/OmerToolsLogo.png";
 import {
@@ -24,6 +25,7 @@ const Header = () => {
   const { isAuthenticated, user } = useSelector((state) => state.auth);
   const cartTotalQuantity = useSelector((state) => state.cart.totalQuantity);
   const categories = useSelector((state) => state.categories.categories);
+  const categoriesStatus = useSelector((state) => state.categories.status); // Get categories status
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -33,6 +35,13 @@ const Header = () => {
   const [apiError, setApiError] = useState("");
   const searchRef = useRef(null);
   const navigate = useNavigate();
+
+  // Fetch categories if not already loaded
+  useEffect(() => {
+    if (categoriesStatus === 'idle') {
+      dispatch(fetchCategories());
+    }
+  }, [categoriesStatus, dispatch]);
 
   useEffect(() => {
     let isMounted = true;
@@ -366,16 +375,22 @@ const Header = () => {
 
               <div className="dropdown-menu">
                 <div className="dropdown-scroller">
-                  {categories.map((category) => (
-                    <Link
-                      key={category.id}
-                      to={`/category/${category.id}`}
-                      className="dropdown-item"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      {category.name}
-                    </Link>
-                  ))}
+                  {categoriesStatus === 'loading' ? (
+                    <div className="loading-categories">Loading categories...</div>
+                  ) : categories.length > 0 ? (
+                    categories.map((category) => (
+                      <Link
+                        key={category.id}
+                        to={`/category/${category.id}`}
+                        className="dropdown-item"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {category.name}
+                      </Link>
+                    ))
+                  ) : (
+                    <div className="no-categories">No categories available</div>
+                  )}
                 </div>
               </div>
             </li>

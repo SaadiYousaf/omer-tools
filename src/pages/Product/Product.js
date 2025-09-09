@@ -397,7 +397,16 @@ const Product = () => {
             >
               ADD TO CART
             </button>
-            <button className="buy-btn">BUY NOW</button>
+      <Link to={'/cart'}>
+      <button 
+              className="buy-btn"
+              onClick={handleAddToCart}
+              disabled={localStock <= 0}
+            >
+              BUY NOW
+            </button>
+      </Link>
+            {/* <button className="buy-btn">BUY NOW</button> */}
           </div>
         </div>
 

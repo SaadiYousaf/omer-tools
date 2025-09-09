@@ -4,11 +4,10 @@ import { useParams, Link } from "react-router-dom";
 import {
   fetchSubcategories,
   setCurrentSubcategory,
+  fetchSubcategoryProducts,
+  selectSubcategoryProducts,
+  selectSubcategoryProductsStatus,
 } from "../../store/subcategoriesSlice";
-import {
-  fetchProductsBySubcategory,
-  filterBySubcategory,
-} from "../../store/productsSlice";
 import { 
   selectAllBrands, 
   selectBrandsStatus,
@@ -39,15 +38,9 @@ const Subcategory = () => {
     (state) => state.subcategories
   );
 
-  // Get all products from Redux and filter by subcategory
-  const { items: allProducts, subcategoryProductsStatus, error: productsError } = 
-    useSelector((state) => state.products);
-
-  // Filter products by current subcategory
-  const productsInThisSubcategory = useMemo(() => {
-    if (!allProducts || !subcategoryId) return [];
-    return allProducts.filter(product => product.subcategoryId === subcategoryId);
-  }, [allProducts, subcategoryId]);
+  // Get products from subcategoriesSlice (already filtered by subcategory)
+  const productsInThisSubcategory = useSelector(selectSubcategoryProducts);
+  const productsStatus = useSelector(selectSubcategoryProductsStatus);
 
   // Get all brands from Redux
   const allBrands = useSelector(selectAllBrands);
@@ -60,21 +53,28 @@ const Subcategory = () => {
     }
   }, [brandsStatus, dispatch]);
 
+  // Fetch subcategories when categoryId changes
   useEffect(() => {
     if (categoryId) {
       dispatch(fetchSubcategories(categoryId));
     }
   }, [categoryId, dispatch]);
 
+  // Set current subcategory and fetch its products when subcategoryId or subcategories change
   useEffect(() => {
-    if (subcategoryId && subcategories.length > 0) {
-      const subcategory = subcategories.find(
-        (sc) => sc.id === subcategoryId
-      );
-      if (subcategory) {
-        dispatch(setCurrentSubcategory(subcategory));
+    if (subcategoryId) {
+      // If we have subcategories, find the current one
+      if (subcategories.length > 0) {
+        const subcategory = subcategories.find(
+          (sc) => sc.id === subcategoryId
+        );
+        if (subcategory) {
+          dispatch(setCurrentSubcategory(subcategory));
+        }
       }
-      dispatch(fetchProductsBySubcategory(subcategoryId));
+      
+      // Always fetch products for the current subcategory
+      dispatch(fetchSubcategoryProducts(subcategoryId));
     }
   }, [subcategoryId, subcategories, dispatch]);
 
@@ -235,6 +235,14 @@ const Subcategory = () => {
 
   if (status === "loading") return <Loading fullPage />;
   if (status === "failed") return <ErrorMessage message={error} />;
+  if (!currentSubcategory && subcategories.length > 0) {
+    // If we have subcategories but no currentSubcategory, try to find it
+    const subcategory = subcategories.find(sc => sc.id === subcategoryId);
+    if (subcategory) {
+      dispatch(setCurrentSubcategory(subcategory));
+    }
+    return <Loading fullPage />;
+  }
   if (!currentSubcategory) return <Loading fullPage />;
 
   return (
@@ -269,10 +277,10 @@ const Subcategory = () => {
         </div>
       </div>
 
-      {subcategoryProductsStatus === "loading" && <Loading />}
-      {subcategoryProductsStatus === "failed" && (
+      {productsStatus === "loading" && <Loading />}
+      {/* {productsStatus === "failed" && (
         <ErrorMessage message={productsError} />
-      )}
+      )} */}
 
       <div className="subcategory-layout">
         {/* Filters Sidebar */}
@@ -423,7 +431,7 @@ const Subcategory = () => {
               ))
             ) : (
               <div className="no-products">
-                {subcategoryProductsStatus === "succeeded"
+                {productsStatus === "succeeded"
                   ? "No products found with current filters"
                   : "Loading products..."}
               </div>
