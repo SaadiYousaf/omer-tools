@@ -377,6 +377,11 @@ select {
 }
 
 @media (max-width: 768px) {
+  .breadcrumb {
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  color: #666;
+}
   .subcategory-hero {
     height: 200px;
   }
@@ -392,10 +397,29 @@ select {
 }
 
 @media (max-width: 480px) {
-  .subcategory-hero {
-    height: 150px;
+ .breadcrumb {
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    color: #666;
   }
-  
+
+  /* Hide all links */
+  .breadcrumb a {
+    display: none;
+  }
+.breadcrumb .current {
+  font-weight: 600;
+}
+  /* Hide all span elements */
+  .breadcrumb span {
+    display: none;
+  }
+
+  /* Show only the last span (subcategory name) */
+  .breadcrumb span:last-of-type {
+    display: inline;
+    font-size: 17px;
+  }
   .products-grid {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }

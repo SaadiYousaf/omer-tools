@@ -255,7 +255,7 @@ const Subcategory = () => {
             <Link to={`/category/${categoryId}`}>Category</Link>
           </>
         )}
-        <span> / {currentSubcategory.name}</span>
+        <span className="Productname"> / {currentSubcategory.name}</span>
       </div>
 
       <div className="subcategory-header">

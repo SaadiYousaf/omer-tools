@@ -307,6 +307,24 @@ const Product = () => {
         <div className="product-header">
           <div className="brand-tag">{brandName}</div>
           <h1 className="product-title">{prod.name}</h1>
+          <div className="mobile-action-buttons">
+  <button 
+    className="cart-btn"
+    onClick={handleAddToCart}
+    disabled={localStock <= 0}
+  >
+    ADD TO CART
+  </button>
+  <Link to={'/cart'}>
+    <button 
+      className="buy-btn"
+      onClick={handleAddToCart}
+      disabled={localStock <= 0}
+    >
+      BUY NOW
+    </button>
+  </Link>
+</div>
           <div className="product-meta">
             <div className="rating-container">
               {renderRating(4.5)}

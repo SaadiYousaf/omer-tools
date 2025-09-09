@@ -332,8 +332,23 @@ font-size: 8px;
   }
 
   .product-title {
-    font-size: 15px;
-    height: 18px;
+    font-size: 0.4rem;
+    /* height: 18px; */
+  }
+
+  .current-price {
+    font-size: 8px;
+  }
+}
+/* Responsive adjustments */
+@media (max-width: 430px) {
+  .image-container {
+    height: 180px;
+  }
+
+  .product-title {
+    font-size: 0.4rem;
+    /* height: 18px; */
   }
 
   .current-price {
