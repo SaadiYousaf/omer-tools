@@ -418,9 +418,9 @@ const Product = () => {
 
     <div className="info-tabs">
       <div className="tab active">Description</div>
-      <div className="tab">Specifications</div>
+      {/* <div className="tab">Specifications</div>
       <div className="tab">Reviews (12)</div>
-      <div className="tab">Shipping & Returns</div>
+      <div className="tab">Shipping & Returns</div> */}
     </div>
 
     <div className="content-container">
