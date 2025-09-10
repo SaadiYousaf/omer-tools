@@ -308,6 +308,22 @@ const Product = () => {
           <div className="brand-tag">{brandName}</div>
           <h1 className="product-title">{prod.name}</h1>
           <div className="mobile-action-buttons">
+                    <div className="mobile-pricing-container">
+          <div className="price-display">
+            <div className="current-price">${currentPrice.toFixed(2)}</div>
+            {hasDiscount && (
+              <div className="original-price">
+                <span className="was">Was </span>
+                <span className="price-value">${Number(prod.price).toFixed(2)}</span>
+              </div>
+            )}
+          </div>
+          {hasDiscount && (
+            <div className="savings-badge">
+              Save ${(Number(prod.price) - Number(prod.discountPrice)).toFixed(2)}
+            </div>
+          )}
+        </div>
   <button 
     className="cart-btn"
     onClick={handleAddToCart}
@@ -324,6 +340,34 @@ const Product = () => {
       BUY NOW
     </button>
   </Link>
+            <div className="quantity-control">
+            <div className="quantity-label">Quantity:</div>
+            <div className="quantity-selector">
+              <button 
+                className="quantity-btn" 
+                onClick={() => handleQuantityChange(quantity - 1)}
+                disabled={quantity <= 1}
+              >
+                -
+              </button>
+              <input 
+                type="text" 
+                className="quantity-input" 
+                value={quantity}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value) || 1;
+                  handleQuantityChange(Math.min(val, localStock));
+                }}
+              />
+              <button 
+                className="quantity-btn" 
+                onClick={() => handleQuantityChange(quantity + 1)}
+                disabled={quantity >= localStock}
+              >
+                +
+              </button>
+            </div>
+          </div>
 </div>
           <div className="product-meta">
             <div className="rating-container">
@@ -359,25 +403,7 @@ const Product = () => {
             </div>
           )}
         </div>
-
-        <div className="promo-banner">
-          <div className="promo-card">
-            <FaTruck className="promo-icon" />
-            <div className="promo-content">
-              <div className="promo-title">Free Shipping</div>
-              <div className="promo-desc">On orders over $99</div>
-            </div>
-          </div>
-          <div className="promo-card">
-            <FaShieldAlt className="promo-icon" />
-            <div className="promo-content">
-              <div className="promo-title">3-Year Warranty</div>
-              <div className="promo-desc">Quality guaranteed</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="actions-container">
+                <div className="actions-container">
           <div className="quantity-control">
             <div className="quantity-label">Quantity:</div>
             <div className="quantity-selector">
@@ -427,6 +453,25 @@ const Product = () => {
             {/* <button className="buy-btn">BUY NOW</button> */}
           </div>
         </div>
+
+        <div className="promo-banner">
+          <div className="promo-card">
+            <FaTruck className="promo-icon" />
+            <div className="promo-content">
+              <div className="promo-title">Free Shipping</div>
+              <div className="promo-desc">On orders over $99</div>
+            </div>
+          </div>
+          <div className="promo-card">
+            <FaShieldAlt className="promo-icon" />
+            <div className="promo-content">
+              <div className="promo-title">3-Year Warranty</div>
+              <div className="promo-desc">Quality guaranteed</div>
+            </div>
+          </div>
+        </div>
+
+
 
         {/* <div className="payment-options">
           <div className="payment-card">
