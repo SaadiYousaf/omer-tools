@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../../../store/authSlice";
-import { fetchCategories } from "../../../store/categoriesSlice"; // Import the fetch action
+import { fetchCategories } from "../../../store/categoriesSlice";
 import "./Header.css";
 import logoImage from "../../../assets/images/OmerToolsLogo.png";
 import {
@@ -17,7 +17,9 @@ import {
   FaBox,
   FaTag,
   FaLayerGroup,
+  FaChevronRight
 } from "react-icons/fa";
+
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const Header = () => {
@@ -25,7 +27,7 @@ const Header = () => {
   const { isAuthenticated, user } = useSelector((state) => state.auth);
   const cartTotalQuantity = useSelector((state) => state.cart.totalQuantity);
   const categories = useSelector((state) => state.categories.categories);
-  const categoriesStatus = useSelector((state) => state.categories.status); // Get categories status
+  const categoriesStatus = useSelector((state) => state.categories.status);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -33,6 +35,7 @@ const Header = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [apiError, setApiError] = useState("");
+  const [showAllCategories, setShowAllCategories] = useState(false);
   const searchRef = useRef(null);
   const navigate = useNavigate();
 
@@ -171,7 +174,8 @@ const Header = () => {
     dispatch(logout());
     navigate("/");
   };
-  const handleuserProfile = () => {
+  
+  const handleUserProfile = () => {
     navigate("/profile");
   };
 
@@ -191,6 +195,16 @@ const Header = () => {
         return <FaSearch className="suggestion-icon default" />;
     }
   };
+
+  // Sort categories alphabetically by name
+  const sortedCategories = [...categories].sort((a, b) => 
+    a.name.localeCompare(b.name)
+  );
+
+  // Calculate categories to display
+  const displayedCategories = showAllCategories 
+    ? sortedCategories 
+    : sortedCategories.slice(0, 10);
 
   return (
     <header className="header">
@@ -333,7 +347,7 @@ const Header = () => {
                       Logout
                     </button>
                     <button
-                      onClick={handleuserProfile}
+                      onClick={handleUserProfile}
                       className="dropdown-item"
                     >
                       User Profile
@@ -367,7 +381,10 @@ const Header = () => {
               }`}
               onClick={() => toggleDropdown("categories")}
               onMouseEnter={() => setActiveDropdown("categories")}
-              onMouseLeave={() => setActiveDropdown(null)}
+              onMouseLeave={() => {
+                setActiveDropdown(null);
+                setShowAllCategories(false);
+              }}
             >
               <span className="dropdown-toggle">
                 <FaBars className="menu-bars" /> Shop by Category
@@ -377,17 +394,31 @@ const Header = () => {
                 <div className="dropdown-scroller">
                   {categoriesStatus === 'loading' ? (
                     <div className="loading-categories">Loading categories...</div>
-                  ) : categories.length > 0 ? (
-                    categories.map((category) => (
-                      <Link
-                        key={category.id}
-                        to={`/category/${category.id}`}
-                        className="dropdown-item"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        {category.name}
-                      </Link>
-                    ))
+                  ) : sortedCategories.length > 0 ? (
+                    <>
+                      {displayedCategories.map((category) => (
+                        <Link
+                          key={category.id}
+                          to={`/category/${category.id}`}
+                          className="dropdown-item"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          {category.name}
+                        </Link>
+                      ))}
+                      {sortedCategories.length > 10 && !showAllCategories && (
+                        <button
+                          className="dropdown-item view-all-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowAllCategories(true);
+                          }}
+                        >
+                          View All Categories ({sortedCategories.length})
+                          <FaChevronRight className="view-all-icon" />
+                        </button>
+                      )}
+                    </>
                   ) : (
                     <div className="no-categories">No categories available</div>
                   )}
