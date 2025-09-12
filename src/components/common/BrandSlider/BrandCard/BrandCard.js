@@ -9,7 +9,9 @@ const BrandCard = ({ brand }) => {
       to={`/brand/${brand.id}`} 
       className="brand-card"
     >
-      <img src={`${brand.imageUrl}`} alt={brand.name} />
+      <div className='brand-image'>
+         <img src={`${brand.imageUrl}`} alt={brand.name} />
+      </div>
       <h3>{brand.name}</h3>
     </Link>
   );

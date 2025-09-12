@@ -1,8 +1,9 @@
 .subcategory-page {
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 2rem 1rem;
 }
+
 /* Subcategory.css */
 .subcategory-layout {
   display: flex;
@@ -377,6 +378,9 @@ select {
 }
 
 @media (max-width: 768px) {
+  .subcategory-filters {
+    display: none;
+  }
   .breadcrumb {
   margin-bottom: 1.5rem;
   font-size: 0.9rem;
@@ -397,6 +401,9 @@ select {
 }
 
 @media (max-width: 480px) {
+   .subcategory-filters {
+    display: none;
+  }
  .breadcrumb {
     margin-bottom: 1.5rem;
     font-size: 0.9rem;
