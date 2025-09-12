@@ -17,7 +17,26 @@
   margin: 0 auto;
   padding: 0 15px;
 }
+.view-all-btn {
+  background-color: #f8f9fa;
+  font-weight: bold;
+  text-align: center;
+  border-top: 1px solid #dee2e6;
+  margin-top: 5px;
+  padding: 10px;
+  width: 100%;
+  cursor: pointer;
+}
 
+.view-all-btn:hover {
+  background-color: #e9ecef;
+}
+
+/* Ensure dropdown has enough height for all items */
+.dropdown-menu {
+  max-height: 400px;
+  overflow-y: auto;
+}
 /* Top Bar */
 .top-bar {
   background-color: #072c62;
