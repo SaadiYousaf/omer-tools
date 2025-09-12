@@ -158,6 +158,11 @@ select {
   font-size: 0.9rem;
 }
 @media (max-width: 600px){
+
+  .products-grid {
+   grid-template-columns: repeat(2, 1fr);
+}
+
 .original-price {
   font-size: x-small;
 }}

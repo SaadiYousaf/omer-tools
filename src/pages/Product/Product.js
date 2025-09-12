@@ -306,7 +306,6 @@ const Product = () => {
       <div className="details-container">
         <div className="product-header">
           <div className="brand-tag">{brandName}</div>
-          <h1 className="product-title">{prod.name}</h1>
           <div className="mobile-action-buttons">
                     <div className="mobile-pricing-container">
           <div className="price-display">
@@ -369,6 +368,7 @@ const Product = () => {
             </div>
           </div>
 </div>
+          <h1 className="product-title">{prod.name}</h1>
           <div className="product-meta">
             <div className="rating-container">
               {renderRating(4.5)}

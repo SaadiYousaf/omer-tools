@@ -116,7 +116,7 @@
 /* Responsive design */
 @media (max-width: 768px) {
   .featured-products {
-    padding: 1rem;
+    padding: 0px;
   }
   
   .featured-products .products-grid {
