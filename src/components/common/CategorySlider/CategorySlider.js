@@ -9,6 +9,7 @@ import {
 } from "../../../store/categoriesSlice";
 import useApi from "../../../api/useApi";
 import "./CategorySlider.css";
+import defaultImg from "../../../assets/images/default.jpg";
 
 const CategorySlider = () => {
   const dispatch = useDispatch();
@@ -92,7 +93,7 @@ const CategorySlider = () => {
     if (category.imageUrl) return category.imageUrl;
     
     // Default image if no images are available
-    return "/images/categories/default.png";
+    return defaultImg;
   };
 
   if (status === "loading") {
@@ -159,7 +160,7 @@ const CategorySlider = () => {
                 alt={category.name}
                 className="category-image"
                 onError={(e) => {
-                  e.target.src = "/images/categories/default.png";
+                  // e.target.src = "/images/categories/default.png";
                 }}
               />
               <span className="category-name">{category.name}</span>

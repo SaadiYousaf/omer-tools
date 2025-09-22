@@ -6,7 +6,7 @@ import ErrorMessage from '../../layout/ErrorMessage/ErrorMessage';
 import Loading from '../Loading/Loading';
 import './CategorySubcategories.css';
 import ScrollToTop from '../Scroll/ScrollToTop';
-
+import defaultImg from "../../../assets/images/default.jpg";
 const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
 const CategorySubcategories = () => {
   const { categoryId } = useParams();
@@ -25,7 +25,7 @@ const CategorySubcategories = () => {
   }, [categoryId, dispatch]);
 
   const getSubcategoryImage = (subcategory) => {
-    if (!subcategory.imageUrl) return '/images/subcategories/default.png';
+    if (!subcategory.imageUrl) return defaultImg;
     return BASE_IMG_URL + subcategory.imageUrl;
   };
 
@@ -66,7 +66,7 @@ const CategorySubcategories = () => {
                     alt={sub.name}
                     className="subcategory-image"
                     onError={(e) => {
-                      e.target.src = '/images/subcategories/default.png';
+                      e.target.src = defaultImg;
                     }}
                   />
                 </div>

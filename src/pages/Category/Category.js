@@ -13,6 +13,7 @@ import {
 import Loading from '../../components/common/Loading/Loading';
 import ErrorMessage from '../../components/layout/ErrorMessage/ErrorMessage';
 import './Category.css';
+import defaultImg from "../../assets/images/default.jpg";
 const BASE_URL=process.env.REACT_APP_BASE_URL;
 const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
 const Category = () => {
@@ -29,7 +30,7 @@ const Category = () => {
 
   // Function to get brand image (consistent with other components)
   const getBrandImage = useCallback((brand) => {
-    if (!brand) return "/images/brands/default.png";
+    if (!brand) return defaultImg;
     
     // First, try to get the primary image from the images array
     if (brand.images && brand.images.length > 0) {
@@ -155,7 +156,7 @@ const Category = () => {
                           className="subcategory-image"
                           onError={(e) => {
                             e.target.onerror = null;
-                            e.target.src = '/images/subcategories/default.png';
+                            e.target.src = defaultImg;
                           }}
                         />
                       </div>
