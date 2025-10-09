@@ -6,6 +6,12 @@ const initialState = {
   totalAmount: 0,
 };
 
+const calculateTotals = (items) => {
+  const totalQuantity = items.reduce((total, item) => total + item.quantity, 0);
+  const totalAmount = items.reduce((total, item) => total + item.totalPrice, 0);
+  return { totalQuantity, totalAmount };
+};
+
 const cartSlice = createSlice({
   name: 'cart',
   initialState,
@@ -14,43 +20,44 @@ const cartSlice = createSlice({
       const newItem = action.payload;
       const existingItem = state.items.find(item => item.id === newItem.id);
       const maxQuantity = newItem.maxQuantity || Infinity;
-      
+      const quantityToAdd = newItem.quantity || 1
       // Prevent adding more than available stock
       if (existingItem) {
-        if (existingItem.quantity >= maxQuantity) return state;
+        if (existingItem.quantity + quantityToAdd > maxQuantity) return state;
       } else {
-        if (maxQuantity < 1) return state;
+        if (quantityToAdd > maxQuantity) return state;
       }
       
       if (!existingItem) {
         state.items.push({
           ...newItem,
-          quantity: 1,
-          totalPrice: newItem.price
+          quantity: quantityToAdd,
+          totalPrice: newItem.price * quantityToAdd
         });
       } else {
-        existingItem.quantity++;
-        existingItem.totalPrice += newItem.price;
+        existingItem.quantity += quantityToAdd;
+        existingItem.totalPrice = existingItem.quantity * existingItem.price; 
       }
       
-      state.totalQuantity++;
-      state.totalAmount += newItem.price;
+       const { totalQuantity, totalAmount } = calculateTotals(state.items);
+      state.totalQuantity = totalQuantity;
+      state.totalAmount = totalAmount;
     },
     removeItemFromCart(state, action) {
       const id = action.payload;
       const existingItem = state.items.find(item => item.id === id);
       
       if (!existingItem) return;
-      
       if (existingItem.quantity === 1) {
         state.items = state.items.filter(item => item.id !== id);
       } else {
-        existingItem.quantity--;
-        existingItem.totalPrice -= existingItem.price;
+          existingItem.quantity--;
+        existingItem.totalPrice = existingItem.quantity *  existingItem.price;; // Recalcula
       }
       
-      state.totalQuantity--;
-      state.totalAmount -= existingItem.price;
+     const { totalQuantity, totalAmount } = calculateTotals(state.items);
+      state.totalQuantity = totalQuantity;
+      state.totalAmount = totalAmount;
     },
     clearCart(state) {
       state.items = [];

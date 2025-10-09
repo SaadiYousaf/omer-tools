@@ -5,9 +5,13 @@ import { clearCart } from '../../store/cartSlice';
 import Payment from '../../components/common/Payment/Payment';
 import Confirmation from '../../components/common/Confirmation/Confirmation';
 import ScrollToTop from "../../components/common/Scroll/ScrollToTop";
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 import axios from 'axios';
 import './Checkout.css';
+
 const BASE_URL = process.env.REACT_APP_BASE_URL;
+const stripePromise = loadStripe('pk_live_51Rs0GlIL9Fa1nSZ5II0JcN2bbgts7PsdjJ4nb4zzpmF8cKDNWVNLTXt8K141GvhzOsYaI5RHcrPoV9tnvkJHHmfx007pCkUOCv');
 
 const Checkout = () => {
   const [step, setStep] = useState(1);
@@ -26,7 +30,7 @@ const Checkout = () => {
   }, []);
 
   const calculateShipping = () => {
-    return totalAmount > 100 ? 0 : 10;
+    return totalAmount > 100 ? 0 : 12;
   };
 
   const shippingCost = calculateShipping();
@@ -39,10 +43,16 @@ const Checkout = () => {
     setShippingData(data);
     nextStep();
   };
-
+  const handleBackToPayment = () => {
+    setPaymentData(null); // Clear the old failed payment data
+    setPaymentError(null); // Clear any payment errors
+    setOrderError(null);
+    prevStep(); // Go back to step 2
+  };
   const handlePaymentSubmit = (data) => {
     setPaymentData(data);
     setPaymentError(null);
+    setOrderError(null); // Clear any previous order errors
     nextStep();
   };
 
@@ -50,87 +60,151 @@ const Checkout = () => {
     setPaymentError(error);
   };
 
- // In your Checkout.js component
- const handlePlaceOrder = async () => {
-  setOrderLoading(true);
-  setOrderError(null);
-  
-  try {
-    const token = localStorage.getItem('token');
+  const handlePlaceOrder = async () => {
+    setOrderLoading(true);
+    setOrderError(null);
     
-    // Format order data to match backend expectations
-    const orderData = {
-      sessionId: `session_${Date.now()}`,
-      userEmail: shippingData.email,
-      orderItems: items.map(item => ({
-        productId: item.id.toString(),
-        productName: item.name,
-        quantity: item.quantity,
-        unitPrice: item.price,
-        imageUrl: item.image || ''
-      })),
-      paymentMethod: 'credit_card',
-      paymentMethodId: 'pm_card_visa',
-      cardData: paymentData ? {
-        Number: paymentData.cardNumber.replace(/\s/g, ''),
-        Expiry: paymentData.expiryDate,
-        Cvc: paymentData.cvv,
-        Name: paymentData.cardName
-      } : null,
-      shippingAddress: {
-        fullName: shippingData.fullName,
-        addressLine1: shippingData.address,
-        addressLine2: '',
-        city: shippingData.city,
-        state: shippingData.state,
-        postalCode: shippingData.postalCode,
-        country: shippingData.country
-      }
-    };
-
-    console.log('Sending order data:', JSON.stringify(orderData, null, 2));
-
-    // Send order to backend
-    const response = await axios.post(`${BASE_URL}/orders`, orderData, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    console.log('Order response:', response.data);
-
-    if (response.data.status === "succeeded") {
-      console.log('Order created:', response.data);
-      dispatch(clearCart());
-      nextStep();
-      
-      // Clear cart after successful order
-      // You might want to dispatch an action to clear the cart here
-    } else {
-      throw new Error(response.data.message || 'Failed to create order');
+    try {
+      const token = localStorage.getItem('token');
+       if (!token) {
+      setOrderError('Authentication expired. Please log in again.');
+      setOrderLoading(false);
+      return;
     }
-  } catch (error) {
-    console.error('Order creation error:', error);
+      try {
+      await axios.get(`${BASE_URL}/auth/verify`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      // Token is valid, continue with order
+    } catch (authError) {
+      // Token is invalid, try to refresh first
+      const refreshToken = localStorage.getItem('refreshToken');
+      if (refreshToken) {
+        try {
+          const refreshResponse = await axios.post(`${BASE_URL}/auth/refresh-token`, {
+            token: token,
+            refreshToken: refreshToken
+          });
+          
+          const newToken = refreshResponse.data.token;
+          localStorage.setItem('token', newToken);
+          
+          // Continue with order using new token
+        } catch (refreshError) {
+          // Refresh failed, logout user
+          localStorage.removeItem('token');
+          localStorage.removeItem('refreshToken');
+          setOrderError('Session expired. Please log in again.');
+          setOrderLoading(false);
+          return;
+        }
+      } else {
+        // No refresh token, logout
+        localStorage.removeItem('token');
+        setOrderError('Session expired. Please log in again.');
+        setOrderLoading(false);
+        return;
+      }
+    }
+
+      // Format order data to match backend expectations
+      const orderData = {
+        sessionId: `session_${Date.now()}`,
+        userEmail: shippingData.email,
+        orderItems: items.map(item => ({
+          productId: item.id.toString(),
+          productName: item.name,
+          quantity: item.quantity,
+          unitPrice: item.price,
+          imageUrl: item.image || ''
+        })),
+        paymentMethod: 'credit_card',
+         paymentMethodId: paymentData.paymentMethodId, // ✅ Only use the Stripe PaymentMethod ID
+      cardData: { // Send empty object instead of null to bypass validation
+    Number: "",
+    Expiry: "", 
+    Cvc: "",
+    Name: ""
+  },
+        shippingAddress: {
+          fullName: shippingData.fullName,
+          addressLine1: shippingData.address,
+          addressLine2: '',
+          city: shippingData.city,
+          state: shippingData.state,
+          postalCode: shippingData.postalCode,
+          country: shippingData.country
+        },
+          subtotal: totalAmount, // Amount without shipping
+  shippingCost: shippingCost, // $12 or $0
+  totalAmount: total, // totalAmount + shippingCost
+      };
+
+      console.log('Sending order data:', JSON.stringify(orderData, null, 2));
+
+      // Send order to backend
+      const response = await axios.post(`${BASE_URL}/orders`, orderData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log('Order response:', response.data);
+
+      if (response.data.status === "succeeded") {
+        console.log('Order created:', response.data);
+        dispatch(clearCart());
+        nextStep();
+      } else if (response.data.status === "payment_failed") {
+      // ✅ Handle payment failure without throwing an error
+      console.log('Payment failed:', response.data.message);
+      setOrderError(response.data.message); // This will show the actual Stripe message
+    }
+    else if (response.data.status === "requires_action") {
+      // Handle 3D Secure if needed
+      console.log('Payment requires action');
+      // You might need to handle this differently
+    }
+    else {
+      // For any other unexpected status
+      setOrderError(response.data.message || 'Unexpected error occurred');
+    }
+    } catch (error) {
+      console.error('Order creation error:', error);
+         // IMPROVED ERROR HANDLING:
     if (error.response?.data) {
       console.error('Backend error details:', error.response.data);
       
-      // Log validation errors if they exist
-      if (error.response.data.errors) {
+      // Check if it's a payment failure with specific message
+      if (error.response.data.status === "payment_failed") {
+        // Use the specific Stripe error message
+        setOrderError(error.response.data.message || 'Payment failed. Please try again.');
+      } 
+      // Check for validation errors
+      else if (error.response.data.errors) {
         console.error('Validation errors:', error.response.data.errors);
+        setOrderError('Please check your order information and try again.');
       }
-      
-      setOrderError(error.response.data.title || error.response.data.message || 'Failed to place order. Please try again.');
-    } else if (error.request) {
+      // Use backend error message if available
+      else if (error.response.data.message) {
+        setOrderError(error.response.data.message);
+      }
+      else {
+        setOrderError('Failed to place order. Please try again.');
+      }
+    } 
+    else if (error.request) {
       console.error('Request error:', error.request);
       setOrderError('Network error. Please check your connection and try again.');
-    } else {
+    } 
+    else {
       setOrderError('Failed to place order. Please try again.');
     }
   } finally {
     setOrderLoading(false);
   }
-};
+  };
 
   const renderStep = () => {
     switch (step) {
@@ -144,12 +218,15 @@ const Checkout = () => {
         );
       case 2:
         return (
-          <Payment 
-            onSubmit={handlePaymentSubmit} 
-            onBack={prevStep}
-            onError={handlePaymentError}
-            total={total}
-          />
+         <Elements stripe={stripePromise}>
+        <Payment 
+          key={step} // ✅ Force re-render when step changes
+          onSubmit={handlePaymentSubmit}
+          onBack={prevStep}
+          onError={handlePaymentError}
+          total={total}
+        />
+      </Elements>
         );
       case 3:
         return (
@@ -160,6 +237,7 @@ const Checkout = () => {
             total={total}
             shippingCost={shippingCost}
             onConfirm={handlePlaceOrder}
+              onBack={handleBackToPayment} // ✅ Use the new function instead of prevStep
             loading={orderLoading}
             error={orderError}
           />
@@ -197,7 +275,6 @@ const Checkout = () => {
 };
 
 // The ShippingForm, OrderSummary, and OrderSuccess components remain the same
-// ... (they should be included in your file)
 const ShippingForm = ({ onSubmit, shippingCost, total }) => {
   const { items, totalAmount } = useSelector(state => state.cart);
   const [formData, setFormData] = useState({
@@ -341,9 +418,7 @@ const ShippingForm = ({ onSubmit, shippingCost, total }) => {
               value={formData.country}
               onChange={handleChange}
             >
-              <option value="US">United States</option>
-              <option value="CA">Canada</option>
-              <option value="UK">United Kingdom</option>
+             
               <option value="AU">Australia</option>
             </select>
           </div>

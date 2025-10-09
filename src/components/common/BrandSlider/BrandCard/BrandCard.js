@@ -12,7 +12,9 @@ const BrandCard = ({ brand }) => {
       <div className='brand-image'>
          <img src={`${brand.imageUrl}`} alt={brand.name} />
       </div>
+      <div className='brand-name'>
       <h3>{brand.name}</h3>
+      </div>
     </Link>
   );
 };

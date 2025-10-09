@@ -371,7 +371,7 @@ const BrandProducts = () => {
             <div className="no-products">
               <h3>No products found for {brandName}</h3>
               
-              {items.length > 0 && (
+              {/* {items.length > 0 && (
                 <div className="debug-help">
                   <h4>Why might this be happening?</h4>
                   <ul>
@@ -396,7 +396,7 @@ const BrandProducts = () => {
                     </button>
                   </div>
                 </div>
-              )}
+              )} */}
             </div>
           )}
         </div>

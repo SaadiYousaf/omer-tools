@@ -1,6 +1,6 @@
 // components/common/Confirmation/Confirmation.js
 import React from 'react';
-//import './Confirmation.css';
+import './Confirmation.css';
 
 const Confirmation = ({ 
   shippingData, 
@@ -9,9 +9,17 @@ const Confirmation = ({
   total, 
   shippingCost, 
   onConfirm, 
+  onBack,
   loading,
   error 
 }) => {
+ const handleRetry = () => {
+    // This will call the parent's handlePlaceOrder function again
+    // without reloading the page or losing authentication
+    onBack();;
+  };
+
+
   return (
     <div className="confirmation-container">
       <div className="confirmation-content">
@@ -21,9 +29,12 @@ const Confirmation = ({
           <div className="confirmation-error">
             <span>⚠️</span>
             <p>{error}</p>
-            <button onClick={() => window.location.reload()} className="retry-btn">
-              Try Again
+            <button onClick={handleRetry} className="retry-btn" disabled={loading}>
+              {loading ? 'Processing...' : 'Use Different Payment Method'}
             </button>
+             <p className="retry-note">
+                Please use a different card or payment method to complete your order.
+            </p>
           </div>
         )}
         
@@ -44,15 +55,24 @@ const Confirmation = ({
           </div>
           
           <div className="confirmation-section">
-            <h4>Payment Information</h4>
-            {paymentData && (
-              <div className="payment-details">
-                <p><strong>Card Number:</strong> **** **** **** {paymentData.cardNumber.slice(-4)}</p>
-                <p><strong>Name on Card:</strong> {paymentData.cardName}</p>
-                <p><strong>Expiry Date:</strong> {paymentData.expiryDate}</p>
+  <h4>Payment Information</h4>
+  {paymentData?.cardData ? (
+    <div className="payment-details">
+      <p><strong>Card Number:</strong> **** **** **** {paymentData.cardData.Last4 || '****'}</p>
+      <p><strong>Name on Card:</strong> {paymentData.cardData.Name || 'Not provided'}</p>
+      <p><strong>Card Type:</strong> {paymentData.cardData.Brand || 'Card'}</p>
+    </div>
+  ) : (
+    <p>Payment information not available</p>
+  )}
+  {error && (
+              <div className="payment-help">
+                <p><strong>Payment Issue Detected:</strong> {error}</p>
+                <p>You can click "Try Again" to retry with the same card, 
+                or go back to use a different payment method.</p>
               </div>
             )}
-          </div>
+</div>
           
           <div className="confirmation-section">
             <h4>Order Summary</h4>
@@ -84,14 +104,26 @@ const Confirmation = ({
             </div>
           </div>
         </div>
+          {!error && (
+          <div className="confirmation-actions">
+            <button 
+              onClick={onBack} 
+              className="back-btn"
+              disabled={loading}
+            >
+              Back to Payment
+            </button>
+            <button 
+              onClick={onConfirm} 
+              className="confirm-order-btn"
+              disabled={loading || !paymentData}
+            >
+              {loading ? 'Processing...' : 'Confirm Order'}
+            </button>
+          </div>
+        )}
         
-        <button 
-          onClick={onConfirm} 
-          className="confirm-order-btn"
-          disabled={loading}
-        >
-          {loading ? 'Processing...' : 'Confirm Order'}
-        </button>
+        
         
         {loading && (
           <div className="loading-indicator">

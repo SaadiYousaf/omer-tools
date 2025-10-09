@@ -1,5 +1,5 @@
 .search-results-container {
-  max-width: 1400px;
+  max-width: 100%;
   margin: 20px auto;
   padding: 0 20px;
 }
@@ -7,6 +7,7 @@
 .search-layout {
   display: flex;
   gap: 30px;
+  max-width: 800px;
 }
 
 .search-filters {
@@ -81,6 +82,7 @@ select {
 
 .search-results {
   flex: 1;
+  max-width: 900px;
 }
 
 .results-summary {
@@ -158,6 +160,12 @@ select {
   font-size: 0.9rem;
 }
 @media (max-width: 600px){
+  .search-results {
+    max-width: 320px;
+  }
+  .search-filters {
+  display:none
+}
 
   .products-grid {
    grid-template-columns: repeat(2, 1fr);

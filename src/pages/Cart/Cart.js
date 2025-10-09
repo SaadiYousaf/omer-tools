@@ -10,7 +10,10 @@ const Cart = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { items, totalQuantity, totalAmount } = useSelector(state => state.cart);
+ 
+  useEffect(() => {
 
+  }, [items]);
   const handleRemoveItem = (productId) => {
     dispatch(removeItemFromCart(productId));
   };
@@ -83,14 +86,14 @@ const Cart = () => {
                     </div>
                     <div className="item-details">
                       <h3>{item.name}</h3>
-                      <div className="item-sku">SKU: {item.sku || "DCF887N-XE"}</div>
+                      <div className="item-sku">SKU: {item.sku}</div>
                     </div>
                   </div>
                   <div className="item-price">
                     <div className="price-value">${item.price.toFixed(2)}</div>
-                    {item.originalPrice && (
-                      <div className="original-price">${item.originalPrice.toFixed(2)}</div>
-                    )}
+                     {item.originalPrice && item.originalPrice > item.price && (
+    <div className="original-price discounted">${item.originalPrice.toFixed(2)}</div>
+  )}
                   </div>
                   <div className="item-quantity">
                     <div className="quantity-box">
@@ -127,12 +130,12 @@ const Cart = () => {
               </div>
               <div className="summary-row">
                 <span>GST:</span>
-                <span>${(totalAmount * 0.1).toFixed(2)}</span>
+                <span>Prices are included GST</span>
               </div>
               
               <div className="summary-total">
                 <span>Total:</span>
-                <span className="total-amount">${(totalAmount * 1.1).toFixed(2)}</span>
+                <span className="total-amount">${(totalAmount).toFixed(2)}</span>
               </div>
               
               <div className="summary-actions">

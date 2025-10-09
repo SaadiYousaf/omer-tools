@@ -93,3 +93,14 @@
   .pay-btn:hover {
     background: #218838;
   }
+
+  .stripe-card-element {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+}
+
+.StripeElement {
+  padding: 10px 0;
+}

@@ -6,7 +6,7 @@ import "./Footer.css";
 const Footer = () => {
   // Dummy click handlers for social media icons
   const handleSocialClick = (platform) => {
-    console.log(`Navigating to ${platform}`);
+   
     // In a real app, you would link to your social media pages:
     // window.open('https://www.facebook.com/yourpage', '_blank');
   };
@@ -62,8 +62,8 @@ const Footer = () => {
           </div>
           <div className="footer-section">
             <h3>Contact</h3>
-            <p>Email: info@omertools.com</p>
-            <p>Phone: (02) 1234 5678</p>
+            <p>Email: Info@omertools.com.au</p>
+            <p>Phone: (02) 9759 8833</p>
           </div>
         </div>
         <div className="footer-bottom">

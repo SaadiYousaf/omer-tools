@@ -8,7 +8,7 @@ import BrandSlider from "../../components/common/BrandSlider/BrandSlider";
 import MemberDeals from "../../components/common/MembersDeal/MemberDeals";
 import ScrollToTop from "../../components/common/Scroll/ScrollToTop";
 import "./Home.css";
-import { fetchFeaturedProducts } from "../../store/productsSlice";
+import { fetchFeaturedProducts,fetchAllProducts } from "../../store/productsSlice";
 
 // Import slider images
 import slide1 from "../../assets/images/pb.jpg";
@@ -21,11 +21,7 @@ import ProductSlider from "../../components/common/ProductSlider/ProductSlider";
 const Home = () => {
   const dispatch = useDispatch();
   const categories = useSelector((state) => state.categories.categories);
-  const featuredProducts = useSelector((state) =>
-    Array.isArray(state.products?.items)
-      ? state.products.items.filter((product) => product.isFeatured).slice(0, 4)
-      : []
-  );
+  const featuredProducts = useSelector((state) => state.products.featuredItems);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -33,6 +29,7 @@ const Home = () => {
 
   useEffect(() => {
     dispatch(fetchFeaturedProducts());
+    //  dispatch(fetchAllProducts()); 
   }, [dispatch]);
 
   // Define slide sets
@@ -101,7 +98,7 @@ const Home = () => {
       {/* Featured Products */}
       <section className="featured-products-section">
         <div className="container">
-          <FeaturedProducts products={featuredProducts} />
+          <FeaturedProducts  />
         </div>
       </section>
        {/* Member Deals */}

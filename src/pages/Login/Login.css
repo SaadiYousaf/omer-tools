@@ -223,12 +223,12 @@
 }
 
 .social-login-options {
+width: 100%;
   display: flex;
-  gap: 15px;
-  margin-bottom: 25px;
+  justify-content: center;
 }
 
-.social-login-btn {
+/* .social-login-btn {
   flex: 1;
   padding: 12px;
   border: 2px solid #e1e5eb;
@@ -241,7 +241,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-}
+} */
 
 .social-login-btn:hover {
   border-color: #072c62;

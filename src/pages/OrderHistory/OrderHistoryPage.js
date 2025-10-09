@@ -160,7 +160,7 @@ const OrderHistoryPage = () => {
                         <div key={item.id} className="order-item">
                           <div className="item-image-container">
                             <img 
-                              src={`${BASE_IMG_URL}${item.imageUrl}`} 
+                              src={`${item.imageUrl}`} 
                               alt={item.productName} 
                               className="item-image" 
                               onError={(e) => {

@@ -71,7 +71,8 @@ const ProductCard = ({ product, linkTo }) => {
       price: priceToUse,
       image: mainImage,
       quantity: 1,
-      maxQuantity: stockQuantity
+      maxQuantity: stockQuantity,
+      sku: product.sku
     }));
   };
 

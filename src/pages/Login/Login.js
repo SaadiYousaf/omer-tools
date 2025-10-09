@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../../store/authSlice";
+import { loginUser ,googleSignIn} from "../../store/authSlice";
 import { useNavigate } from "react-router-dom";
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import "./Login.css";
 
 const Login = () => {
@@ -18,8 +19,21 @@ const Login = () => {
       navigate("/");
     }
   };
+ const handleGoogleSuccess = async (credentialResponse) => {
+    const result = await dispatch(googleSignIn({ 
+      idToken: credentialResponse.credential 
+    }));
+    
+    if (googleSignIn.fulfilled.match(result)) {
+      navigate("/");
+    }
+  };
 
+  const handleGoogleError = () => {
+    console.log('Google Login Failed');
+  };
   return (
+    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
     <div className="login-page-container">
       <div className="login-content-wrapper">
         <div className="login-left-panel">
@@ -116,11 +130,15 @@ const Login = () => {
             </div>
 
             <div className="social-login-options">
-              <button type="button" className="social-login-btn google-login">
-                <span className="social-icon">G</span>
-                Google
-              </button>
-         
+               <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleError}
+                  theme="filled_blue"
+                  size="large"
+                  text="signin_with"
+                  shape="rectangular"
+                  width="100%"
+                />
             </div>
 
             <div className="signup-redirect">
@@ -133,6 +151,7 @@ const Login = () => {
         </div>
       </div>
     </div>
+    </GoogleOAuthProvider>
   );
 };
 

@@ -147,6 +147,9 @@
 .original-price {
   font-size: 13px;
   color: #999;
+  /* text-decoration: line-through; */
+}
+.original-price.discounted {
   text-decoration: line-through;
 }
 

@@ -219,8 +219,8 @@ const Header = () => {
             <div className="top-bar-left"></div>
             <div className="top-bar-right">
               <span>
-                <a href="tel:1300360603" className="phone-link">
-                  <FaPhone /> 1300 360 603
+                <a href="tel:0297598833" className="phone-link">
+                  <FaPhone /> 02 9759 8833
                 </a>
               </span>
               <span>
@@ -391,38 +391,26 @@ const Header = () => {
               </span>
 
               <div className="dropdown-menu">
-                <div className="dropdown-scroller">
-                  {categoriesStatus === 'loading' ? (
-                    <div className="loading-categories">Loading categories...</div>
-                  ) : sortedCategories.length > 0 ? (
-                    <>
-                      {displayedCategories.map((category) => (
-                        <Link
-                          key={category.id}
-                          to={`/category/${category.id}`}
-                          className="dropdown-item"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                          {category.name}
-                        </Link>
-                      ))}
-                      {sortedCategories.length > 10 && !showAllCategories && (
-                        <button
-                          className="dropdown-item view-all-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setShowAllCategories(true);
-                          }}
-                        >
-                          View All Categories ({sortedCategories.length})
-                          <FaChevronRight className="view-all-icon" />
-                        </button>
-                      )}
-                    </>
-                  ) : (
-                    <div className="no-categories">No categories available</div>
-                  )}
-                </div>
+               <div className="dropdown-scroller">
+  {categoriesStatus === 'loading' ? (
+    <div className="loading-categories">Loading categories...</div>
+  ) : sortedCategories.length > 0 ? (
+    <div className="dropdown-scroller category-grid">
+      {sortedCategories.map((category) => (
+        <Link
+          key={category.id}
+          to={`/category/${category.id}`}
+          className="dropdown-item"
+          onClick={() => setIsMobileMenuOpen(false)}
+        >
+          {category.name}
+        </Link>
+      ))}
+    </div>
+  ) : (
+    <div className="no-categories">No categories available</div>
+  )}
+</div>
               </div>
             </li>
             <li className="nav-item" onClick={() => setIsMobileMenuOpen(false)}>

@@ -106,8 +106,10 @@ const Product = () => {
           id: prod.id,
           name: prod.name,
           price: prod.discountPrice || prod.price,
+          originalPrice: hasDiscount ? prod.price : null, 
           image: mainImage,
-          quantity,
+          quantity: quantity,
+          sku: prod.sku
         })
       );
       setLocalStock((s) => s - quantity);
@@ -313,7 +315,7 @@ const Product = () => {
             {hasDiscount && (
               <div className="original-price">
                 <span className="was">Was </span>
-                <span className="price-value">${Number(prod.price).toFixed(2)}</span>
+                <span className="original-value">${Number(prod.price).toFixed(2)}</span>
               </div>
             )}
           </div>
@@ -552,7 +554,7 @@ const Product = () => {
           {relatedProducts.map(rp => {
             const rpImage = toAbsoluteImage(rp.images?.[0]?.imageUrl) || 
                             'https://via.placeholder.com/300x300?text=Product+Image';
-            
+            const rpHasDiscount = rp.discountPrice && rp.discountPrice < rp.price;
             return (
               <div className="related-card" key={rp.id}>
                 <Link to={`/product/${rp.id}`}>
@@ -567,6 +569,7 @@ const Product = () => {
                       id: rp.id,
                       name: rp.name,
                       price: rp.discountPrice || rp.price,
+                      originalPrice: rpHasDiscount ? rp.price : null,
                       image: rpImage,
                       quantity: 1
                     }))}

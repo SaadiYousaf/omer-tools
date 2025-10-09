@@ -2,10 +2,15 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import ProductCard from '../Card/ProductCard';
 import './FeaturedProducts.css';
+import { selectFeaturedProducts } from '../../../store/productsSlice';
 
 const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
 
 const FeaturedProducts = () => {
+  // const featureProducts = useSelector(selectFeaturedProducts);
+  const featuredProductsFromRedux = useSelector(selectFeaturedProducts);
+  const featuredStatus = useSelector((state) => state.products.featuredStatus || 'idle');
+const productsStatus = useSelector((state) => state.products.status || 'idle');
   const [visibleProducts, setVisibleProducts] = useState(8);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -15,14 +20,19 @@ const FeaturedProducts = () => {
   const items = useSelector((state) => state.products.items);
 
   // Memoize featured products with proper image handling
-  const featuredProducts = useMemo(() => {
-    return items
-      .filter(product => product.isFeatured)
-      .map(product => ({
-        ...product,
-        imageUrl: BASE_IMG_URL + product.images?.[0]?.imageUrl || '/images/products/default.png'
-      }));
-  }, [items]);
+const featuredProducts = useMemo(() => {
+    if (!featuredProductsFromRedux || featuredProductsFromRedux.length === 0) {
+      return [];
+    }
+    
+    return featuredProductsFromRedux.map(product => ({
+      ...product,
+      imageUrl: product.images?.[0]?.imageUrl 
+        ? BASE_IMG_URL + product.images[0].imageUrl 
+        : '/images/products/default.png'
+    }));
+  }, [featuredProductsFromRedux]); // Correct dependency
+  
 
   // Handle infinite scroll
   useEffect(() => {
@@ -59,6 +69,33 @@ const FeaturedProducts = () => {
     }, 1500);
   };
 
+  const isLoadingState = featuredStatus === 'loading' || productsStatus === 'loading';
+  const hasNoProducts = featuredProducts.length === 0;
+  if (isLoadingState && hasNoProducts) {
+    return (
+      <div className="featured-products">
+        <div className="header-section">
+          <h2>Featured Products</h2>
+        </div>
+        <div className="loading-indicator">
+          <div className="loader"></div>
+          <p>Loading featured products...</p>
+        </div>
+      </div>
+    );
+  }
+if (!isLoadingState && hasNoProducts) {
+    return (
+      <div className="featured-products">
+        <div className="header-section">
+          <h2>Featured Products</h2>
+        </div>
+        <div className="no-products-message">
+          <p>No featured products available at the moment.</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="featured-products">
       <div className="header-section">
@@ -68,7 +105,7 @@ const FeaturedProducts = () => {
         )}
       </div>
       
-      {featuredProducts.length > 0 ? (
+      {featuredProducts.length > 0 && (
         <>
           <div className="products-grid">
             {featuredProducts.slice(0, visibleProducts).map(product => (
@@ -92,20 +129,17 @@ const FeaturedProducts = () => {
           {visibleProducts >= featuredProducts.length && featuredProducts.length > 0 && (
             <div className="end-of-products">
               <p>You've viewed all featured products</p>
-              <button className="view-all-btn" onClick={handleViewAll}>
+              {/* <button className="view-all-btn" onClick={handleViewAll}>
                 View All Products
-              </button>
+              </button> */}
 
               {message && <p className="inline-message">{message}</p>}
             </div>
           )}
         </>
-      ) : (
-        <div className="no-featured-products">
-          <p>No featured products available at the moment</p>
-          <p>Check back later for new arrivals</p>
-        </div>
-      )}
+      ) 
+      
+      }
     </div>
   );
 };

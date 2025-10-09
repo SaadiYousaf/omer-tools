@@ -17,7 +17,6 @@ const BASE_URL = process.env.REACT_APP_BASE_URL;
 // Async Thunks
 
 
-
 // Async Thunks
 export const fetchAllProducts = createAsyncThunk(
   "products/fetchAllProducts",
@@ -86,7 +85,7 @@ export const fetchFeaturedProducts = createAsyncThunk(
       const response = await fetch(`${BASE_URL}/products/featured`);
       if (!response.ok) throw new Error('Failed to fetch featured products');
       const data = await response.json();
-      console.log('Featured products data:', data); // Debug log
+     
       return data;
     } catch (err) {
       console.error('Error fetching featured products:', err); // Debug log
@@ -115,6 +114,8 @@ const initialState = {
   filteredItems: [],
   redemptionItems: [], // New state for redemption products
   currentProduct: null,
+   featuredItems: [], // ✅ Add separate state for featured products
+    featuredStatus: "idle",
   status: "idle",
   error: null,
   productsBySubcategory: [],
@@ -192,14 +193,15 @@ const productsSlice = createSlice({
       })
       // fetchFeaturedProducts
       .addCase(fetchFeaturedProducts.pending, (state) => {
-        state.status = "loading";
+        state.featuredStatus  = "loading";
       })
       .addCase(fetchFeaturedProducts.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.items = action.payload;
+        state.featuredStatus  = "succeeded";
+        // state.items = action.payload;
+         state.featuredItems = action.payload;
       })
       .addCase(fetchFeaturedProducts.rejected, (state, action) => {
-        state.status = "failed";
+        state.featuredStatus  = "failed";
         state.error = action.payload;
       })
 
@@ -230,6 +232,7 @@ export const {
 
 // Selectors
 export const selectAllProducts = (state) => state.products.items;
+export const selectFeaturedProducts = (state) => state.products.featuredItems; // ✅ New selector
 export const selectFilteredProducts = (state) => state.products.filteredItems;
 export const selectCurrentProduct = (state) => state.products.currentProduct;
 export const selectProductsStatus = (state) => state.products.status;

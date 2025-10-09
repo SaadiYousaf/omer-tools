@@ -28,6 +28,31 @@ export const loginUser = createAsyncThunk(
   }
 );
 
+export const googleSignIn = createAsyncThunk(
+  'auth/googleSignIn',
+  async ({ idToken }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${BASE_URL}/auth/google-signin`, {
+        idToken
+      });
+      
+      if (!response.data.token) {
+        throw new Error('No token received');
+      }
+      
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('refreshToken', response.data.refreshToken);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+      return response.data;
+    } catch (err) {
+      const errorData = err.response?.data || {
+        message: err.message || 'Google sign-in failed'
+      };
+      return rejectWithValue(errorData);
+    }
+  }
+);
+
 export const registerUser = createAsyncThunk(
   'auth/register',
   async ({ firstName, lastName, email, password,PhoneNumber }, { rejectWithValue }) => {
@@ -43,7 +68,7 @@ export const registerUser = createAsyncThunk(
       localStorage.setItem('user', JSON.stringify(response.data.user));
       return response.data.user;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || 'Registration failed');
+      return rejectWithValue(err.response?.data?.errors?.[0] || 'Registration failed');
     }
   }
 );
@@ -80,6 +105,8 @@ const getInitialState = () => {
   
   return {
     user: user ? JSON.parse(user) : null,
+    token: token || null,
+    refreshToken: localStorage.getItem('refreshToken') || null,
     isAuthenticated: !!token,
     loading: false,
     error: null
@@ -92,6 +119,8 @@ const authSlice = createSlice({
   reducers: {
     logout(state) {
       state.user = null;
+      state.token = null;
+      state.refreshToken = null;
       state.isAuthenticated = false;
       state.loading = false;
       state.error = null;
@@ -110,9 +139,12 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        state.user = action.payload;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.refreshToken = action.payload.refreshToken;
         state.isAuthenticated = true;
         state.loading = false;
+        state.error = null;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -126,7 +158,29 @@ const authSlice = createSlice({
           state.error = payload;
         }
       })
-      
+      .addCase(googleSignIn.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(googleSignIn.fulfilled, (state, action) => {
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.refreshToken = action.payload.refreshToken;
+        state.isAuthenticated = true;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(googleSignIn.rejected, (state, action) => {
+        state.loading = false;
+        let payload = action.payload;
+        if (typeof payload === 'object') {
+          state.error = payload.message 
+            || payload.error 
+            || (Array.isArray(payload.errors) ? payload.errors.join(', ') : JSON.stringify(payload));
+        } else {
+          state.error = payload;
+        }
+      })
       // Register
       .addCase(registerUser.pending, (state) => {
         state.loading = true;

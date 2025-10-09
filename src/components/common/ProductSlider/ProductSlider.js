@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useCallback,useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllProducts, selectAllProducts, selectProductsStatus } from "../../../store/productsSlice";
 import ProductCard from "../Card/ProductCard";
@@ -37,27 +37,85 @@ const ProductSlider = ({
   }, [status, dispatch, products.length]);
 
   // Handle infinite scroll
-  useEffect(() => {
-    const handleScroll = () => {
-      if (isLoading || visibleProducts >= taggedProducts.length) return;
+  // useEffect(() => {
+  //   const handleScroll  = useCallback(() => {
+  //     if (isLoading || visibleProducts >= taggedProducts.length) return;
       
-      const scrollPosition = window.innerHeight + document.documentElement.scrollTop;
-      const pageHeight = document.documentElement.offsetHeight;
+  //     const scrollPosition = window.innerHeight + document.documentElement.scrollTop;
+  //     const pageHeight = document.documentElement.offsetHeight;
       
-      if (scrollPosition >= pageHeight - 300) {
-        setIsLoading(true);
+  //     if (scrollPosition >= pageHeight - 300) {
+  //       setIsLoading(true);
         
-        setTimeout(() => {
-          setVisibleProducts(prev => Math.min(prev + productsPerLoad, taggedProducts.length));
-          setIsLoading(false);
-        }, 500);
+  //       setTimeout(() => {
+  //         setVisibleProducts(prev => Math.min(prev + productsPerLoad, taggedProducts.length));
+  //         setIsLoading(false);
+  //       }, 500);
+  //     }
+  //   };
+
+  //   window.addEventListener('scroll', handleScroll);
+  //   return () => window.removeEventListener('scroll', handleScroll);
+  // }, [visibleProducts, isLoading, taggedProducts.length]);
+    const handleScroll = useCallback(() => {
+    if (isLoading || visibleProducts >= taggedProducts.length) return;
+    
+    const scrollPosition = window.innerHeight + document.documentElement.scrollTop;
+    const pageHeight = document.documentElement.offsetHeight;
+    
+    if (scrollPosition >= pageHeight - 300) {
+      setIsLoading(true);
+      
+      // Use requestAnimationFrame for better performance
+      requestAnimationFrame(() => {
+        setVisibleProducts(prev => Math.min(prev + productsPerLoad, taggedProducts.length));
+        setIsLoading(false);
+      });
+    }
+  }, [visibleProducts, isLoading, taggedProducts.length, productsPerLoad]);
+  // Optimized: Throttled scroll event listener
+  useEffect(() => {
+    let ticking = false;
+    
+    const throttledScrollHandler = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [visibleProducts, isLoading, taggedProducts.length]);
+    window.addEventListener('scroll', throttledScrollHandler, { passive: true });
+    return () => window.removeEventListener('scroll', throttledScrollHandler);
+  }, [handleScroll]);
 
+    // Optimized: Memoized skeleton items
+  const skeletonItems = useMemo(() => 
+    [...Array(maxItems)].map((_, index) => (
+      <div key={`skeleton-${index}`} className="product-card-wrapper skeleton">
+        <div className="product-image-placeholder"></div>
+        <div className="product-info">
+          <div className="title-placeholder"></div>
+          <div className="description-placeholder"></div>
+        </div>
+      </div>
+    )), [maxItems]
+  );
+
+  // Optimized: Memoized product list
+  const productList = useMemo(() => 
+    taggedProducts.slice(0, visibleProducts).map((product) => (
+      <div key={product.id} className="product-card-wrapper">
+        <ProductCard 
+          product={product}
+          description={product.tagLine}
+          linkTo={`/product/${product.id}`}
+        />
+      </div>
+    )), [taggedProducts, visibleProducts]
+  );
   // Show loading state if products are being fetched
   if (status === "loading") {
     return (
