@@ -1,0 +1,100 @@
+/* components/common/Payment/Payment.css */
+.payment-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+.payment-form {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  padding: 30px 40px;
+  max-width: 420px;
+  width: 100%;
+}
+
+.payment-form h3 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #555;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+  border-color: #6772e5;
+  outline: none;
+}
+
+.stripe-card-element {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.payment-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 25px;
+}
+
+.pay-btn,
+.back-btn {
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  transition: background 0.3s;
+}
+
+.back-btn {
+  background: #ddd;
+  color: #333;
+}
+
+.back-btn:hover {
+  background: #ccc;
+}
+
+.pay-btn {
+  background: #6772e5;
+  color: #fff;
+}
+
+.pay-btn:hover {
+  background: #5469d4;
+}
+
+.payment-error {
+  display: flex;
+  align-items: center;
+  background: #ffe6e6;
+  border: 1px solid #ffb3b3;
+  color: #b30000;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
