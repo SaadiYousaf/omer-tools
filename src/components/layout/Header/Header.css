@@ -759,8 +759,8 @@
   .user-btn,
   .login-btn,
   .cart-container {
-    padding: 1px; /* bigger touch-friendly padding */
-    font-size: 30px; /* larger text for readability */
+    padding: 3px; /* bigger touch-friendly padding */
+    font-size: 20px; /* larger text for readability */
     border-radius: 6px; /* optional rounded corners */
   }
 }
