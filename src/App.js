@@ -25,7 +25,7 @@ import CategorySubcategories from "./components/common/Subcategory/CategorySubca
 import SubcategoryWrapper from "./components/common/Subcategory/SubcategoryWrapper";
 import ProductUpload from "./pages/ProductUpload/ProductUpload";
 import ScrollToTop from "./components/common/Scroll/ScrollToTop";
-import SearchResultsPage from './pages/SearchResultPages/SearchResultPage';
+import SearchResultsPage from "./pages/SearchResultPages/SearchResultPage";
 import ShopByBrand from "./pages/ShopbyBrand/ShopByBrand";
 import RedemptionProducts from "./pages/Redemption/RedemptionProducts";
 import OmerToolsStoreLocator from "./components/common/Map/OmerToolsStoreLocator";
@@ -37,11 +37,11 @@ import OrderDetailsPage from "./pages/OrderDetails/OrderDetailsPage";
 
 function App() {
   const dispatch = useDispatch();
-  const { isAuthenticated, loading } = useSelector(state => state.auth);
+  const { isAuthenticated, loading } = useSelector((state) => state.auth);
 
   // Check if user is logged in on app load
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       dispatch(verifyToken());
     }
@@ -55,19 +55,28 @@ function App() {
     <div className="app">
       <Header />
       <main>
-        <ScrollToTop/>
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Home />} />
-          
+
           {/* Category and Subcategory Routes */}
           <Route path="/search" element={<SearchResultsPage />} />
           <Route path="/category/:categoryId" element={<Category />} />
-          <Route path="/category/:categoryId/subcategory/:subcategoryId" element={<Subcategory />} />
-          <Route path='/category/:categoryId/subcategory/:subcategoryId/product/:productId' element={<Product/>}/>
-          <Route path="/subcategory/:categoryId" element={<CategorySubcategories />} />
+          <Route
+            path="/category/:categoryId/subcategory/:subcategoryId"
+            element={<Subcategory />}
+          />
+          <Route
+            path="/category/:categoryId/subcategory/:subcategoryId/product/:productId"
+            element={<Product />}
+          />
+          <Route
+            path="/subcategory/:categoryId"
+            element={<CategorySubcategories />}
+          />
           <Route path="/upload" element={<ProductUpload />} />
-          <Route path="/shop-by-brand" element={<ShopByBrand/>} />
-          
+          <Route path="/shop-by-brand" element={<ShopByBrand />} />
+
           {/* Other Routes */}
           <Route path="/product/:productId" element={<Product />} />
           <Route path="/login" element={<Login />} />
@@ -75,46 +84,61 @@ function App() {
           <Route path="/create-your-kit" element={<ComingSoon />} />
           <Route path="/brand/:brandId" element={<BrandProducts />} />
           <Route path="/redemption" element={<RedemptionProducts />} />
-          <Route path="/store-locations" element={<OmerToolsStoreLocator/>} />
-          <Route path="/cart" element={<Cart/>}/>
+          <Route path="/store-locations" element={<OmerToolsStoreLocator />} />
+          <Route path="/cart" element={<Cart />} />
           <Route path="/orders" element={<OrderHistoryPage />} />
           <Route path="/orders/:orderId" element={<OrderHistory />} />
-        <Route path="/addresses" element={<AddressBookPage />} />
-        <Route path="/payment-methods" element={<PaymentMethodsPage />} />
-        <Route path="/account-settings" element={<AccountSettingsPage />} />
-        <Route path="/orders/:orderId" element={<OrderDetailsPage />} />
-          
-          <Route path="/orders" element={
-            <ProtectedRoute>
-              <OrderHistory />
-            </ProtectedRoute>
-          } />
-          
+          <Route path="/addresses" element={<AddressBookPage />} />
+          <Route path="/payment-methods" element={<PaymentMethodsPage />} />
+          <Route path="/account-settings" element={<AccountSettingsPage />} />
+          <Route path="/orders/:orderId" element={<OrderDetailsPage />} />
+
+          <Route
+            path="/orders"
+            element={
+              <ProtectedRoute>
+                <OrderHistory />
+              </ProtectedRoute>
+            }
+          />
+
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          
-          <Route path="/checkout" element={
-            <ProtectedRoute>
-              <Checkout />
-            </ProtectedRoute>
-          } />
-          
+
+          <Route
+            path="/checkout"
+            element={
+              <ProtectedRoute>
+                <Checkout />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Protected Routes */}
-          <Route path="/profile" element={
-            <ProtectedRoute>
-              <ProfilePage />
-            </ProtectedRoute>
-          } />
-          <Route path="/membership" element={
-            <ProtectedRoute>
-              <MembershipPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/welcome" element={
-            <ProtectedRoute>
-              <WelcomePage />
-            </ProtectedRoute>
-          } />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/membership"
+            element={
+              <ProtectedRoute>
+                <MembershipPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/welcome"
+            element={
+              <ProtectedRoute>
+                <WelcomePage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </main>
       <Footer />
