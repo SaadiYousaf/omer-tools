@@ -1,10 +1,13 @@
+// Payment.js
 import React, { useState, useEffect } from "react";
 import {
   useStripe,
   useElements,
   CardElement,
   PaymentRequestButtonElement,
+  Elements,
 } from "@stripe/react-stripe-js";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import "./Payment.css";
 
 const Payment = ({ onSubmit, onBack, total, onError }) => {
@@ -17,27 +20,14 @@ const Payment = ({ onSubmit, onBack, total, onError }) => {
   const [paymentRequest, setPaymentRequest] = useState(null);
   const [canMakePayment, setCanMakePayment] = useState(false);
 
-  // Clear card input on mount
-  useEffect(() => {
-    if (elements) {
-      const cardElement = elements.getElement(CardElement);
-      if (cardElement) cardElement.clear();
-    }
-    setError("");
-    setLoading(false);
-  }, [elements]);
-
-  // Initialize Apple Pay / Payment Request
+  // Stripe Card / Apple Pay setup
   useEffect(() => {
     if (!stripe) return;
 
     const pr = stripe.paymentRequest({
-      country: "AU", // Australia
-      currency: "aud", // Australian dollars
-      total: {
-        label: "Total",
-        amount: Math.round(total * 100), // convert dollars to cents
-      },
+      country: "AU",
+      currency: "aud",
+      total: { label: "Total", amount: Math.round(total * 100) },
       requestPayerName: true,
       requestPayerEmail: true,
     });
@@ -48,8 +38,7 @@ const Payment = ({ onSubmit, onBack, total, onError }) => {
 
     pr.on("paymentmethod", async (ev) => {
       try {
-        // You can optionally process payment here with backend
-        onSubmit({ paymentMethodId: ev.paymentMethod.id });
+        onSubmit({ paymentMethodId: ev.paymentMethod.id, type: "stripe" });
         ev.complete("success");
       } catch (err) {
         ev.complete("fail");
@@ -60,8 +49,8 @@ const Payment = ({ onSubmit, onBack, total, onError }) => {
     setPaymentRequest(pr);
   }, [stripe, total, onSubmit, onError]);
 
-  // Handle Card Payment
-  const handleSubmit = async (e) => {
+  // Stripe Card Payment
+  const handleStripeSubmit = async (e) => {
     e.preventDefault();
     if (!stripe || !elements) return;
 
@@ -84,19 +73,10 @@ const Payment = ({ onSubmit, onBack, total, onError }) => {
         return;
       }
 
-      const paymentData = {
-        paymentMethodId: paymentMethod.id,
-        cardData: {
-          Name: paymentMethod.billing_details.name,
-          Last4: paymentMethod.card.last4,
-          Brand: paymentMethod.card.brand,
-        },
-      };
-
-      onSubmit(paymentData);
+      onSubmit({ paymentMethodId: paymentMethod.id, type: "stripe" });
     } catch {
-      setError("Payment processing failed. Please try again.");
-      onError("Payment processing failed.");
+      setError("Stripe payment failed. Please try again.");
+      onError("Stripe payment failed.");
     } finally {
       setLoading(false);
     }
@@ -113,64 +93,98 @@ const Payment = ({ onSubmit, onBack, total, onError }) => {
     },
   };
 
+  // PayPal Options
+  const initialPayPalOptions = {
+    "client-id": process.env.REACT_APP_PAYPAL_CLIENT_ID, // Sandbox or Live
+    currency: "AUD",
+    intent: "capture",
+  };
+
   return (
     <div className="payment-container">
-      <div className="payment-form">
-        <h3>Payment Information</h3>
+      <h3>Payment Information</h3>
 
-        {error && (
-          <div className="payment-error">
-            <span>⚠️</span>
-            <p>{error}</p>
-          </div>
-        )}
+      {error && (
+        <div className="payment-error">
+          <span>⚠️</span>
+          <p>{error}</p>
+        </div>
+      )}
 
-        {/* Apple Pay / Payment Request Button */}
-        {canMakePayment && paymentRequest && (
-          <div className="apple-pay-section">
-            <PaymentRequestButtonElement options={{ paymentRequest }} />
-            <p style={{ textAlign: "center" }}>Or pay with card</p>
-          </div>
-        )}
+      {/* Stripe: Apple Pay / Payment Request Button */}
+      {canMakePayment && paymentRequest && (
+        <div className="apple-pay-section">
+          <PaymentRequestButtonElement options={{ paymentRequest }} />
+          <p style={{ textAlign: "center" }}>Or pay with card</p>
+        </div>
+      )}
 
-        {/* Card Payment Form */}
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Name on Card</label>
-            <input
-              type="text"
-              value={cardName}
-              onChange={(e) => setCardName(e.target.value)}
-              placeholder="John Doe"
-              required
-            />
-          </div>
+      {/* Stripe Card Payment Form */}
+      <form onSubmit={handleStripeSubmit} className="stripe-payment-form">
+        <div className="form-group">
+          <label>Name on Card</label>
+          <input
+            type="text"
+            value={cardName}
+            onChange={(e) => setCardName(e.target.value)}
+            placeholder="John Doe"
+            required
+          />
+        </div>
 
-          <div className="form-group">
-            <label>Card Details</label>
-            <div className="stripe-card-element">
-              <CardElement options={cardElementOptions} />
-            </div>
+        <div className="form-group">
+          <label>Card Details</label>
+          <div className="stripe-card-element">
+            <CardElement options={cardElementOptions} />
           </div>
+        </div>
 
-          <div className="payment-actions">
-            <button
-              type="button"
-              onClick={onBack}
-              className="back-btn"
-              disabled={loading}
-            >
-              Back to Shipping
-            </button>
-            <button
-              type="submit"
-              className="pay-btn"
-              disabled={!stripe || loading}
-            >
-              {loading ? "Processing..." : `Pay $${total.toFixed(2)}`}
-            </button>
-          </div>
-        </form>
+        <div className="payment-actions">
+          <button
+            type="button"
+            onClick={onBack}
+            className="back-btn"
+            disabled={loading}
+          >
+            Back to Shipping
+          </button>
+          <button
+            type="submit"
+            className="pay-btn"
+            disabled={!stripe || loading}
+          >
+            {loading ? "Processing..." : `Pay $${total.toFixed(2)}`}
+          </button>
+        </div>
+      </form>
+
+      {/* PayPal Button */}
+      <div className="paypal-section">
+        <PayPalScriptProvider options={initialPayPalOptions}>
+          <PayPalButtons
+            style={{ layout: "vertical" }}
+            createOrder={(data, actions) => {
+              return actions.order.create({
+                purchase_units: [
+                  {
+                    amount: { value: total.toFixed(2) },
+                  },
+                ],
+              });
+            }}
+            onApprove={async (data, actions) => {
+              const details = await actions.order.capture();
+              const name = details.payer.name.given_name;
+              alert(`PayPal transaction completed by ${name}`);
+              onSubmit({
+                paypalOrderId: data.orderID,
+                payerDetails: details,
+                type: "paypal",
+              });
+            }}
+            onError={(err) => onError("PayPal payment failed")}
+          />
+        </PayPalScriptProvider>
       </div>
     </div>
   );

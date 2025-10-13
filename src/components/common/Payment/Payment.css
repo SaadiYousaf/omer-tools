@@ -1,9 +1,21 @@
 /* components/common/Payment/Payment.css */
 .payment-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 40px;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+.payment-container h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+  text-align: center;
+}
+/* Stripe Payment Form */
+.stripe-payment-form {
+  margin-bottom: 2rem;
 }
 
 .payment-form {
@@ -23,7 +35,7 @@
 }
 
 .form-group {
-  margin-bottom: 18px;
+  margin-bottom: 1rem;
 }
 
 .form-group label {
@@ -52,11 +64,26 @@
   border: 1px solid #ccc;
   border-radius: 8px;
 }
+/* Stripe & Apple Pay / Payment Request Button */
+.apple-pay-section {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.apple-pay-section p {
+  margin-top: 0.5rem;
+  color: #666;
+}
 
 .payment-actions {
   display: flex;
   justify-content: space-between;
   margin-top: 25px;
+}
+.paypal-section {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
 }
 
 .pay-btn,

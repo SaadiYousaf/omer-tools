@@ -670,7 +670,7 @@
 
   .logo img {
     height: 30px;
-    margin-right: 35px; /* remove negative margin */
+    margin-right: auto; /* remove negative margin */
   }
 
   .user-cart-container {
