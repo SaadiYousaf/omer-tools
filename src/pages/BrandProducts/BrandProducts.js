@@ -84,7 +84,7 @@ const BrandProducts = () => {
     setLoadingProducts(true);
     setError(null);
     try {
-      const productsData = await get('https://zohaibii-001-site1.mtempurl.com/api/products?limit=1000');
+      const productsData = await get(`${BASE_URL}/products?limit=1000`);
       
       // Cache the products
       localStorage.setItem(`cachedProducts_${brandId}`, JSON.stringify(productsData));
@@ -129,7 +129,7 @@ const BrandProducts = () => {
         allBrandIdsInProducts: brandIdsInProducts,
         brandIdExistsInProducts: brandIdExists,
         matchingProductsCount: matchingProducts.length,
-        apiUrl: 'https://zohaibii-001-site1.mtempurl.com/api/products?limit=1000',
+        apiUrl: `${BASE_URL}/products?limit=1000`,
         filteredItemsCount: filteredItems.length,
         manuallyFilteredCount: manuallyFilteredProducts.length,
         isInitialLoad: isInitialLoad

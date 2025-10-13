@@ -544,61 +544,56 @@ const Product = () => {
       <div className="tab">Shipping & Returns</div> */}
       </div>
 
-      <div className="content-container">
-        <div className="description-section">
-          <h3>Product Overview</h3>
-          <div
-            className={`description-content ${
-              expandedDescription ? "expanded" : ""
-            }`}
-          >
-            {prod.description ? (
-              <>
-                {String(prod.description)
-                  .split(/\n+/)
-                  .map((para, i) => (
-                    <p key={i}>{para}</p>
-                  ))}
-              </>
-            ) : (
-              <>
-                <p>
-                  The DEWALT DCGG581P1GXE 18V 5.0Ah XR Li-Ion Cordless 2-Speed
-                  Grease Gun Combo Kit delivers professional-grade performance
-                  for demanding lubrication tasks. Engineered with a
-                  high-performance motor, this grease gun provides up to 15g of
-                  grease per minute at 10,000 psi.
-                </p>
-                <p>
-                  The innovative 2-speed selector allows you to switch between
-                  high-speed application for efficiency and high-pressure mode
-                  for stubborn fittings. The ergonomic design features a
-                  comfortable grip and balanced weight distribution to minimize
-                  user fatigue during extended operation.
-                </p>
-              </>
-            )}
-          </div>
-          <button
-            className="expand-btn"
-            onClick={() => setExpandedDescription(!expandedDescription)}
-          >
-            {expandedDescription ? "Show Less" : "Read More"}
-          </button>
+<div className="content-container">
+  <div className="description-section">
+    <h3>Product Overview</h3>
+    <div
+      className={`description-content ${expandedDescription ? "expanded" : ""}`}
+    >
+      {prod.description ? (
+        <div 
+          className="html-description"
+          dangerouslySetInnerHTML={{ __html: prod.description }}
+        />
+      ) : (
+        <div className="default-description">
+          <p>
+            The DEWALT DCGG581P1GXE 18V 5.0Ah XR Li-Ion Cordless 2-Speed
+            Grease Gun Combo Kit delivers professional-grade performance
+            for demanding lubrication tasks. Engineered with a
+            high-performance motor, this grease gun provides up to 15g of
+            grease per minute at 10,000 psi.
+          </p>
+          <p>
+            The innovative 2-speed selector allows you to switch between
+            high-speed application for efficiency and high-pressure mode
+            for stubborn fittings. The ergonomic design features a
+            comfortable grip and balanced weight distribution to minimize
+            user fatigue during extended operation.
+          </p>
         </div>
+      )}
+    </div>
+    <button
+      className="expand-btn"
+      onClick={() => setExpandedDescription(!expandedDescription)}
+    >
+      {expandedDescription ? "Show Less" : "Read More"}
+    </button>
+  </div>
 
-        <div className="specifications-section">
-          <h3>Technical Specifications</h3>
-          <div className="specs-grid">
-            {Object.entries(specifications).map(([key, value]) => (
-              <div className="spec-row" key={key}>
-                <div className="spec-name">{key}</div>
-                <div className="spec-value">{value}</div>
-              </div>
-            ))}
-          </div>
+  <div className="specifications-section">
+    <h3>Technical Specifications</h3>
+    <div className="specs-grid">
+      {Object.entries(specifications).map(([key, value]) => (
+        <div className="spec-row" key={key}>
+          <div className="spec-name">{key}</div>
+          <div className="spec-value">{value}</div>
         </div>
-      </div>
+      ))}
+    </div>
+  </div>
+</div>
 
       {relatedProducts.length > 0 && (
         <div className="related-section">

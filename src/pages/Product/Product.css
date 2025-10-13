@@ -415,6 +415,60 @@ h3.product-title {
 .thumbnail-strip {
   display: none;
 }
+.html-description{
+background-color: #fafcff;
+}
+/* Fix for displaying HTML content with bullets */
+.html-description ul,
+.html-description ol {
+  margin: 1rem 0 !important;
+  padding-left: 2rem !important;
+}
+
+.html-description ul {
+  list-style-type: disc !important;
+}
+
+.html-description ol {
+  list-style-type: decimal !important;
+}
+
+.html-description li {
+  display: list-item !important;
+  list-style-position: outside !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* Remove any styles that might be hiding bullets */
+.html-description ul li::before,
+.html-description ol li::before {
+  display: none !important;
+}
+
+/* Nested list styles */
+.html-description ul ul,
+.html-description ol ol,
+.html-description ul ol,
+.html-description ol ul {
+  margin: 0.5rem 0 !important;
+}
+
+.html-description ul ul {
+  list-style-type: circle !important;
+}
+
+.html-description ul ul ul {
+  list-style-type: square !important;
+}
+
+.html-description ol ol {
+  list-style-type: lower-alpha !important;
+}
+
+.html-description ol ol ol {
+  list-style-type: lower-roman !important;
+}
+
 @media (max-width: 600px) {
   .thumbnail-strip-pc {
     display: none;
@@ -747,6 +801,7 @@ h3.product-title {
   max-height: 120px;
   overflow: hidden;
   transition: max-height 0.5s ease;
+  background-color: #fafcff;
 }
 
 .description-content.expanded {
