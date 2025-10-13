@@ -11,7 +11,76 @@
   margin: 0 auto;
   padding: 20px;
 }
+/* User Info Styles */
+.user-info-option {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #e8f4fd;
+  border-radius: 8px;
+  border: 2px solid #bee5eb;
+}
 
+.info-preview {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.info-preview div {
+  margin-bottom: 0.25rem;
+}
+
+.no-address-notice {
+  color: #856404;
+  background-color: #fff3cd;
+  border: 1px solid #ffeaa7;
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+/* Existing Confirm and Collect styles */
+.confirm-collect-option {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #2c5530;
+}
+
+.checkbox-label input[type="checkbox"] {
+  margin-right: 10px;
+  transform: scale(1.2);
+}
+
+.option-description {
+  margin: 0.5rem 0 0 0;
+  font-size: 0.9rem;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.collect-notice {
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  color: #155724;
+}
 .checkout-header {
   text-align: center;
   margin-bottom: 30px;

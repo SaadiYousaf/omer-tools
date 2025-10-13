@@ -11,10 +11,10 @@ const FeaturedProducts = () => {
   const featuredProductsFromRedux = useSelector(selectFeaturedProducts);
   const featuredStatus = useSelector((state) => state.products.featuredStatus || 'idle');
 const productsStatus = useSelector((state) => state.products.status || 'idle');
-  const [visibleProducts, setVisibleProducts] = useState(8);
+  const [visibleProducts, setVisibleProducts] = useState(10);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const productsPerLoad = 8;
+  const productsPerLoad = 10;
 
   // Get all products from Redux store
   const items = useSelector((state) => state.products.items);

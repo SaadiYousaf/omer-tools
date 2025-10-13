@@ -7,14 +7,14 @@ import "./ProductSlider.css";
 const ProductSlider = ({
   title = "Premium Collections",
   subtitle = "Discover our enterprise-grade solutions designed for professionals",
-  maxItems = 8,
+  maxItems = 10,
 }) => {
   const dispatch = useDispatch();
   const products = useSelector(selectAllProducts);
   const status = useSelector(selectProductsStatus);
   const [visibleProducts, setVisibleProducts] = useState(maxItems);
   const [isLoading, setIsLoading] = useState(false);
-  const productsPerLoad = 8;
+  const productsPerLoad = 10;
 
   // Filter products with non-null tagline
   const taggedProducts = React.useMemo(() => {

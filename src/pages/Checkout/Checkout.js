@@ -20,6 +20,9 @@ const Checkout = () => {
   const [paymentError, setPaymentError] = useState(null);
   const [orderError, setOrderError] = useState(null);
   const [orderLoading, setOrderLoading] = useState(false);
+    const [userAddresses, setUserAddresses] = useState([]);
+  const [userProfile, setUserProfile] = useState(null);
+  const [isConfirmAndCollect, setIsConfirmAndCollect] = useState(false);
   const { items, totalAmount } = useSelector(state => state.cart);
   const { user } = useSelector(state => state.auth);
   const dispatch = useDispatch();
@@ -27,13 +30,56 @@ const Checkout = () => {
   
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+  
+     
+      fetchUserProfile();
+ 
+  }, [user]);
+
+    const fetchUserProfile = async () => {
+    try {
+      const token = localStorage.getItem('token');
+       console.log('Fetching user profile with token:', token ? 'Token exists' : 'No token');
+      const response = await axios.get(`${BASE_URL}/users/profile`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+        console.log('User profile response:', response.data);
+      setUserProfile(response.data);
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+    }
+  };
+// const fetchUserAddresses = async () => {
+//     try {
+//       const token = localStorage.getItem('token');
+//       const response = await axios.get(`${BASE_URL}/users/profile`, {
+//         headers: { 'Authorization': `Bearer ${token}` }
+//       });
+      
+//       if (response.data.addresses) {
+//         setUserAddresses(response.data.addresses);
+//         setUserProfile(response.data);
+//       }
+//     } catch (error) {
+//       console.error('Error fetching user addresses:', error);
+//     }
+//   };
+
+  // ✅ Function to get default address
+  const getDefaultAddress = () => {
+    const defaultAddress = userAddresses.find(addr => addr.isDefault);
+    return defaultAddress || userAddresses[0]; // Return default or first address
+  };
 
   const calculateShipping = () => {
     return totalAmount > 100 ? 0 : 12;
   };
-
+  
   const shippingCost = calculateShipping();
+  const dynamicShippingCost = isConfirmAndCollect ? 0 : shippingCost;
+  const dynamicTotal = totalAmount + dynamicShippingCost;
+    const originalTotal = totalAmount + shippingCost; // ✅ For Step 1
+
   const total = totalAmount + shippingCost;
 
   const nextStep = () => setStep(step + 1);
@@ -41,6 +87,7 @@ const Checkout = () => {
 
   const handleShippingSubmit = (data) => {
     setShippingData(data);
+     setIsConfirmAndCollect(data.isConfirmAndCollect || false); 
     nextStep();
   };
   const handleBackToPayment = () => {
@@ -136,8 +183,10 @@ const Checkout = () => {
           country: shippingData.country
         },
           subtotal: totalAmount, // Amount without shipping
-  shippingCost: shippingCost, // $12 or $0
-  totalAmount: total, // totalAmount + shippingCost
+shippingCost: dynamicShippingCost, // ✅ Dynamic shipping cost
+      totalAmount: dynamicTotal, // ✅ Dynamic total
+      // ✅ Add the new flag
+  isConfirmAndCollect: isConfirmAndCollect
       };
 
       console.log('Sending order data:', JSON.stringify(orderData, null, 2));
@@ -213,7 +262,9 @@ const Checkout = () => {
           <ShippingForm 
             onSubmit={handleShippingSubmit} 
             shippingCost={shippingCost}
-            total={total}
+            total={originalTotal}
+            userAddresses={userAddresses}
+          userProfile={userProfile}
           />
         );
       case 2:
@@ -224,7 +275,7 @@ const Checkout = () => {
           onSubmit={handlePaymentSubmit}
           onBack={prevStep}
           onError={handlePaymentError}
-          total={total}
+          total={dynamicTotal}
         />
       </Elements>
         );
@@ -234,8 +285,8 @@ const Checkout = () => {
             shippingData={shippingData} 
             paymentData={paymentData}
             items={items}
-            total={total}
-            shippingCost={shippingCost}
+            total={dynamicTotal}
+            shippingCost={dynamicShippingCost}
             onConfirm={handlePlaceOrder}
               onBack={handleBackToPayment} // ✅ Use the new function instead of prevStep
             loading={orderLoading}
@@ -275,7 +326,7 @@ const Checkout = () => {
 };
 
 // The ShippingForm, OrderSummary, and OrderSuccess components remain the same
-const ShippingForm = ({ onSubmit, shippingCost, total }) => {
+const ShippingForm = ({ onSubmit, shippingCost, total, userAddresses, userProfile  }) => {
   const { items, totalAmount } = useSelector(state => state.cart);
   const [formData, setFormData] = useState({
     fullName: '',
@@ -286,8 +337,37 @@ const ShippingForm = ({ onSubmit, shippingCost, total }) => {
     postalCode: '',
     country: 'US'
   });
-
+ const [isConfirmAndCollect, setIsConfirmAndCollect] = useState(false);
+    const [useMyInfo, setUseMyInfo] = useState(false); // ✅ Renamed to be more general
   const [errors, setErrors] = useState({});
+  const dynamicShippingCost = isConfirmAndCollect ? 0 : shippingCost;
+  const dynamicTotal = totalAmount + dynamicShippingCost;
+
+
+  useEffect(() => {
+       if (useMyInfo && userProfile) {
+      const fullName = `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim();
+
+        const hasAddresses = userAddresses && userAddresses.length > 0;
+      const defaultAddress = hasAddresses ? 
+        (userAddresses.find(addr => addr.isDefault) || userAddresses[0]) : 
+        null;
+      
+      setFormData(prev => ({
+        ...prev,
+        fullName: fullName,
+        email: userProfile.email || prev.email,
+        // Only fill address fields if user has saved addresses
+        ...(hasAddresses && defaultAddress ? {
+          address: defaultAddress.addressLine1 || '',
+          city: defaultAddress.city || '',
+          state: defaultAddress.state || '',
+          postalCode: defaultAddress.postalCode || '',
+          country: defaultAddress.country || 'US'
+        } : {})
+      }));
+    }
+  }, [useMyInfo, userProfile, userAddresses]);
 
   const handleChange = (e) => {
     setFormData({
@@ -302,6 +382,13 @@ const ShippingForm = ({ onSubmit, shippingCost, total }) => {
         [e.target.name]: ''
       });
     }
+  };
+  const handleConfirmAndCollectChange = (e) => {
+    setIsConfirmAndCollect(e.target.checked);
+  };
+
+    const handleUseMyInfoChange = (e) => {
+    setUseMyInfo(e.target.checked);
   };
 
   const validateForm = () => {
@@ -320,13 +407,17 @@ const ShippingForm = ({ onSubmit, shippingCost, total }) => {
     
     return newErrors;
   };
-
+  
   const handleSubmit = (e) => {
     e.preventDefault();
     const formErrors = validateForm();
     
     if (Object.keys(formErrors).length === 0) {
-      onSubmit(formData);
+     onSubmit({
+        ...formData,
+        isConfirmAndCollect: isConfirmAndCollect,
+         usedMyInfo: useMyInfo
+      });
     } else {
       setErrors(formErrors);
     }
@@ -336,6 +427,57 @@ const ShippingForm = ({ onSubmit, shippingCost, total }) => {
     <div className="checkout-container">
       <div className="checkout-form">
         <h3>Shipping Information</h3>
+         {userProfile && (
+          <div className="user-info-option">
+            <label className="checkbox-label">
+              <input 
+                type="checkbox" 
+                checked={useMyInfo}
+                onChange={handleUseMyInfoChange}
+              />
+              <span className="checkmark"></span>
+              Use my account information
+            </label>
+            <p className="option-description">
+              Automatically fill your name and email from your account
+              {userAddresses && userAddresses.length > 0 
+                ? '. We\'ll also use your saved address.' 
+                : ''}
+            </p>
+            
+            {/* Show what information will be used */}
+            {useMyInfo && (
+              <div className="info-preview">
+                <div><strong>Name:</strong> {userProfile.firstName} {userProfile.lastName}</div>
+                <div><strong>Email:</strong> {userProfile.email}</div>
+                {userAddresses && userAddresses.length > 0 ? (
+                  <div>
+                    <strong>Address:</strong> Using your saved address
+                  </div>
+                ) : (
+                  <div className="no-address-notice">
+                    <em>No saved addresses found. Please enter your shipping address below.</em>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+                <div className="confirm-collect-option">
+          <label className="checkbox-label">
+            <input 
+              type="checkbox" 
+              checked={isConfirmAndCollect}
+              onChange={handleConfirmAndCollectChange}
+            />
+            <span className="checkmark"></span>
+            Confirm and Collect (Pick up from store - Free Shipping)
+          </label>
+          <p className="option-description">
+            Select this option to collect your order from our store. No shipping charges will apply.
+          </p>
+        </div>
+
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Full Name</label>
@@ -431,16 +573,23 @@ const ShippingForm = ({ onSubmit, shippingCost, total }) => {
       <OrderSummary 
         items={items} 
         totalAmount={totalAmount} 
-        shippingCost={shippingCost} 
-        total={total} 
+        shippingCost={dynamicShippingCost} 
+        total={dynamicTotal}
+        isConfirmAndCollect={isConfirmAndCollect}
       />
     </div>
   );
 };
 
-const OrderSummary = ({ items, totalAmount, shippingCost, total }) => (
+const OrderSummary = ({ items, totalAmount, shippingCost, total,isConfirmAndCollect  }) => (
   <div className="checkout-summary">
     <h3>Order Summary</h3>
+     {isConfirmAndCollect && (
+      <div className="collect-notice">
+        <strong>🛍️ Store Pickup Selected</strong>
+        <p>You will collect your order from our store</p>
+      </div>
+    )}
     <div className="order-items">
       {items.map(item => (
         <div key={item.id} className="order-item">

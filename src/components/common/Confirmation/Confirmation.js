@@ -95,7 +95,7 @@ const Confirmation = ({
               </div>
               <div className="summary-item">
                 <span>Shipping</span>
-                <span>${shippingCost.toFixed(2)}</span>
+                <span>{shippingCost === 0 ? 'FREE' : `$${shippingCost.toFixed(2)}`}</span>
               </div>
               <div className="summary-item total">
                 <span>Total</span>
