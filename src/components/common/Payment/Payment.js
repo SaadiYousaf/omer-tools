@@ -95,9 +95,10 @@ const Payment = ({ onSubmit, onBack, total, onError }) => {
 
   // PayPal Options
   const initialPayPalOptions = {
-    "client-id": process.env.REACT_APP_PAYPAL_CLIENT_ID, // Sandbox or Live
-    currency: "AUD",
-    intent: "capture",
+   "client-id": process.env.REACT_APP_PAYPAL_CLIENT_ID,
+  currency: "AUD",
+  intent: "capture",
+  "disable-funding": "card", // disables debit/credit card option
   };
 
   return (

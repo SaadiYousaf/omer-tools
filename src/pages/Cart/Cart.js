@@ -1,5 +1,5 @@
 // src/pages/Cart/Cart.js
-import React, { useEffect } from "react";
+import React, { useEffect,useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { removeItemFromCart, clearCart } from "../../store/cartSlice";
 import { useNavigate } from "react-router-dom";
@@ -12,7 +12,8 @@ const Cart = () => {
   const { items, totalQuantity, totalAmount } = useSelector(
     (state) => state.cart
   );
-
+ const { user,isAuthenticated  } = useSelector(state => state.auth); // ✅ Get user from auth state
+  const [showGuestOption, setShowGuestOption] = useState(false); // ✅ NEW STATE
   useEffect(() => {}, [items]);
   const handleRemoveItem = (productId) => {
     dispatch(removeItemFromCart(productId));
@@ -23,9 +24,38 @@ const Cart = () => {
   };
 
   const handleCheckout = () => {
+    const token = localStorage.getItem('token');
+     const storedUser = localStorage.getItem('user');
+
+  //      console.log('Checkout auth check:', {
+  //   token: !!token,
+  //   reduxUser: user,
+  //   reduxAuthenticated: isAuthenticated,
+  //   storedUser: !!storedUser
+  // });
+ const hasToken = !!token;
+  const hasUserInRedux = !!user;
+  const hasUserInStorage = !!storedUser;
+  const isReduxAuthenticated = isAuthenticated;
+
+  // If we have a token and user data anywhere, proceed to checkout
+  if (hasToken && (hasUserInRedux || hasUserInStorage || isReduxAuthenticated)) {
+    navigate("/checkout");
+  } else {
+    setShowGuestOption(true);
+  }
+  };
+ // ✅ NEW FUNCTION FOR GUEST CHECKOUT
+  const handleGuestCheckout = () => {
     navigate("/checkout");
   };
+   const handleLogin = () => {
+    navigate("/login", { state: { from: '/checkout' } });
+  };
 
+    const closeGuestOption = () => {
+    setShowGuestOption(false);
+  };
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -56,6 +86,45 @@ const Cart = () => {
   return (
     <div className="cart-page">
       <ScrollToTop />
+      {/* ✅ GUEST CHECKOUT MODAL */}
+      {showGuestOption && (
+        <div className="guest-checkout-modal">
+          <div className="modal-overlay" onClick={closeGuestOption}></div>
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3>Continue to Checkout</h3>
+              <button className="close-modal" onClick={closeGuestOption}>×</button>
+            </div>
+            <div className="modal-body">
+              <div className="checkout-option">
+                <div className="option-icon">👤</div>
+                <div className="option-content">
+                  <h4>Login to Your Account</h4>
+                  <p>Access your order history and save your information for faster checkout.</p>
+                  <button onClick={handleLogin} className="option-btn primary">
+                    Login & Checkout
+                  </button>
+                </div>
+              </div>
+              
+              <div className="checkout-divider">
+                <span>OR</span>
+              </div>
+              
+              <div className="checkout-option">
+                <div className="option-icon">🚀</div>
+                <div className="option-content">
+                  <h4>Continue as Guest</h4>
+                  <p>Checkout without creating an account. You can create an account later.</p>
+                  <button onClick={handleGuestCheckout} className="option-btn secondary">
+                    Checkout as Guest
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="cart-container">
         <div className="cart-header">
           <h1 className="cart-title">

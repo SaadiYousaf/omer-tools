@@ -18,7 +18,7 @@ export const loginUser = createAsyncThunk(
       
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
-      return response.data.user;
+      return response.data;
     } catch (err) {
       const errorData = err.response?.data || {
         message: err.message || 'Login failed'
@@ -66,7 +66,7 @@ export const registerUser = createAsyncThunk(
       });
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
-      return response.data.user;
+      return response.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.errors?.[0] || 'Registration failed');
     }
@@ -86,13 +86,15 @@ export const verifyToken = createAsyncThunk(
       const response = await axios.get(`${BASE_URL}/users/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+       localStorage.setItem('user', JSON.stringify(response.data));
+       return response.data;
       // If we get here, the token is valid
-      const user = JSON.parse(localStorage.getItem('user'));
-      return user;
+      // const user = JSON.parse(localStorage.getItem('user'));
+      // return user;
     } catch (err) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+       localStorage.removeItem('refreshToken');
       return rejectWithValue(err.response?.data?.message || 'Token verification failed');
     }
   }
@@ -126,9 +128,14 @@ const authSlice = createSlice({
       state.error = null;
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      localStorage.removeItem('refreshToken');
     },
     clearError(state) {
       state.error = null;
+    },
+     setUser(state, action) {
+      state.user = action.payload;
+      state.isAuthenticated = !!action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -187,7 +194,7 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
-        state.user = action.payload;
+        state.user = action.payload.user;
         state.isAuthenticated = true;
         state.loading = false;
       })

@@ -86,6 +86,7 @@ function App() {
           <Route path="/redemption" element={<RedemptionProducts />} />
           <Route path="/store-locations" element={<OmerToolsStoreLocator />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
           <Route path="/orders" element={<OrderHistoryPage />} />
           <Route path="/orders/:orderId" element={<OrderHistory />} />
           <Route path="/addresses" element={<AddressBookPage />} />

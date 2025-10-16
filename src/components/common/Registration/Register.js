@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerUser } from '../../../store/authSlice';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useLocation } from 'react-router-dom';
 import './Register.css';
 
 const Register = () => {
@@ -15,10 +15,26 @@ const Register = () => {
     address: ''
   });
   const [errors, setErrors] = useState({});
+    const [showGuestConversion, setShowGuestConversion] = useState(false);
   
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const { loading, error } = useSelector(state => state.auth);
+
+  // ✅ Check if coming from guest checkout
+  React.useEffect(() => {
+    const guestEmail = localStorage.getItem('guestEmail');
+    if (guestEmail) {
+      setFormData(prev => ({
+        ...prev,
+        email: guestEmail
+      }));
+      setShowGuestConversion(true);
+      // Clear the guest email from storage
+      localStorage.removeItem('guestEmail');
+    }
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -67,8 +83,19 @@ const Register = () => {
     const { confirmPassword, ...userData } = formData;
     
     const result = await dispatch(registerUser(userData));
-    if (registerUser.fulfilled.match(result)) {
-      navigate('/');
+       if (registerUser.fulfilled.match(result)) {
+      // ✅ Check if this was a guest conversion
+      if (result.payload?.message?.includes('upgraded') || result.payload?.message?.includes('guest')) {
+        // Show success message for guest conversion
+        alert('Your guest account has been successfully upgraded! Your order history has been preserved.');
+      } else {
+        // Regular registration success
+        alert('Account created successfully!');
+      }
+      
+      // Navigate based on where they came from
+      const from = location.state?.from || '/';
+      navigate(from);
     }
   };
 
@@ -79,6 +106,18 @@ const Register = () => {
           <div className="register-promo-content">
             <h2>Join Us Today!</h2>
             <p>Create an account to enjoy exclusive benefits, faster checkout, and personalized shopping experiences.</p>
+           {showGuestConversion && (
+              <div className="guest-conversion-notice">
+                <h3>✨ Upgrade Your Guest Account</h3>
+                <p>We found your previous guest order! Create an account to:</p>
+                <ul>
+                  <li>Access your order history</li>
+                  <li>Track your current orders</li>
+                  <li>Save your shipping preferences</li>
+                  <li>Get exclusive member benefits</li>
+                </ul>
+              </div>
+            )}
             <div className="register-benefits">
               <div className="benefit-item">
                 <span className="benefit-icon">✓</span>

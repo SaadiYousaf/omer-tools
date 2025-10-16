@@ -186,6 +186,43 @@ input.error {
   font-weight: 500;
   transition: background-color 0.2s ease, transform 0.1s ease;
 }
+/* Guest conversion styles */
+.guest-conversion-notice {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.guest-conversion-notice h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.3rem;
+}
+
+.guest-conversion-notice p {
+  margin: 0 0 15px 0;
+  opacity: 0.9;
+}
+
+.guest-conversion-notice ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.guest-conversion-notice li {
+  margin-bottom: 5px;
+  opacity: 0.9;
+}
+
+.email-note {
+  display: block;
+  margin-top: 5px;
+  color: #666;
+  font-size: 0.85rem;
+  font-style: italic;
+}
 
 .register-submit-btn:hover {
   background: #2b6cb0;

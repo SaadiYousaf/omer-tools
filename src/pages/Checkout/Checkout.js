@@ -23,6 +23,7 @@ const Checkout = () => {
     const [userAddresses, setUserAddresses] = useState([]);
   const [userProfile, setUserProfile] = useState(null);
   const [isConfirmAndCollect, setIsConfirmAndCollect] = useState(false);
+   const [isGuestCheckout, setIsGuestCheckout] = useState(false);
   const { items, totalAmount } = useSelector(state => state.cart);
   const { user } = useSelector(state => state.auth);
   const dispatch = useDispatch();
@@ -32,18 +33,24 @@ const Checkout = () => {
     window.scrollTo(0, 0);
   
      
+      const token = localStorage.getItem('token');
+    if (token && user) {
       fetchUserProfile();
+      setIsGuestCheckout(false);
+    } else {
+      setIsGuestCheckout(true); // ✅ GUEST CHECKOUT
+    }
  
   }, [user]);
 
     const fetchUserProfile = async () => {
     try {
       const token = localStorage.getItem('token');
-       console.log('Fetching user profile with token:', token ? 'Token exists' : 'No token');
+      //  console.log('Fetching user profile with token:', token ? 'Token exists' : 'No token');
       const response = await axios.get(`${BASE_URL}/users/profile`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-        console.log('User profile response:', response.data);
+        // console.log('User profile response:', response.data);
       setUserProfile(response.data);
     } catch (error) {
       console.error('Error fetching user profile:', error);
@@ -112,47 +119,42 @@ const Checkout = () => {
     setOrderError(null);
     
     try {
-      const token = localStorage.getItem('token');
-       if (!token) {
-      setOrderError('Authentication expired. Please log in again.');
-      setOrderLoading(false);
-      return;
-    }
-      try {
-      await axios.get(`${BASE_URL}/auth/verify`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      // Token is valid, continue with order
-    } catch (authError) {
-      // Token is invalid, try to refresh first
-      const refreshToken = localStorage.getItem('refreshToken');
-      if (refreshToken) {
+      let token = localStorage.getItem('token');
+      
+      // ✅ GUEST CHECKOUT: Skip token validation
+      if (!isGuestCheckout && token) {
+        // Only validate token for logged-in users
         try {
-          const refreshResponse = await axios.post(`${BASE_URL}/auth/refresh-token`, {
-            token: token,
-            refreshToken: refreshToken
+          await axios.get(`${BASE_URL}/auth/verify`, {
+            headers: { 'Authorization': `Bearer ${token}` }
           });
-          
-          const newToken = refreshResponse.data.token;
-          localStorage.setItem('token', newToken);
-          
-          // Continue with order using new token
-        } catch (refreshError) {
-          // Refresh failed, logout user
-          localStorage.removeItem('token');
-          localStorage.removeItem('refreshToken');
-          setOrderError('Session expired. Please log in again.');
-          setOrderLoading(false);
-          return;
+        } catch (authError) {
+          // Token is invalid, try to refresh first
+          const refreshToken = localStorage.getItem('refreshToken');
+          if (refreshToken) {
+            try {
+              const refreshResponse = await axios.post(`${BASE_URL}/auth/refresh-token`, {
+                token: token,
+                refreshToken: refreshToken
+              });
+              
+              token = refreshResponse.data.token;
+              localStorage.setItem('token', token);
+            } catch (refreshError) {
+              // Refresh failed, switch to guest checkout
+              localStorage.removeItem('token');
+              localStorage.removeItem('refreshToken');
+              setIsGuestCheckout(true);
+              token = null;
+            }
+          } else {
+            // No refresh token, switch to guest checkout
+            localStorage.removeItem('token');
+            setIsGuestCheckout(true);
+            token = null;
+          }
         }
-      } else {
-        // No refresh token, logout
-        localStorage.removeItem('token');
-        setOrderError('Session expired. Please log in again.');
-        setOrderLoading(false);
-        return;
       }
-    }
 
       // Format order data to match backend expectations
       const orderData = {
@@ -186,20 +188,31 @@ const Checkout = () => {
 shippingCost: dynamicShippingCost, // ✅ Dynamic shipping cost
       totalAmount: dynamicTotal, // ✅ Dynamic total
       // ✅ Add the new flag
-  isConfirmAndCollect: isConfirmAndCollect
+  isConfirmAndCollect: isConfirmAndCollect,
+   isGuestOrder: isGuestCheckout, // ✅ ADD GUEST ORDER FLAG
+
+   ...(isGuestCheckout && {
+        GuestUser: {
+          FullName: shippingData.fullName,
+          Email: shippingData.email
+        }
+      })
       };
 
       console.log('Sending order data:', JSON.stringify(orderData, null, 2));
 
       // Send order to backend
-      const response = await axios.post(`${BASE_URL}/orders`, orderData, {
+      const config = {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
-      });
+      };
 
-      console.log('Order response:', response.data);
+      if (token && !isGuestCheckout) {
+        config.headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await axios.post(`${BASE_URL}/orders`, orderData, config);
 
       if (response.data.status === "succeeded") {
         console.log('Order created:', response.data);
@@ -265,6 +278,7 @@ shippingCost: dynamicShippingCost, // ✅ Dynamic shipping cost
             total={originalTotal}
             userAddresses={userAddresses}
           userProfile={userProfile}
+          isGuestCheckout={isGuestCheckout} 
           />
         );
       case 2:
@@ -291,10 +305,11 @@ shippingCost: dynamicShippingCost, // ✅ Dynamic shipping cost
               onBack={handleBackToPayment} // ✅ Use the new function instead of prevStep
             loading={orderLoading}
             error={orderError}
+             isGuestCheckout={isGuestCheckout} 
           />
         );
       case 4:
-        return <OrderSuccess />;
+        return <OrderSuccess isGuestCheckout={isGuestCheckout}  />;
       default:
         return <ShippingForm onSubmit={handleShippingSubmit} />;
     }
@@ -304,7 +319,7 @@ shippingCost: dynamicShippingCost, // ✅ Dynamic shipping cost
     <div className="checkout-page">
       <ScrollToTop />
       <div className="checkout-header">
-        <h2>Checkout</h2>
+       <h2>Checkout {isGuestCheckout && <span className="guest-badge">Guest</span>}</h2> {/* ✅ SHOW GUEST BADGE */}
         <div className="checkout-steps">
           <span className={step >= 1 ? 'active' : ''}>Shipping</span>
           <span className={step >= 2 ? 'active' : ''}>Payment</span>
@@ -326,7 +341,7 @@ shippingCost: dynamicShippingCost, // ✅ Dynamic shipping cost
 };
 
 // The ShippingForm, OrderSummary, and OrderSuccess components remain the same
-const ShippingForm = ({ onSubmit, shippingCost, total, userAddresses, userProfile  }) => {
+const ShippingForm = ({ onSubmit, shippingCost, total, userAddresses, userProfile ,isGuestCheckout }) => {
   const { items, totalAmount } = useSelector(state => state.cart);
   const [formData, setFormData] = useState({
     fullName: '',
@@ -345,7 +360,7 @@ const ShippingForm = ({ onSubmit, shippingCost, total, userAddresses, userProfil
 
 
   useEffect(() => {
-       if (useMyInfo && userProfile) {
+       if (useMyInfo && userProfile && !isGuestCheckout) {
       const fullName = `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim();
 
         const hasAddresses = userAddresses && userAddresses.length > 0;
@@ -367,7 +382,7 @@ const ShippingForm = ({ onSubmit, shippingCost, total, userAddresses, userProfil
         } : {})
       }));
     }
-  }, [useMyInfo, userProfile, userAddresses]);
+  }, [useMyInfo, userProfile, userAddresses,isGuestCheckout]);
 
   const handleChange = (e) => {
     setFormData({
@@ -426,8 +441,15 @@ const ShippingForm = ({ onSubmit, shippingCost, total, userAddresses, userProfil
   return (
     <div className="checkout-container">
       <div className="checkout-form">
-        <h3>Shipping Information</h3>
-         {userProfile && (
+        <h3>Shipping Information  {isGuestCheckout && <span className="guest-badge">Guest Checkout</span>}</h3>
+         
+                 {/* ✅ GUEST CHECKOUT NOTICE */}
+        {isGuestCheckout && (
+          <div className="guest-notice">
+            <p>You're checking out as a guest. You can still place your order without creating an account.</p>
+          </div>
+        )}
+         {!isGuestCheckout && userProfile && (
           <div className="user-info-option">
             <label className="checkbox-label">
               <input 
@@ -619,9 +641,20 @@ const OrderSummary = ({ items, totalAmount, shippingCost, total,isConfirmAndColl
   </div>
 );
 
-const OrderSuccess = () => {
+const OrderSuccess = ({ isGuestCheckout } ) => {
   const navigate = useNavigate();
-  
+   const handleCreateAccount = () => {
+    // ✅ Store guest email for registration
+    if (isGuestCheckout) {
+      // You might need to get the guest email from your order data
+      // For now, we'll assume it's available in localStorage or state
+      const guestEmail = localStorage.getItem('guestOrderEmail') || '';
+      if (guestEmail) {
+        localStorage.setItem('guestEmail', guestEmail);
+      }
+    }
+    navigate('/register');
+  };
   return (
     <div className="order-success">
       <div className="success-icon">
@@ -632,6 +665,18 @@ const OrderSuccess = () => {
       <h3>Order Confirmed!</h3>
       <p>Thank you for your purchase. Your order has been received and is being processed.</p>
       <p>We've sent a confirmation email with your order details.</p>
+       {isGuestCheckout && (
+        <div className="guest-success-notice">
+          <h4>Create an Account</h4>
+          <p>Want to track your order and save your information for next time?</p>
+          <button 
+            onClick={() => navigate('/register')}
+            className="create-account-btn"
+          >
+            Create an Account
+          </button>
+        </div>
+      )}
       <button 
         onClick={() => navigate('/')}
         className="back-to-shop-btn"
