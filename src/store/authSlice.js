@@ -55,14 +55,15 @@ export const googleSignIn = createAsyncThunk(
 
 export const registerUser = createAsyncThunk(
   'auth/register',
-  async ({ firstName, lastName, email, password,PhoneNumber }, { rejectWithValue }) => {
+  async ({ firstName, lastName, email, password,PhoneNumber,address }, { rejectWithValue }) => {
     try {
       const response = await axios.post(`${BASE_URL}/auth/register`, {
         firstName,
         lastName,
         email,
         password,
-        PhoneNumber
+        PhoneNumber,
+        address
       });
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));

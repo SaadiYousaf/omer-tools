@@ -218,33 +218,39 @@ const SearchResultsPage = () => {
               <ProductGrid products={transformProducts()} />
               
               {/* Pagination */}
-              {results.totalPages > 1 && (
-                <div className="pagination">
-                  <button 
-                    disabled={page === 1} 
-                    onClick={() => handlePageChange(page - 1)}
-                  >
-                    Previous
-                  </button>
-                  
-                  {Array.from({ length: results.totalPages }, (_, i) => i + 1).map(pageNum => (
-                    <button
-                      key={pageNum}
-                      className={page === pageNum ? 'active' : ''}
-                      onClick={() => handlePageChange(pageNum)}
-                    >
-                      {pageNum}
-                    </button>
-                  ))}
-                  
-                  <button 
-                    disabled={page === results.totalPages} 
-                    onClick={() => handlePageChange(page + 1)}
-                  >
-                    Next
-                  </button>
-                </div>
-              )}
+{results.totalPages > 1 && (
+  <div className="pagination">
+    <button 
+      disabled={page === 1} 
+      onClick={() => handlePageChange(page - 1)}
+    >
+      Previous
+    </button>
+    
+    {Array.from({ length: results.totalPages }, (_, i) => i + 1).map(pageNum => (
+      <button
+        key={pageNum}
+        className={`${page === pageNum ? 'active' : ''} ${
+          pageNum <= 3 || 
+          pageNum >= results.totalPages - 2 || 
+          Math.abs(pageNum - page) <= 1
+            ? 'visible' 
+            : 'hidden'
+        }`}
+        onClick={() => handlePageChange(pageNum)}
+      >
+        {pageNum}
+      </button>
+    ))}
+    
+    <button 
+      disabled={page === results.totalPages} 
+      onClick={() => handlePageChange(page + 1)}
+    >
+      Next
+    </button>
+  </div>
+)}
             </>
           )}
         </div>

@@ -52,7 +52,7 @@ const BrandSlider = () => {
 
   // Optimized: Memoized displayed brands (first 8)
   const displayedBrands = useMemo(() => 
-    brands.slice(0, 8), 
+    brands.slice(0, 10), 
     [brands]
   );
 
@@ -62,7 +62,7 @@ const BrandSlider = () => {
       <div className="container">
         <h2 className="brands-heading">Our Brands</h2>
         <div className="brand-container">
-          {[...Array(8)].map((_, index) => (
+          {[...Array(10)].map((_, index) => (
             <div key={`skeleton-${index}`} className="brand-card skeleton" />
           ))}
         </div>

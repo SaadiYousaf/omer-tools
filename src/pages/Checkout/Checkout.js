@@ -362,11 +362,13 @@ const ShippingForm = ({ onSubmit, shippingCost, total, userAddresses, userProfil
   useEffect(() => {
        if (useMyInfo && userProfile && !isGuestCheckout) {
       const fullName = `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim();
-
-        const hasAddresses = userAddresses && userAddresses.length > 0;
+console.log('USER PROFILE', userProfile);
+        const hasAddresses = userProfile.addresses && userProfile.addresses.length > 0;
+        console.log('Address PROFILE', hasAddresses);
       const defaultAddress = hasAddresses ? 
-        (userAddresses.find(addr => addr.isDefault) || userAddresses[0]) : 
+        (userProfile.addresses[0]) : 
         null;
+        console.log('defaultAddress PROFILE', defaultAddress);
       
       setFormData(prev => ({
         ...prev,
@@ -462,7 +464,7 @@ const ShippingForm = ({ onSubmit, shippingCost, total, userAddresses, userProfil
             </label>
             <p className="option-description">
               Automatically fill your name and email from your account
-              {userAddresses && userAddresses.length > 0 
+              {userProfile.addresses && userProfile.addresses.length > 0 
                 ? '. We\'ll also use your saved address.' 
                 : ''}
             </p>
@@ -472,7 +474,7 @@ const ShippingForm = ({ onSubmit, shippingCost, total, userAddresses, userProfil
               <div className="info-preview">
                 <div><strong>Name:</strong> {userProfile.firstName} {userProfile.lastName}</div>
                 <div><strong>Email:</strong> {userProfile.email}</div>
-                {userAddresses && userAddresses.length > 0 ? (
+                {userProfile.addresses && userProfile.addresses.length > 0 ? (
                   <div>
                     <strong>Address:</strong> Using your saved address
                   </div>
