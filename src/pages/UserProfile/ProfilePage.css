@@ -1,0 +1,290 @@
+/* src/components/ProfilePage/ProfilePage.css */
+.profile-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Header */
+.profile-header {
+  background: #072c62;
+  color: white;
+  padding: 30px;
+  border-radius: 10px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.profile-header h1 {
+  margin: 0;
+  font-size: 2.2em;
+  font-weight: 600;
+}
+
+.profile-header p {
+  margin: 10px 0 0;
+  opacity: 0.9;
+  font-size: 1.1em;
+}
+
+/* Layout */
+.profile-content {
+  display: flex;
+  gap: 25px;
+}
+
+/* Sidebar */
+.profile-sidebar {
+  width: 280px;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
+}
+
+.account-info h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #072c62;
+  font-weight: 600;
+}
+
+.account-info p {
+  margin: 8px 0;
+  color: #333;
+  font-size: 0.95em;
+}
+
+/* Sidebar Navigation */
+.account-nav {
+  margin-top: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.account-nav a {
+  padding: 12px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #666;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.account-nav a:hover {
+  background: #f0f5ff;
+  color: #072c62;
+}
+
+.account-nav a.active {
+  background: #072c62;
+  color: white;
+  box-shadow: 0 2px 4px rgba(7, 44, 98, 0.2);
+}
+
+/* Main Content */
+.profile-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* Recent Orders */
+.recent-orders {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.recent-orders h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #072c62;
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.order-card {
+  background: #f9fbff;
+  border: 1px solid #e1e5eb;
+  border-radius: 10px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.order-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(7, 44, 98, 0.1);
+}
+
+.order-header {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin-bottom: 15px;
+  font-size: 0.95em;
+}
+
+.order-items h4 {
+  margin: 10px 0;
+  font-size: 1em;
+  color: #333;
+}
+
+.order-items ul {
+  margin: 0;
+  padding-left: 18px;
+  color: #555;
+}
+
+.order-actions {
+  margin-top: 15px;
+  display: flex;
+  gap: 12px;
+}
+
+.status-succeeded {
+  color: #155724;
+  font-weight: 600;
+}
+
+.status-pending {
+  color: #856404;
+  font-weight: 600;
+}
+
+.status-cancelled {
+  color: #721c24;
+  font-weight: 600;
+}
+
+/* Buttons */
+.btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95em;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-view {
+  background: #072c62;
+  color: white;
+}
+
+.btn-view:hover {
+  background: #054296;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(7, 44, 98, 0.3);
+}
+
+.btn-reorder {
+  background: #f0f5ff;
+  color: #072c62;
+  border: 1px solid #072c62;
+}
+
+.btn-reorder:hover {
+  background: #072c62;
+  color: white;
+}
+
+.btn-view-all {
+  margin-top: 20px;
+  background: #072c62;
+  color: white;
+}
+
+.btn-view-all:hover {
+  background: #054296;
+}
+
+/* Account Tools */
+.account-tools {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.account-tools h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #072c62;
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.tool-card {
+  background: #f9fbff;
+  border: 1px solid #e1e5eb;
+  border-radius: 10px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.tool-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(7, 44, 98, 0.1);
+}
+
+.tool-card h3 {
+  margin: 0 0 10px;
+  color: #072c62;
+}
+
+.tool-card p {
+  margin: 0 0 15px;
+  color: #555;
+}
+
+.btn-tool {
+  background: #072c62;
+  color: white;
+}
+
+.btn-tool:hover {
+  background: #054296;
+}
+
+/* Loading & Error */
+.loading,
+.error {
+  text-align: center;
+  padding: 30px;
+  font-size: 1.2em;
+}
+
+.error {
+  color: #721c24;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .profile-content {
+    flex-direction: column;
+  }
+  .profile-sidebar {
+    width: 100%;
+  }
+  .order-header {
+    grid-template-columns: 1fr 1fr;
+  }
+}

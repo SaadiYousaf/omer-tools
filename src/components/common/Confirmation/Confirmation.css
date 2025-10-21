@@ -1,0 +1,61 @@
+/* Confirmation.css */
+.confirmation-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.confirmation-actions .back-btn,
+.confirmation-actions .confirm-order-btn {
+  flex: 1; /* Make both buttons equal width */
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.confirmation-actions .back-btn {
+  background-color: #6c757d;
+  color: white;
+}
+
+.confirmation-actions .back-btn:hover:not(:disabled) {
+  background-color: #5a6268;
+}
+
+.confirmation-actions .confirm-order-btn {
+  background-color: #007bff;
+  color: white;
+}
+
+.confirmation-actions .confirm-order-btn:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.confirmation-actions .back-btn:disabled,
+.confirmation-actions .confirm-order-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.retry-btn {
+  padding: 12px 24px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.retry-btn:hover:not(:disabled) {
+  background-color: #c82333;
+}
+
+.retry-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
