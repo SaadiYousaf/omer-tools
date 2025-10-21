@@ -3,7 +3,7 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 20px 40px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .brands-header {
@@ -64,7 +64,7 @@
   border-radius: 2px;
 }
 
-.top-brands-section, 
+.top-brands-section,
 .brand-filter-section,
 .products-section {
   margin-bottom: 60px;
@@ -157,7 +157,7 @@
   .content-wrapper {
     padding: 30px;
   }
-  
+
   .brands-grid {
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 20px;
@@ -165,22 +165,26 @@
 }
 
 @media (max-width: 768px) {
+  .shop-by-brand-container {
+    padding: 0;
+  }
   .brands-header h1 {
     font-size: 2.2rem;
   }
-  
+
   .brands-header p {
     font-size: 1.1rem;
   }
-  
+
   .content-wrapper {
-    padding: 25px 20px;
+    padding: 0;
   }
-  
+
   .section-header h2 {
+    margin-left: 15px;
     font-size: 1.6rem;
   }
-  
+
   .brands-grid {
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 15px;
@@ -191,21 +195,22 @@
   .header-gradient {
     padding: 40px 15px;
   }
-  
+
   .brands-header h1 {
     font-size: 1.8rem;
   }
-  
+
   .brands-header p {
     font-size: 1rem;
   }
-  
+
   .section-header h2 {
+    margin-left: 15px;
     font-size: 1.4rem;
   }
-  
+
   .brands-grid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 0px;
   }
 }
