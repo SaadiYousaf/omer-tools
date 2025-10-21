@@ -360,7 +360,7 @@ const Header = () => {
                 </Link>
               )}
 
-              <Link to="/cart" className="cart-container">
+              <Link to="/cart" className="cart-container1">
                 <div className="cart-icon">
                   <FaShoppingCart />
                   <span className="cart-count">{cartTotalQuantity}</span>

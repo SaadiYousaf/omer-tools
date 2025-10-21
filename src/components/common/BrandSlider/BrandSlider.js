@@ -71,7 +71,7 @@ const BrandSlider = () => {
     return customOrder
       .map((id) => brandMap.get(id))
       .filter(Boolean)
-      .slice(0, 12);
+      .slice(0, 8);
   }, [brandMap, customOrder]);
 
   // Skeleton loader while loading

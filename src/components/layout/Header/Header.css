@@ -490,6 +490,11 @@
   display: flex;
   align-items: center;
 }
+.cart-container1 {
+  display: flex; /* Use flexbox */
+  align-items: center; /* Vertically center the icon and text */
+  gap: 8px; /* Space between icon and text */
+}
 
 .nav-item a:hover,
 .nav-item .dropdown-toggle:hover {
