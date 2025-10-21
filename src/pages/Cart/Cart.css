@@ -9,7 +9,6 @@
   --font-body: clamp(0.9rem, 1.5vw, 1rem);
   --shadow-light: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
-
 /* === Base Layout === */
 .cart-page {
   background-color: var(--color-light);

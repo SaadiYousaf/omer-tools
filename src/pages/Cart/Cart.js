@@ -143,7 +143,7 @@ const Cart = () => {
         <div className="cart-header">
           <h1 className="cart-title">
             Your Cart
-            <span className="cart-count">
+            <span className="cart-count-1">
               ({totalQuantity} {totalQuantity === 1 ? "item" : "items"})
             </span>
           </h1>
