@@ -198,7 +198,7 @@
 @media (max-width: 576px) {
   .brand-hero .container,
   .products-container .container {
-    padding: 0 20px;
+    padding: 0 5px;
   }
 
   .brand-info h1 {

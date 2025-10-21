@@ -224,7 +224,7 @@ select {
   .search-results-container {
     width: 100%;
     margin: 10px auto;
-    padding: 0 15px;
+    padding: 0 5px;
   }
 
   .search-layout {
