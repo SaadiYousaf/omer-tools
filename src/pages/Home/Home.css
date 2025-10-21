@@ -59,6 +59,9 @@
     font-size: 20px;
     margin-bottom: 18px;
   }
+  .featured-products-section {
+    padding: 0;
+  }
 
   .brand-showcase {
     padding: 25px 0 15px;
@@ -148,5 +151,6 @@
 @media (max-width: 768px) {
   .dual-hero-container {
     gap: 10px;
+    padding: 10px 0;
   }
 }
