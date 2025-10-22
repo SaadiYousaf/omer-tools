@@ -36,10 +36,10 @@
   position: absolute;
   top: 0;
   right: 0;
-  font-size: 12px; /* mobile-friendly base */
+  font-size: 16px; /* mobile-friendly base */
   background-color: red;
   color: white;
-  padding: 4px 8px;
+  padding: 4px 20px;
   z-index: 10; /* increased to stay on top */
   border-bottom-left-radius: 6px;
   white-space: nowrap; /* prevent wrapping */
@@ -52,11 +52,12 @@
 
   .tagline-ribbon {
     position: relative;
-    font-size: xx-small;
+    font-size: 14px;
   }
   .discount-ribbon {
-    font-size: 11px;
-    padding: 3px 6px;
+    font-size: 15px;
+    padding: 4px 30px;
+    margin-top: 32px;
   }
   .wishlist-btn {
     visibility: hidden;

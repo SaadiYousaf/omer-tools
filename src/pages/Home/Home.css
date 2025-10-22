@@ -80,7 +80,7 @@
 }
 
 .category-navigation.secondary-categories {
-  background: linear-gradient(135deg, #072c62 0%, #054296 100%);
+  background: #f8fafc;
 }
 .category-navigation.secondary-categories h2 {
   display: none;

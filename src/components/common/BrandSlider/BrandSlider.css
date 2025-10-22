@@ -20,7 +20,7 @@
 
 .brand-container {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 5px;
   align-items: center;
 }
@@ -34,7 +34,7 @@
 
 .brand-container {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(3brand-image, 1fr);
   gap: 10px;
   align-items: stretch;
 }
@@ -54,7 +54,7 @@
 .brand-image {
   width: 50%;
   height: 100%;
-  object-fit: contain; /* Show entire logo without cropping */
+  object-fit: cover; /* Show entire logo without cropping */
   display: block;
   border-radius: 0 !important;
 }

@@ -9,6 +9,6 @@
 @media (max-width: 576px) {
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 0;
+    gap: 5px;
   }
 }

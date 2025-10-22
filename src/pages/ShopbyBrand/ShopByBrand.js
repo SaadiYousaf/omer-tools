@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   setBrandsLoading,
@@ -26,24 +26,32 @@ const ShopByBrand = () => {
   const [productsLoading, setProductsLoading] = useState(false);
   const [productsError, setProductsError] = useState(null);
 
-  // Function to get brand image (same as in BrandSlider)
+  // Desired brand UUID order
+  const customOrder = [
+    "fe9ca5ed-6447-419a-a812-7805091b5341",
+    "8401991c-6e62-4605-a488-8948adc120b7",
+    "d303d79b-e3f3-443f-a052-1bc9bfc4a660",
+    "2f35bdc1-481c-448f-abff-d3449a7431ef",
+    "38ac4eb0-4b95-49ed-80db-2bed180bb4b1",
+    "ef97e746-0a93-4bfb-a1b1-db9aa5caaada",
+    "77ba46cd-5921-4bd9-b858-35cd2b6b11dc",
+    "b15b2e62-c24f-489a-a215-b7bff7b5a646",
+    "2bc76e96-4934-4c1b-8adf-8956b96b2491",
+  ];
+
+  // Get brand image
   const getBrandImage = (brand) => {
-    // First, try to get the primary image from the images array
     if (brand.images && brand.images.length > 0) {
-      // Find the primary image or use the first one
       const primaryImage =
         brand.images.find((img) => img.isPrimary) || brand.images[0];
       return BASE_IMG_URL + primaryImage.imageUrl;
     }
 
-    // Fall back to the legacy imageUrl property
     if (brand.imageUrl) return brand.imageUrl;
-
-    // Default image if no images are available
     return "/images/categories/default.png";
   };
 
-  // Fetch brands function (same as in BrandSlider)
+  // Fetch brands
   const fetchBrands = useCallback(async () => {
     dispatch(setBrandsLoading());
     try {
@@ -54,7 +62,7 @@ const ShopByBrand = () => {
     }
   }, [dispatch, get, BASE_URL]);
 
-  // Fetch products function
+  // Fetch products
   const fetchProducts = useCallback(async () => {
     try {
       setProductsLoading(true);
@@ -78,12 +86,26 @@ const ShopByBrand = () => {
     }
   }, [BASE_URL]);
 
+  // Load data on mount
   useEffect(() => {
     if (status === "idle") {
       fetchBrands();
     }
     fetchProducts();
   }, [status, fetchBrands, fetchProducts]);
+
+  // Display brands in custom order
+  const displayedBrands = useMemo(() => {
+    const brandMap = new Map();
+    brands.forEach((b) => {
+      brandMap.set(b.id, b);
+    });
+
+    return customOrder
+      .map((id) => brandMap.get(id))
+      .filter(Boolean)
+      .slice(0, 6);
+  }, [brands, customOrder]);
 
   const isLoading = status === "loading" || productsLoading;
   const hasError = error || productsError;
@@ -133,7 +155,7 @@ const ShopByBrand = () => {
             </div>
           ) : (
             <div className="brands-grid">
-              {brands.slice(0, 8).map((brand) => {
+              {displayedBrands.map((brand) => {
                 const imageUrl = getBrandImage(brand);
                 console.log("Brand:", brand.name, "Image URL:", imageUrl); // For debugging
 
@@ -142,7 +164,7 @@ const ShopByBrand = () => {
                     key={brand.id}
                     brand={{
                       ...brand,
-                      imageUrl: imageUrl, // Ensure this is passed correctly
+                      imageUrl: imageUrl,
                     }}
                   />
                 );
