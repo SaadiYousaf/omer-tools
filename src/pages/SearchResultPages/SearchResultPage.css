@@ -111,8 +111,8 @@ select {
 
 .product-image {
   width: 100%;
-  height: 200px;
-  object-fit: contain;
+  height: 240px;
+  object-fit: cover;
   background: #fff;
   padding: 15px;
 }
@@ -308,7 +308,7 @@ select {
   }
 
   .product-image {
-    height: 130px;
+    height: 186px;
   }
 
   .product-name {
