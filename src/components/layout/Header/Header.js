@@ -374,44 +374,45 @@ const Header = () => {
 
       <nav className={`navbar ${isMobileMenuOpen ? "open" : ""}`}>
         <div className="container">
+          {isMobileMenuOpen && (
+            <button
+              className="mobile-menu-close"
+              onClick={() => setIsMobileMenuOpen(false)}
+              aria-label="Close menu"
+            >
+              <FaTimes />
+            </button>
+          )}
           <ul className="nav-list">
             <li
               className={`nav-item dropdown ${
                 activeDropdown === "categories" ? "active" : ""
               }`}
               onClick={() => toggleDropdown("categories")}
-              onMouseEnter={() => setActiveDropdown("categories")}
-              onMouseLeave={() => {
-                setActiveDropdown(null);
-                setShowAllCategories(false);
-              }}
             >
               <span className="dropdown-toggle">
                 <FaBars className="menu-bars" /> Shop by Category
               </span>
 
-              <div className="dropdown-menu">
-                {categoriesStatus === "loading" ? (
-                  <div className="loading-categories">
-                    Loading categories...
-                  </div>
-                ) : sortedCategories.length > 0 ? (
+              {activeDropdown === "categories" && (
+                <div className="dropdown-menu">
                   <div className="category-grid">
                     {sortedCategories.map((category) => (
                       <Link
                         key={category.id}
                         to={`/category/${category.id}`}
                         className="dropdown-item"
-                        onClick={() => setIsMobileMenuOpen(false)}
+                        onClick={() => {
+                          setActiveDropdown(null);
+                          setIsMobileMenuOpen(false);
+                        }}
                       >
                         {category.name}
                       </Link>
                     ))}
                   </div>
-                ) : (
-                  <div className="no-categories">No categories available</div>
-                )}
-              </div>
+                </div>
+              )}
             </li>
             <li className="nav-item" onClick={() => setIsMobileMenuOpen(false)}>
               <Link to="/shop-by-brand">Shop By Brand</Link>

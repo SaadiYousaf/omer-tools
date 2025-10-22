@@ -10,6 +10,9 @@
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+.mobile-menu-close {
+  display: none;
+}
 
 .container {
   width: 100%;
@@ -555,6 +558,9 @@
 .nav-item:hover .dropdown-menu {
   display: block;
 }
+a.dropdown-item {
+  padding: 5px;
+}
 
 .dropdown-item {
   padding: 12px 20px;
@@ -571,8 +577,8 @@
 }
 .category-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0;
 }
 
 /* Responsive Styles */
@@ -594,7 +600,7 @@
   }
   .category-grid .dropdown-item {
     border-right: 1px solid #e0e0e0; /* Vertical line between columns */
-    border-bottom: none; /* Remove horizontal lines */
+    border-bottom: 1px solid #e0e0e0; /* Remove horizontal lines */
   }
 
   /* Remove right border from last column */
@@ -697,29 +703,59 @@
   .cart-text {
     display: none;
   }
+  .mobile-menu-close {
+    display: block;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 10000;
+  }
 
   .navbar {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px; /* or your preferred width */
+    height: 100vh;
+    background-color: #072c62;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 9999;
+    padding-top: 60px;
   }
 
   .navbar.open {
-    overflow-y: auto;
-    max-height: 100vh;
-    -webkit-overflow-scrolling: touch;
+    transform: translateX(0);
   }
 
+  /* Optional overlay behind the menu */
+  .menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+    display: none;
+  }
+
+  .menu-overlay.active {
+    display: block;
+  }
   .nav-list {
     flex-direction: column;
+    padding: 0;
   }
-
-  .nav-item {
-    width: 100%;
-    height: auto;
-  }
-  .dropdown-scroller {
-    max-height: 40vh;
+  .nav-item a {
+    padding: 15px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 }
 
