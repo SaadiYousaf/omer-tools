@@ -1,0 +1,132 @@
+/* --- Modal Container (Desktop: top-right) --- */
+.cart-modal-container {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  animation: slideIn 0.4s ease-out;
+}
+
+/* --- Modal Box --- */
+.cart-modal {
+  background: #ffffff;
+  color: #333;
+  padding: 1.2rem 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  width: 280px;
+  border-top: 4px solid #2d8fdd;
+  font-family: "Poppins", sans-serif;
+  transition: all 0.3s ease;
+}
+
+/* --- Text --- */
+.cart-modal-message {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+/* --- Buttons Wrapper --- */
+.cart-modal-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+/* --- Buttons --- */
+.cart-btn {
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 10s ease;
+}
+
+/* Checkout Button */
+.checkout-btn {
+  background-color: #2d8fdd;
+  color: white;
+}
+.checkout-btn:hover {
+  background-color: #1e70b8;
+}
+
+/* Continue Shopping Button */
+.continue-btn {
+  background-color: #f3f4f6;
+  color: #333;
+}
+.continue-btn:hover {
+  background-color: #e5e7eb;
+}
+.cart-modal-container.fade-out {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+/* --- Animation --- */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) translateX(0);
+  }
+}
+
+/* --- Mobile Responsive Styles --- */
+@media (max-width: 768px) {
+  .cart-modal-container {
+    top: auto;
+    bottom: 1.5rem;
+    right: 50%;
+    transform: translateX(50%);
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    animation: slideUp 0.4s ease-out;
+  }
+
+  .cart-modal {
+    width: 90%;
+    border-radius: 14px;
+    border-top: 4px solid #2d8fdd;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .cart-modal-message {
+    font-size: 0.95rem;
+    margin-bottom: 0.8rem;
+  }
+
+  /* Buttons side-by-side for mobile */
+  .cart-modal-buttons {
+    flex-direction: row;
+    justify-content: center;
+    gap: 0.8rem;
+  }
+
+  .cart-btn {
+    flex: 1;
+    padding: 0.7rem 0;
+    font-size: 0.9rem;
+  }
+
+  /* Slight animation for mobile entry */
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}

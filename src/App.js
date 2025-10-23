@@ -1,5 +1,5 @@
 // App.js
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Routes, Route } from "react-router-dom";
 import Header from "./components/layout/Header/Header";
@@ -34,10 +34,19 @@ import AccountSettingsPage from "./pages/UserProfile/AccountSetting/AccountSetti
 import PaymentMethodsPage from "./pages/UserProfile/PaymentMethod/PaymentMethod";
 import { verifyToken } from "./store/authSlice";
 import OrderDetailsPage from "./pages/OrderDetails/OrderDetailsPage";
+import Modal from "./components/common/popupmodal/modal";
 
 function App() {
   const dispatch = useDispatch();
   const { isAuthenticated, loading } = useSelector((state) => state.auth);
+  const cartItems = useSelector((state) => state.cart.items);
+
+  // State for modal popup
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+
+  // To keep track of previous cart length
+  const prevCartLength = useRef(cartItems.length);
 
   // Check if user is logged in on app load
   useEffect(() => {
@@ -46,6 +55,19 @@ function App() {
       dispatch(verifyToken());
     }
   }, [dispatch]);
+
+  // Detect when something new is added to the cart
+  useEffect(() => {
+    if (cartItems.length > prevCartLength.current) {
+      setModalMessage("🛒 Item added to cart!");
+      setShowModal(true);
+
+      // Hide automatically after 2 seconds
+      setTimeout(() => setShowModal(false), 2000);
+    }
+
+    prevCartLength.current = cartItems.length;
+  }, [cartItems]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -80,6 +102,7 @@ function App() {
           {/* Other Routes */}
           <Route path="/product/:productId" element={<Product />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/clearance" element={<ClearanceSale />} />
           <Route path="/create-your-kit" element={<ComingSoon />} />
           <Route path="/brand/:brandId" element={<BrandProducts />} />
@@ -140,9 +163,33 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/checkout"
+            element={
+              <ProtectedRoute>
+                <Checkout />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/orders"
+            element={
+              <ProtectedRoute>
+                <OrderHistory />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </main>
+
       <Footer />
+
+      {/* Global Modal */}
+      <Modal
+        show={showModal}
+        message={modalMessage}
+        onClose={() => setShowModal(false)}
+      />
     </div>
   );
 }
