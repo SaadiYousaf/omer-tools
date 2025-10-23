@@ -104,10 +104,17 @@ const Checkout = () => {
     prevStep(); // Go back to step 2
   };
   const handlePaymentSubmit = (data) => {
+     console.log('🟡 PAYMENT DATA RECEIVED:', data);
+  console.log('🟡 Payment Type:', data.type);
+  console.log('🟡 Payment Method ID:', data.paymentMethodId);
+  console.log('🟡 Full Data Structure:', JSON.stringify(data, null, 2));
     setPaymentData(data);
     setPaymentError(null);
     setOrderError(null); // Clear any previous order errors
+   
+    console.log('✅ PayPal payment successful, proceeding to confirmation...');
     nextStep();
+    // For Stripe, wait for user confirmation in next step
   };
 
   const handlePaymentError = (error) => {
@@ -155,11 +162,40 @@ const Checkout = () => {
           }
         }
       }
-
+    let paymentPayload = {};
+    if (paymentData.type === 'stripe') {
+      paymentPayload = {
+        paymentMethod: 'credit_card',
+        paymentMethodId: paymentData.paymentMethodId,
+        paymentCompleted: false,
+        cardData: {
+          Number: "",
+          Expiry: "", 
+          Cvc: "",
+          Name: paymentData.cardName || "" 
+        }
+      };
+    } else if (paymentData.type === 'paypal') {
+      paymentPayload = {
+        paymentMethod: 'paypal',
+        paymentMethodId: paymentData.paymentMethodId, // PayPal order ID
+        paypalOrderId: paymentData.paypalOrderId, // Also include explicitly
+        paymentCompleted: true, 
+        paymentStatus: 'completed',
+        payerDetails: paymentData.payerDetails, // Include PayPal payer info
+        cardData: {
+          Number: "PAYPAL",
+          Expiry: "", 
+          Cvc: "",
+          Name: paymentData.payerDetails?.payer?.name?.given_name || "PayPal Customer"
+        }
+      };
+    }
       // Format order data to match backend expectations
       const orderData = {
         sessionId: `session_${Date.now()}`,
         userEmail: shippingData.email,
+        phoneNumber: shippingData.phone,
         orderItems: items.map(item => ({
           productId: item.id.toString(),
           productName: item.name,
@@ -167,14 +203,7 @@ const Checkout = () => {
           unitPrice: item.price,
           imageUrl: item.image || ''
         })),
-        paymentMethod: 'credit_card',
-         paymentMethodId: paymentData.paymentMethodId, // ✅ Only use the Stripe PaymentMethod ID
-      cardData: { // Send empty object instead of null to bypass validation
-    Number: "",
-    Expiry: "", 
-    Cvc: "",
-    Name: ""
-  },
+...paymentPayload,
         shippingAddress: {
           fullName: shippingData.fullName,
           addressLine1: shippingData.address,
@@ -213,7 +242,16 @@ shippingCost: dynamicShippingCost, // ✅ Dynamic shipping cost
       }
 
       const response = await axios.post(`${BASE_URL}/orders`, orderData, config);
-
+ if (paymentData.type === 'paypal') {
+      // For PayPal, payment is already complete, so any success response should proceed
+      if (response.data.status === "succeeded") {
+        console.log('✅ PayPal order created successfully:', response.data);
+        dispatch(clearCart());
+        nextStep();
+      } else {
+        setOrderError('Failed to create order after PayPal payment.');
+      }
+    } else {
       if (response.data.status === "succeeded") {
         console.log('Order created:', response.data);
         dispatch(clearCart());
@@ -231,7 +269,7 @@ shippingCost: dynamicShippingCost, // ✅ Dynamic shipping cost
     else {
       // For any other unexpected status
       setOrderError(response.data.message || 'Unexpected error occurred');
-    }
+    }}
     } catch (error) {
       console.error('Order creation error:', error);
          // IMPROVED ERROR HANDLING:
@@ -346,11 +384,12 @@ const ShippingForm = ({ onSubmit, shippingCost, total, userAddresses, userProfil
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
+    phone: '',
     address: '',
     city: '',
     state: '',
     postalCode: '',
-    country: 'US'
+    country: 'AUS'
   });
  const [isConfirmAndCollect, setIsConfirmAndCollect] = useState(false);
     const [useMyInfo, setUseMyInfo] = useState(false); // ✅ Renamed to be more general
@@ -374,8 +413,10 @@ console.log('USER PROFILE', userProfile);
         ...prev,
         fullName: fullName,
         email: userProfile.email || prev.email,
+        
         // Only fill address fields if user has saved addresses
         ...(hasAddresses && defaultAddress ? {
+          phone: defaultAddress.phoneNumber || '',
           address: defaultAddress.addressLine1 || '',
           city: defaultAddress.city || '',
           state: defaultAddress.state || '',
@@ -417,6 +458,11 @@ console.log('USER PROFILE', userProfile);
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email is invalid';
     }
+      if (!formData.phone.trim()) {
+    newErrors.phone = 'Phone number is required';
+  } else if (!/^[\+]?[0-9\s\-\(\)]{10,}$/.test(formData.phone.replace(/\s/g, ''))) {
+    newErrors.phone = 'Please enter a valid phone number';
+  }
     if (!formData.address.trim()) newErrors.address = 'Address is required';
     if (!formData.city.trim()) newErrors.city = 'City is required';
     if (!formData.state.trim()) newErrors.state = 'State is required';
@@ -527,6 +573,25 @@ console.log('USER PROFILE', userProfile);
             />
             {errors.email && <span className="error-text">{errors.email}</span>}
           </div>
+          <div className="form-group">
+  <label>Phone Number *</label>
+  <input 
+    type="tel" 
+    name="phone" 
+    value={formData.phone}
+    onChange={handleChange}
+    maxLength="20"
+     onKeyPress={(e) => {
+      // ✅ Allow only numbers, spaces, parentheses, plus, and hyphen
+      if (!/[0-9\s\(\)\+\-]/.test(e.key)) {
+        e.preventDefault();
+      }
+    }}
+    className={errors.phone ? 'error' : ''}
+    placeholder="+61 412 345 678" 
+  />
+  {errors.phone && <span className="error-text">{errors.phone}</span>}
+</div>
           <div className="form-group">
             <label>Address</label>
             <input 

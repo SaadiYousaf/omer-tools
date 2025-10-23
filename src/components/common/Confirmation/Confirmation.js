@@ -45,6 +45,7 @@ const Confirmation = ({
               <div className="shipping-details">
                 <p><strong>Name:</strong> {shippingData.fullName}</p>
                 <p><strong>Email:</strong> {shippingData.email}</p>
+                <p><strong>Phone Number:</strong> {shippingData.phone}</p>
                 <p><strong>Address:</strong> {shippingData.address}</p>
                 <p><strong>City:</strong> {shippingData.city}</p>
                 <p><strong>State:</strong> {shippingData.state}</p>
@@ -65,6 +66,21 @@ const Confirmation = ({
   ) : (
     <p>Payment information not available</p>
   )}
+  {paymentData && (
+  <div style={{ 
+    background: '#f0f8ff', 
+    padding: '1rem', 
+    margin: '1rem 0', 
+    border: '1px solid #ccc',
+    fontSize: '0.8rem'
+  }}>
+    <strong>Payment Data:</strong>
+    <div><strong>Type:</strong> {paymentData.type}</div>
+    <div><strong>Status:</strong> {paymentData.paymentStatus || 'unknown'}</div>
+    <div><strong>Completed:</strong> {paymentData.paymentCompleted ? 'Yes' : 'No'}</div>
+    <div><strong>ID:</strong> {paymentData.paymentMethodId}</div>
+  </div>
+)}
   {error && (
               <div className="payment-help">
                 <p><strong>Payment Issue Detected:</strong> {error}</p>

@@ -92,7 +92,7 @@ const BrandSlider = () => {
             className="brand-image"
             loading="lazy" // Added lazy loading for better performance
             onError={(e) => {
-              e.target.src = '/images/brands/default.png';
+              e.target.src = '/images/default.png';
             }}
           />
         </div>
