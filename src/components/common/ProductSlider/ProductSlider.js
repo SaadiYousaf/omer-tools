@@ -1,6 +1,6 @@
 import React, { useEffect, useState,useCallback,useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllProducts, selectAllProducts, selectProductsStatus } from "../../../store/productsSlice";
+import { selectSliderProducts, selectSliderProductsStatus, fetchSliderProducts } from "../../../store/productsSlice";
 import ProductCard from "../Card/ProductCard";
 import "./ProductSlider.css";
 
@@ -10,31 +10,23 @@ const ProductSlider = ({
   maxItems = 10,
 }) => {
   const dispatch = useDispatch();
-  const products = useSelector(selectAllProducts);
-  const status = useSelector(selectProductsStatus);
+  const sliderProducts = useSelector(selectSliderProducts);
+  const sliderStatus = useSelector(selectSliderProductsStatus);
   const [visibleProducts, setVisibleProducts] = useState(maxItems);
   const [isLoading, setIsLoading] = useState(false);
   const productsPerLoad = 10;
 
   // Filter products with non-null tagline
   const taggedProducts = React.useMemo(() => {
-    return products
-      .filter(
-        (product) =>
-          product.tagLine &&
-          product.tagLine.trim() !== "" &&
-          !product.isFeatured &&
-          !product.isRedemption
-      )
-      .slice(0, maxItems);
-  }, [products, maxItems]);
+    return sliderProducts.slice(0, maxItems);
+  }, [sliderProducts, maxItems]);
 
   useEffect(() => {
     // Only fetch products if they haven't been loaded yet
-    if (status === "idle" || products.length === 0) {
-      dispatch(fetchAllProducts());
+ if (sliderStatus === "idle" || sliderProducts.length === 0) {
+      dispatch(fetchSliderProducts(maxItems));
     }
-  }, [status, dispatch, products.length]);
+  }, [sliderStatus, dispatch, maxItems, sliderProducts.length]);
 
   // Handle infinite scroll
   // useEffect(() => {
@@ -117,7 +109,7 @@ const ProductSlider = ({
     )), [taggedProducts, visibleProducts]
   );
   // Show loading state if products are being fetched
-  if (status === "loading") {
+  if (sliderStatus  === "loading") {
     return (
       <section className="product-slider-container">
         <div className="slider-header">
@@ -140,7 +132,7 @@ const ProductSlider = ({
     );
   }
 
-  if (status === "failed") {
+  if (sliderStatus  === "failed") {
     return (
       <section className="product-slider-container">
         <div className="slider-header">
@@ -154,7 +146,7 @@ const ProductSlider = ({
           <p>Please check your connection and try again</p>
           <button
             className="retry-button"
-            onClick={() => dispatch(fetchAllProducts())}
+            onClick={() => dispatch(fetchSliderProducts())}
           >
             Retry
           </button>

@@ -109,6 +109,19 @@ export const fetchProductsBySubcategory = createAsyncThunk(
   }
 );
 
+export const fetchSliderProducts = createAsyncThunk(
+  "products/fetchSliderProducts",
+  async (maxItems = 10, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${BASE_URL}/products/slider?maxItems=${maxItems}`);
+      if (!response.ok) throw new Error("Failed to fetch slider products");
+      return await response.json();
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
+
 const initialState = {
   items: [],
   filteredItems: [],
@@ -121,6 +134,9 @@ const initialState = {
   productsBySubcategory: [],
   subcategoryProductsStatus: "idle",
   redemptionStatus: "idle", // New status for redemption products
+  sliderItems: [],
+  sliderStatus: "idle",
+  sliderError: null,
 };
 const productsSlice = createSlice({
   name: "products",
@@ -156,6 +172,7 @@ const productsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // fetchAllProducts
+      
       .addCase(fetchAllProducts.pending, (state) => {
         state.status = "loading";
       })
@@ -167,7 +184,18 @@ const productsSlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
       })
-
+  .addCase(fetchSliderProducts.pending, (state) => {
+      state.sliderStatus = "loading";
+      state.sliderError = null;
+    })
+    .addCase(fetchSliderProducts.fulfilled, (state, action) => {
+      state.sliderStatus = "succeeded";
+      state.sliderItems = action.payload;
+    })
+    .addCase(fetchSliderProducts.rejected, (state, action) => {
+      state.sliderStatus = "failed";
+      state.sliderError = action.payload;
+    })
       // fetchProductById
       .addCase(fetchProductById.pending, (state) => {
         state.status = "loading";
@@ -239,6 +267,9 @@ export const selectProductsStatus = (state) => state.products.status;
 export const selectProductsError = (state) => state.products.error;
 export const selectRedemptionProducts = (state) => state.products.redemptionItems;
 export const selectRedemptionStatus = (state) => state.products.redemptionStatus;
+export const selectSliderProducts = (state) => state.products.sliderItems;
+export const selectSliderProductsStatus = (state) => state.products.sliderStatus;
+export const selectSliderProductsError = (state) => state.products.sliderError;
 export const selectProductsBySubcategory = (state) =>
   state.products.productsBySubcategory;
 export const selectSubcategoryProductsStatus = (state) =>

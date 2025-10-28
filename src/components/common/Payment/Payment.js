@@ -1,5 +1,5 @@
 // Payment.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useCallback } from "react";
 import {
   useStripe,
   useElements,
@@ -19,6 +19,7 @@ const Payment = ({ onSubmit, onBack, total, onError }) => {
   const [cardName, setCardName] = useState("");
   const [paymentRequest, setPaymentRequest] = useState(null);
   const [canMakePayment, setCanMakePayment] = useState(false);
+    const [paypalSuccess, setPaypalSuccess] = useState(false);
 
   // Stripe Card / Apple Pay setup
   useEffect(() => {
@@ -38,7 +39,7 @@ const Payment = ({ onSubmit, onBack, total, onError }) => {
 
     pr.on("paymentmethod", async (ev) => {
       try {
-        onSubmit({ paymentMethodId: ev.paymentMethod.id, type: "stripe" });
+        onSubmit({ paymentMethodId: ev.paymentMethod.id, type: "stripe" ,paymentCompleted:true});
         ev.complete("success");
       } catch (err) {
         ev.complete("fail");
@@ -72,6 +73,8 @@ const Payment = ({ onSubmit, onBack, total, onError }) => {
         setLoading(false);
         return;
       }
+        // PayPal Payment Handler
+
 
       onSubmit({ paymentMethodId: paymentMethod.id, type: "stripe" });
     } catch {
@@ -81,7 +84,40 @@ const Payment = ({ onSubmit, onBack, total, onError }) => {
       setLoading(false);
     }
   };
+  const handlePayPalSuccess = useCallback(async (data, actions) => {
+    try {
+      setLoading(true);
+      const details = await actions.order.capture();
+      
+      console.log('💰 PayPal payment successful:', {
+        orderID: data.orderID,
+        details: details
+      });
 
+      // Prepare PayPal data to send to parent component
+      const paypalData = {
+        paypalOrderId: data.orderID,
+        payerDetails: details,
+        type: "paypal",
+        status: "completed",
+        amount: total,
+        timestamp: new Date().toISOString()
+      };
+
+      console.log('📤 Sending PayPal data to parent:', paypalData);
+
+      // Call the onSubmit prop with PayPal data
+      onSubmit(paypalData);
+      setPaypalSuccess(true);
+      
+    } catch (error) {
+      console.error("PayPal error:", error);
+      setError("PayPal payment failed. Please try again.");
+      onError("PayPal payment failed.");
+    } finally {
+      setLoading(false);
+    }
+  }, [onSubmit, onError, total]);
   const cardElementOptions = {
     style: {
       base: {
@@ -95,10 +131,9 @@ const Payment = ({ onSubmit, onBack, total, onError }) => {
 
   // PayPal Options
   const initialPayPalOptions = {
-   "client-id": process.env.REACT_APP_PAYPAL_CLIENT_ID,
-  currency: "AUD",
-  intent: "capture",
-  "disable-funding": "card", // disables debit/credit card option
+    "client-id": process.env.REACT_APP_PAYPAL_CLIENT_ID, // Sandbox or Live
+    currency: "AUD",
+    intent: "capture",
   };
 
   return (
@@ -109,6 +144,12 @@ const Payment = ({ onSubmit, onBack, total, onError }) => {
         <div className="payment-error">
           <span>⚠️</span>
           <p>{error}</p>
+        </div>
+      )}
+       {paypalSuccess && (
+        <div className="payment-success">
+          <span>✅</span>
+          <p>PayPal payment completed successfully!</p>
         </div>
       )}
 
@@ -173,17 +214,50 @@ const Payment = ({ onSubmit, onBack, total, onError }) => {
                 ],
               });
             }}
-            onApprove={async (data, actions) => {
-              const details = await actions.order.capture();
-              const name = details.payer.name.given_name;
-              alert(`PayPal transaction completed by ${name}`);
-              onSubmit({
-                paypalOrderId: data.orderID,
-                payerDetails: details,
-                type: "paypal",
-              });
+                  onApprove={async (data, actions) => {
+        console.log('✅ PayPal onApprove triggered:', data);
+        try {
+          setLoading(true);
+          const details = await actions.order.capture();
+          
+          console.log('💰 PayPal payment successful:', {
+            orderID: data.orderID,
+            details: details
+          });
+
+          // Prepare PayPal data to send to parent component
+          const paypalData = {
+            paymentMethodId: data.orderID,
+            payerDetails: details,
+            type: "paypal",
+            paymentStatus: "completed",
+            paymentCompleted: true,
+            amount: total,
+            timestamp: new Date().toISOString()
+          };
+
+          console.log('📤 Sending PayPal data to parent:', paypalData);
+
+          // Call the onSubmit prop with PayPal data
+          onSubmit(paypalData);
+          setPaypalSuccess(true);
+          
+        } catch (error) {
+          console.error("PayPal error:", error);
+          setError("PayPal payment failed. Please try again.");
+          onError("PayPal payment failed.");
+        } finally {
+          setLoading(false);
+        }
+      }}
+      onError={(err) => {
+        console.error("PayPal Button Error:", err);
+        setError("PayPal payment failed. Please try again.");
+        onError("PayPal payment failed.");
+      }}
+             onCancel={() => {
+              setError("PayPal payment was cancelled.");
             }}
-            onError={(err) => onError("PayPal payment failed")}
           />
         </PayPalScriptProvider>
       </div>
