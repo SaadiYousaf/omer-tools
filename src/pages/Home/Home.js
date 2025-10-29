@@ -18,12 +18,12 @@ import slide1 from "../../assets/images/Slider1.jpg";
 import slide2 from "../../assets/images/Slider2.jpg";
 import slide3 from "../../assets/images/Slider3.jpg";
 import slide4 from "../../assets/images/dew2.jpg";
-import slide5 from "../../assets/images/new-arrivals.jpg";
+import slide5 from "../../assets/images/HIKOKI.jpg";
 import ProductSlider from "../../components/common/ProductSlider/ProductSlider";
 // Mobile Images
-// import slide1Mobile from "../../assets/images/Slider1-mobile.jpg";
-// import slide2Mobile from "../../assets/images/Slider2-mobile.jpg";
-// import slide3Mobile from "../../assets/images/Slider3-mobile.jpg";
+import slide1Mobile from "../../assets/images/milwaukee_phone_size.jpg";
+import slide2Mobile from "../../assets/images/hikoki_phone_size.jpg";
+import slide3Mobile from "../../assets/images/dewalt-phone-size.jpg";
 // import slide4Mobile from "../../assets/images/dew2-mobile.jpg";
 // import slide5Mobile from "../../assets/images/new-arrivals-mobile.jpg";
 
@@ -53,7 +53,7 @@ const Home = () => {
   }, [dispatch]);
 
   // Define slide sets
-  const heroSlides1 = /*isMobile
+  const heroSlides1 = isMobile
     ? [
         {
           id: 1,
@@ -64,16 +64,16 @@ const Home = () => {
         { id: 2, image: slide2Mobile, cta: "Explore", link: "/new-arrivals" },
         { id: 3, image: slide3Mobile, cta: "none", link: "/new-arrivals" },
       ]
-    : */ [
-    {
-      id: 1,
-      image: slide1,
-      cta: "Shop Now",
-      link: "/category/power-tools",
-    },
-    { id: 2, image: slide2, cta: "Explore", link: "/new-arrivals" },
-    { id: 3, image: slide3, cta: "none", link: "/new-arrivals" },
-  ];
+    : [
+        {
+          id: 1,
+          image: slide1,
+          cta: "Shop Now",
+          link: "/category/power-tools",
+        },
+        { id: 2, image: slide2, cta: "Explore", link: "/new-arrivals" },
+        { id: 3, image: slide3, cta: "none", link: "/new-arrivals" },
+      ];
 
   const heroSlides2 = /* isMobile
     ? [
