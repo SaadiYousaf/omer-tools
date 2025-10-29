@@ -1,5 +1,5 @@
 // Home.js
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import CategorySlider from "../../components/common/CategorySlider/CategorySlider";
 import FeaturedProducts from "../../components/common/FeaturedProducts/FeaturedProducts";
@@ -13,17 +13,34 @@ import {
   fetchAllProducts,
 } from "../../store/productsSlice";
 
-// Import slider images
+// Desktop  slider images
 import slide1 from "../../assets/images/Slider1.jpg";
 import slide2 from "../../assets/images/Slider2.jpg";
 import slide3 from "../../assets/images/Slider3.jpg";
 import slide4 from "../../assets/images/dew2.jpg";
 import slide5 from "../../assets/images/new-arrivals.jpg";
 import ProductSlider from "../../components/common/ProductSlider/ProductSlider";
+// Mobile Images
+// import slide1Mobile from "../../assets/images/Slider1-mobile.jpg";
+// import slide2Mobile from "../../assets/images/Slider2-mobile.jpg";
+// import slide3Mobile from "../../assets/images/Slider3-mobile.jpg";
+// import slide4Mobile from "../../assets/images/dew2-mobile.jpg";
+// import slide5Mobile from "../../assets/images/new-arrivals-mobile.jpg";
 
 const Home = () => {
   const dispatch = useDispatch();
   const categories = useSelector((state) => state.categories.categories);
+  // State to detect mobile
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  // Update isMobile on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
   const featuredProducts = useSelector((state) => state.products.featuredItems);
 
   useEffect(() => {
@@ -36,13 +53,44 @@ const Home = () => {
   }, [dispatch]);
 
   // Define slide sets
-  const heroSlides1 = [
-    { id: 1, image: slide1, cta: "Shop Now", link: "/category/power-tools" },
+  const heroSlides1 = /*isMobile
+    ? [
+        {
+          id: 1,
+          image: slide1Mobile,
+          cta: "Shop Now",
+          link: "/category/power-tools",
+        },
+        { id: 2, image: slide2Mobile, cta: "Explore", link: "/new-arrivals" },
+        { id: 3, image: slide3Mobile, cta: "none", link: "/new-arrivals" },
+      ]
+    : */ [
+    {
+      id: 1,
+      image: slide1,
+      cta: "Shop Now",
+      link: "/category/power-tools",
+    },
     { id: 2, image: slide2, cta: "Explore", link: "/new-arrivals" },
     { id: 3, image: slide3, cta: "none", link: "/new-arrivals" },
   ];
 
-  const heroSlides2 = [
+  const heroSlides2 = /* isMobile
+    ? [
+        {
+          id: 1,
+          image: slide4Mobile,
+          cta: "Learn More",
+          link: "/shipping-info",
+        },
+        {
+          id: 2,
+          image: slide5Mobile,
+          cta: "Buy Now",
+          link: "/category/hand-tools",
+        },
+      ]
+    :*/ [
     { id: 1, image: slide4, cta: "Learn More", link: "/shipping-info" },
     { id: 2, image: slide5, cta: "Buy Now", link: "/category/hand-tools" },
   ];
