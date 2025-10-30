@@ -40,7 +40,7 @@ ul {
 @media (max-width: 768px) {
   .container {
     width: 95%; /* almost full width */
-    padding: 0 15px; /* small padding on sides */
+    padding: 0 17px; /* small padding on sides */
     max-width: 100%; /* remove max-width restriction */
   }
 }

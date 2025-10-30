@@ -715,6 +715,16 @@ a.dropdown-item {
     cursor: pointer;
     z-index: 10000;
   }
+  /* Backdrop overlay when mobile menu is open */
+  .backdrop {
+    position: fixed; /* Cover the entire screen */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* semi-transparent */
+    z-index: 999; /* behind navbar but above other content */
+  }
 
   .navbar {
     position: fixed;

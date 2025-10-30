@@ -38,6 +38,27 @@ const Header = () => {
   const [showAllCategories, setShowAllCategories] = useState(false);
   const searchRef = useRef(null);
   const navigate = useNavigate();
+  const navbarRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!isMobileMenuOpen) return;
+
+      // if navbarRef or one of its children contains the click, do nothing
+      if (navbarRef.current && navbarRef.current.contains(event.target)) {
+        return;
+      }
+
+      // otherwise, close menu
+      setIsMobileMenuOpen(false);
+      setActiveDropdown(null);
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isMobileMenuOpen]);
 
   // Fetch categories if not already loaded
   useEffect(() => {
@@ -130,6 +151,14 @@ const Header = () => {
     e.preventDefault();
     const trimmedTerm = searchTerm.trim();
     if (trimmedTerm) {
+      // Forcefully hide the suggestions before navigating
+      setShowSuggestions(false);
+      setSuggestions([]);
+      // Blur the input to close dropdown visually
+      if (searchRef.current) {
+        const input = searchRef.current.querySelector("input");
+        if (input) input.blur();
+      }
       navigate(`/search?term=${encodeURIComponent(trimmedTerm)}`);
       setIsMobileMenuOpen(false);
       setShowSuggestions(false);
@@ -371,8 +400,14 @@ const Header = () => {
           </div>
         </div>
       </div>
-
-      <nav className={`navbar ${isMobileMenuOpen ? "open" : ""}`}>
+      {isMobileMenuOpen && (
+        <div className="backdrop" onClick={() => setIsMobileMenuOpen(false)} />
+      )}
+      <nav
+        ref={navbarRef}
+        className={`navbar ${isMobileMenuOpen ? "open" : ""}`}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="container">
           {isMobileMenuOpen && (
             <button
@@ -414,6 +449,7 @@ const Header = () => {
                 </div>
               )}
             </li>
+
             <li className="nav-item" onClick={() => setIsMobileMenuOpen(false)}>
               <Link to="/shop-by-brand">Shop By Brand</Link>
             </li>
