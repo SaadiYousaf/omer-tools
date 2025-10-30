@@ -11,6 +11,7 @@ import {
   FaStarHalfAlt
 } from "react-icons/fa";
 import "./ProductCard.css";
+import defaultImg from "../../../assets/images/default.jpg";
 const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
 
 const renderRating = (rating = 0) => {
@@ -38,7 +39,7 @@ const ProductCard = ({ product, linkTo }) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
 
   const getImageUrl = useCallback((path) => {
-    if (!path) return "/images/products/default.png";
+    if (!path) return defaultImg;
     // if (path.startsWith("http") || path.startsWith("/")) return path;
     if (path.startsWith("/")) return `${BASE_IMG_URL}${path}`;
     return `${BASE_IMG_URL}${path}`;
@@ -122,7 +123,7 @@ const ProductCard = ({ product, linkTo }) => {
             alt={product.name}
             className="product-image"
             loading="lazy"
-            onError={(e) => (e.target.src = "/images/default-product.jpg")}
+            onError={(e) => (e.target.src = defaultImg)}
           />
         </div>
       </Link>

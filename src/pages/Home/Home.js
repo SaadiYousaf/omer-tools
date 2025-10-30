@@ -11,6 +11,7 @@ import "./Home.css";
 import {
   fetchFeaturedProducts,
   fetchAllProducts,
+  selectAllProducts
 } from "../../store/productsSlice";
 
 // Desktop  slider images
@@ -30,6 +31,7 @@ import ProductSlider from "../../components/common/ProductSlider/ProductSlider";
 const Home = () => {
   const dispatch = useDispatch();
   const categories = useSelector((state) => state.categories.categories);
+  const products = useSelector(selectAllProducts);
   // State to detect mobile
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 

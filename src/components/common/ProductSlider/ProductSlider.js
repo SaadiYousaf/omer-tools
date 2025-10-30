@@ -1,16 +1,17 @@
 import React, { useEffect, useState,useCallback,useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectSliderProducts, selectSliderProductsStatus, fetchSliderProducts } from "../../../store/productsSlice";
+import { selectSliderProducts, selectSliderProductsStatus, fetchSliderProducts, fetchAllProducts,selectAllProducts } from "../../../store/productsSlice";
 import ProductCard from "../Card/ProductCard";
 import "./ProductSlider.css";
 
 const ProductSlider = ({
   title = "Premium Collections",
   subtitle = "Discover our enterprise-grade solutions designed for professionals",
-  maxItems = 10,
+  maxItems = 20,
 }) => {
   const dispatch = useDispatch();
   const sliderProducts = useSelector(selectSliderProducts);
+  const products = useSelector(selectAllProducts);
   const sliderStatus = useSelector(selectSliderProductsStatus);
   const [visibleProducts, setVisibleProducts] = useState(maxItems);
   const [isLoading, setIsLoading] = useState(false);
@@ -25,6 +26,7 @@ const ProductSlider = ({
     // Only fetch products if they haven't been loaded yet
  if (sliderStatus === "idle" || sliderProducts.length === 0) {
       dispatch(fetchSliderProducts(maxItems));
+      dispatch(fetchAllProducts());
     }
   }, [sliderStatus, dispatch, maxItems, sliderProducts.length]);
 

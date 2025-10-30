@@ -111,7 +111,7 @@ export const fetchProductsBySubcategory = createAsyncThunk(
 
 export const fetchSliderProducts = createAsyncThunk(
   "products/fetchSliderProducts",
-  async (maxItems = 10, { rejectWithValue }) => {
+  async (maxItems = 20, { rejectWithValue }) => {
     try {
       const response = await fetch(`${BASE_URL}/products/slider?maxItems=${maxItems}`);
       if (!response.ok) throw new Error("Failed to fetch slider products");

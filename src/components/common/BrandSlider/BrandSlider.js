@@ -8,6 +8,7 @@ import {
 } from "../../../store/brandsSlice";
 import useApi from "../../../api/useApi";
 import "./BrandSlider.css";
+import defaultImg from "../../../assets/images/default.jpg";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
@@ -25,7 +26,7 @@ const BrandSlider = () => {
       return BASE_IMG_URL + primaryImage.imageUrl;
     }
     if (brand.imageUrl) return brand.imageUrl;
-    return "/images/categories/default.png";
+    return defaultImg;
   }, []);
 
   // Fetch brands only if not loaded yet
@@ -117,7 +118,7 @@ const BrandSlider = () => {
               className="brand-image"
               loading="lazy"
               onError={(e) => {
-                e.target.src = "/images/brands/default.png";
+                e.target.src = defaultImg;
               }}
             />
           </div>
