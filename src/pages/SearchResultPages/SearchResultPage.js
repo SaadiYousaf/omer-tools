@@ -233,7 +233,7 @@ const SearchResultsPage = () => {
 
               {/* Pagination */}
               {results.totalPages > 1 && (
-                <div className="pagination">
+                <div className="search-pagination">
                   <button
                     disabled={page === 1}
                     onClick={() => handlePageChange(page - 1)}

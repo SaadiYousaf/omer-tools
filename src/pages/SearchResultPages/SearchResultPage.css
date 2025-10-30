@@ -174,14 +174,14 @@ select {
   color: #e74c3c;
 }
 
-.pagination {
+.search-pagination {
   display: flex;
   justify-content: center;
   margin-top: 40px;
   gap: 10px;
 }
 
-.pagination button {
+.search-pagination button {
   padding: 8px 15px;
   border: 1px solid #ddd;
   background: white;
@@ -189,13 +189,13 @@ select {
   border-radius: 4px;
 }
 
-.pagination button.active {
+.search-pagination button.active {
   background: #3498db;
   color: white;
   border-color: #3498db;
 }
 
-.pagination button:disabled {
+.search-pagination button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
@@ -283,13 +283,13 @@ select {
     font-size: 0.75rem;
   }
 
-  .pagination {
+  .search-pagination {
     flex-wrap: wrap;
     gap: 6px;
     margin-top: 30px;
   }
 
-  .pagination button {
+  .search-pagination button {
     padding: 6px 10px;
     font-size: 0.9rem;
   }

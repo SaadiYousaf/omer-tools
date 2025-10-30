@@ -105,7 +105,17 @@ const subcategoriesSlice = createSlice({
       })
       .addCase(fetchSubcategoryProducts.fulfilled, (state, action) => {
         state.productsStatus = 'succeeded';
-        state.products = action.payload;
+          if (action.payload.data && Array.isArray(action.payload.data)) {
+    // New paginated response - extract the data array
+    state.products = action.payload.data;
+  } else if (Array.isArray(action.payload)) {
+    // Old non-paginated response - use directly
+    state.products = action.payload;
+  } else {
+    // Fallback - ensure it's always an array
+    state.products = [];
+    console.warn('Unexpected subcategory products response format:', action.payload);
+  }
       })
       .addCase(fetchSubcategoryProducts.rejected, (state, action) => {
         state.productsStatus = 'failed';

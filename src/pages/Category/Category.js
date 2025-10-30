@@ -46,12 +46,12 @@ const Category = () => {
     if (brand.logoUrl) return brand.logoUrl;
     
     // Default image if no images are available
-    return "/images/brands/default.png";
+    return defaultImg;
   }, []);
 
   // Function to get subcategory image
   const getSubcategoryImage = useCallback((subcategory) => {
-    if (!subcategory) return "/images/subcategories/default.png";
+    if (!subcategory) return defaultImg;
     
     // First, try to get the primary image from the images array
     if (subcategory.images && subcategory.images.length > 0) {
@@ -64,7 +64,7 @@ const Category = () => {
     if (subcategory.imageUrl) return subcategory.imageUrl;
     
     // Default image if no images are available
-    return "/images/subcategories/default.png";
+    return defaultImg;
   }, []);
 
   // Load brands and subcategories when categoryId changes
@@ -113,7 +113,7 @@ const Category = () => {
                         className="brand-logo"
                         onError={(e) => {
                           e.target.onerror = null;
-                          e.target.src = '/images/brands/default.png';
+                          e.target.src = defaultImg;
                         }}
                       />
                     </Link>

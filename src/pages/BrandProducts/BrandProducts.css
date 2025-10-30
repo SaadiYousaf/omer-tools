@@ -112,7 +112,7 @@
 /* Product Grid */
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  /* grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); */
   gap: 30px;
 }
 
@@ -196,7 +196,7 @@
   }
 
   .product-grid {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
     gap: 20px;
     padding: 0 10px;
   }
@@ -218,6 +218,7 @@
   }
 
   .product-grid {
-    grid-template-columns: 1fr;
+     display: grid;
+   grid-template-columns: repeat(2, 1fr);
   }
 }

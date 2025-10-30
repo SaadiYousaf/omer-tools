@@ -10,6 +10,7 @@ import BrandCard from "../../components/common/BrandSlider/BrandCard/BrandCard";
 import ProductGrid from "../../components/common/ProductGrid/ProductGrid";
 import BrandFilter from "../../components/common/BrandSlider/BrandFilter/BrandFilter";
 import Loading from "../../components/common/Loading/Loading";
+import Pagination from "../../components/common/Pagination/Pagination"; // Import your Pagination component
 import "./ShopByBrand.css";
 
 const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
@@ -25,6 +26,12 @@ const ShopByBrand = () => {
   const [products, setProducts] = useState([]);
   const [productsLoading, setProductsLoading] = useState(false);
   const [productsError, setProductsError] = useState(null);
+  
+  // Pagination states for products
+  const [currentProductPage, setCurrentProductPage] = useState(1);
+  const [productsPerPage] = useState(15); // Show 12 products per page
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [totalProductPages, setTotalProductPages] = useState(0);
 
   // Desired brand UUID order
   const customOrder = [
@@ -62,14 +69,15 @@ const ShopByBrand = () => {
     }
   }, [dispatch, get, BASE_URL]);
 
-  // Fetch products
-  const fetchProducts = useCallback(async () => {
+  // Fetch products with pagination
+  const fetchProducts = useCallback(async (page = 1) => {
     try {
       setProductsLoading(true);
       setProductsError(null);
 
+      // Use your API call with pagination parameters
       const response = await fetch(
-        `${BASE_URL}/products?featured=true&limit=12`
+        `${BASE_URL}/products?featured=true&page=${page}&limit=${productsPerPage}`
       );
 
       if (!response.ok) {
@@ -77,22 +85,37 @@ const ShopByBrand = () => {
       }
 
       const data = await response.json();
-      setProducts(data);
+      
+      // Handle both paginated and non-paginated responses
+      if (data.data && data.total !== undefined) {
+        // Paginated response
+        setProducts(data.data);
+        setTotalProducts(data.total);
+        setTotalProductPages(data.totalPages);
+      } else {
+        // Non-paginated response (fallback)
+        setProducts(data);
+        setTotalProducts(data.length);
+        setTotalProductPages(Math.ceil(data.length / productsPerPage));
+      }
     } catch (err) {
       setProductsError("Failed to load products. Please try again later.");
       console.error("Error fetching products:", err);
     } finally {
       setProductsLoading(false);
     }
-  }, [BASE_URL]);
+  }, [BASE_URL, productsPerPage]);
 
-  // Load data on mount
+  // Load data on mount and when page changes
   useEffect(() => {
     if (status === "idle") {
       fetchBrands();
     }
-    fetchProducts();
-  }, [status, fetchBrands, fetchProducts]);
+  }, [status, fetchBrands]);
+
+  useEffect(() => {
+    fetchProducts(currentProductPage);
+  }, [currentProductPage, fetchProducts]);
 
   // Display brands in custom order
   const displayedBrands = useMemo(() => {
@@ -107,8 +130,27 @@ const ShopByBrand = () => {
       .slice(0, 6);
   }, [brands, customOrder]);
 
+  // Handle product page change
+  const handleProductPageChange = (pageNumber) => {
+    setCurrentProductPage(pageNumber);
+    // Optional: Scroll to products section
+    const productsSection = document.querySelector('.products-section');
+    if (productsSection) {
+      productsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const isLoading = status === "loading" || productsLoading;
   const hasError = error || productsError;
+
+  // Calculate showing range for products
+  const getProductShowingRange = () => {
+    const start = (currentProductPage - 1) * productsPerPage + 1;
+    const end = Math.min(currentProductPage * productsPerPage, totalProducts);
+    return { start, end };
+  };
+
+  const { start, end } = getProductShowingRange();
 
   if (hasError) {
     return (
@@ -120,7 +162,7 @@ const ShopByBrand = () => {
             className="retry-button"
             onClick={() => {
               if (error) fetchBrands();
-              if (productsError) fetchProducts();
+              if (productsError) fetchProducts(currentProductPage);
             }}
           >
             Retry
@@ -187,14 +229,20 @@ const ShopByBrand = () => {
           />
         </section>
 
-        {/* Products Section */}
+        {/* Products Section with Pagination */}
         <section className="products-section">
           <div className="section-header">
             <h2>Featured Products</h2>
             <div className="header-divider"></div>
+            {/* Products count info */}
+            {!productsLoading && products.length > 0 && (
+              <p className="page-info">
+                Showing {start}-{end} of {totalProducts} products
+              </p>
+            )}
           </div>
 
-          {isLoading ? (
+          {productsLoading ? (
             <div className="loading-container">
               <Loading size="medium" variant="spinner" color="primary" />
             </div>
@@ -205,7 +253,20 @@ const ShopByBrand = () => {
               <p>We couldn't find any featured products at the moment.</p>
             </div>
           ) : (
-            <ProductGrid products={products} />
+            <>
+              <ProductGrid products={products} />
+              
+              {/* Pagination Component */}
+              {totalProductPages > 1 && (
+                <div className="pagination-wrapper">
+                  <Pagination
+                    currentPage={currentProductPage}
+                    totalPages={totalProductPages}
+                    onPageChange={handleProductPageChange}
+                  />
+                </div>
+              )}
+            </>
           )}
         </section>
       </div>

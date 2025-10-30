@@ -178,7 +178,14 @@ const productsSlice = createSlice({
       })
       .addCase(fetchAllProducts.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.items = action.payload;
+       if (action.payload.data && Array.isArray(action.payload.data)) {
+    state.items = action.payload.data; // New format
+  } else if (Array.isArray(action.payload)) {
+    state.items = action.payload; // Old format
+  } else {
+    state.items = []; // Fallback
+    console.warn('Unexpected products response format:', action.payload);
+  }
       })
       .addCase(fetchAllProducts.rejected, (state, action) => {
         state.status = "failed";
@@ -213,7 +220,17 @@ const productsSlice = createSlice({
       })
       .addCase(fetchRedemptionProducts.fulfilled, (state, action) => {
         state.redemptionStatus = "succeeded";
-        state.redemptionItems = action.payload;
+ if (action.payload.data && Array.isArray(action.payload.data)) {
+    // New paginated response - extract the data array
+    state.redemptionItems = action.payload.data;
+  } else if (Array.isArray(action.payload)) {
+    // Old non-paginated response - use directly
+    state.redemptionItems = action.payload;
+  } else {
+    // Fallback - ensure it's always an array
+    state.redemptionItems = [];
+    console.warn('Unexpected redemption products response format:', action.payload);
+  }
       })
       .addCase(fetchRedemptionProducts.rejected, (state, action) => {
         state.redemptionStatus = "failed";
@@ -226,7 +243,17 @@ const productsSlice = createSlice({
       .addCase(fetchFeaturedProducts.fulfilled, (state, action) => {
         state.featuredStatus  = "succeeded";
         // state.items = action.payload;
-         state.featuredItems = action.payload;
+        if (action.payload.data && Array.isArray(action.payload.data)) {
+    // New paginated response - extract the data array
+    state.featuredItems = action.payload.data;
+  } else if (Array.isArray(action.payload)) {
+    // Old non-paginated response - use directly
+    state.featuredItems = action.payload;
+  } else {
+    // Fallback - ensure it's always an array
+    state.featuredItems = [];
+    console.warn('Unexpected featured products response format:', action.payload);
+  }
       })
       .addCase(fetchFeaturedProducts.rejected, (state, action) => {
         state.featuredStatus  = "failed";
@@ -260,7 +287,10 @@ export const {
 
 // Selectors
 export const selectAllProducts = (state) => state.products.items;
-export const selectFeaturedProducts = (state) => state.products.featuredItems; // ✅ New selector
+export const selectFeaturedProducts = (state) => {
+  const featured = state.products.featuredItems;
+  return Array.isArray(featured) ? featured : [];
+}; // ✅ New selector
 export const selectFilteredProducts = (state) => state.products.filteredItems;
 export const selectCurrentProduct = (state) => state.products.currentProduct;
 export const selectProductsStatus = (state) => state.products.status;

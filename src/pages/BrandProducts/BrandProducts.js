@@ -1,14 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { filterByBrand, fetchAllProducts } from '../../store/productsSlice';
-import { 
-  setBrandsLoading, 
-  setBrandsSuccess, 
-  setBrandsFailed 
-} from '../../store/brandsSlice';
+import { useSelector } from 'react-redux';
 import useApi from '../../api/useApi';
-import ProductCard from '../../components/common/Card/ProductCard';
+import ProductGrid from '../../components/common/ProductGrid/ProductGrid';
+import Pagination from '../../components/common/Pagination/Pagination';
 import Loading from '../../components/common/Loading/Loading';
 import ScrollToTop from '../../components/common/Scroll/ScrollToTop';
 import './BrandProducts.css';
@@ -18,20 +13,22 @@ const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
 
 const BrandProducts = () => {
   const { brandId } = useParams();
-  const dispatch = useDispatch();
   const { get } = useApi();
   const BASE_URL = process.env.REACT_APP_BASE_URL;
   
   const [sortOption, setSortOption] = useState('featured');
-  const [loadingProducts, setLoadingProducts] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [debugInfo, setDebugInfo] = useState({});
-  const [showDebug, setShowDebug] = useState(false);
-  const [manuallyFilteredProducts, setManuallyFilteredProducts] = useState([]);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productsPerPage] = useState(15);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   
-  const { filteredItems, items, status } = useSelector(state => state.products);
-  const { brands, status: brandsStatus, error: brandsError } = useSelector(state => state.brands);
+  // State for brand details and products
+  const [brand, setBrand] = useState(null);
+  const [products, setProducts] = useState([]);
+
+  const { brands, status: brandsStatus } = useSelector(state => state.brands);
 
   // Function to get brand image
   const getBrandImage = useCallback((brand) => {
@@ -48,164 +45,92 @@ const BrandProducts = () => {
     return defaultImg;
   }, [BASE_IMG_URL]);
 
-  // Fetch brands function
-  const fetchBrands = useCallback(async () => {
-    dispatch(setBrandsLoading());
+  // Fetch brand details
+  const fetchBrandDetails = useCallback(async () => {
     try {
-      const data = await get(`${BASE_URL}/brands?includeImages=true`);
-      dispatch(setBrandsSuccess(data));
+      const brandData = await get(`${BASE_URL}/brands/${brandId}?includeImages=true`);
+      setBrand(brandData);
     } catch (err) {
-      dispatch(setBrandsFailed(err.message));
+      console.error('Error fetching brand details:', err);
     }
-  }, [dispatch, get, BASE_URL]);
+  }, [brandId, get, BASE_URL]);
 
-  // Fetch all products with persistence
-  const fetchProducts = useCallback(async () => {
-    // Check if we already have products in localStorage
-    const cachedProducts = localStorage.getItem(`cachedProducts_${brandId}`);
-    const cacheTimestamp = localStorage.getItem(`cacheTimestamp_${brandId}`);
-    const isCacheValid = cacheTimestamp && (Date.now() - parseInt(cacheTimestamp)) < 300000; // 5 minutes
-    
-    if (isCacheValid && cachedProducts) {
-      try {
-        const parsedProducts = JSON.parse(cachedProducts);
-        dispatch({
-          type: 'products/fetchAllProducts/fulfilled',
-          payload: parsedProducts
-        });
-        dispatch(filterByBrand(brandId));
-        return;
-      } catch (e) {
-        console.error('Error parsing cached products:', e);
-      }
-    }
-    
-    // If no valid cache, fetch from API
-    setLoadingProducts(true);
-    setError(null);
+  // Fetch brand-specific products with pagination
+  const fetchBrandProducts = useCallback(async (page = 1) => {
     try {
-      const productsData = await get(`${BASE_URL}/products?limit=1000`);
-      
-      // Cache the products
-      localStorage.setItem(`cachedProducts_${brandId}`, JSON.stringify(productsData));
-      localStorage.setItem(`cacheTimestamp_${brandId}`, Date.now().toString());
-      
-      dispatch({
-        type: 'products/fetchAllProducts/fulfilled',
-        payload: productsData
-      });
-      
-      return productsData;
+      setLoading(true);
+      setError(null);
+
+      // Use the brand-specific products endpoint with pagination
+      const response = await get(
+        `${BASE_URL}/products?brandId=${brandId}&page=${page}&limit=${productsPerPage}`
+      );
+
+      // Handle paginated response
+      if (response.data && response.total !== undefined) {
+        setProducts(response.data);
+        setTotalProducts(response.total);
+        setTotalPages(response.totalPages);
+      } else if (Array.isArray(response)) {
+        // Fallback for non-paginated response
+        setProducts(response);
+        setTotalProducts(response.length);
+        setTotalPages(Math.ceil(response.length / productsPerPage));
+      } else {
+        setProducts([]);
+        setTotalProducts(0);
+        setTotalPages(0);
+      }
     } catch (err) {
-      setError('Failed to load products');
-      console.error('Failed to fetch products:', err);
-      throw err;
+      setError('Failed to load brand products. Please try again later.');
+      console.error('Error fetching brand products:', err);
     } finally {
-      setLoadingProducts(false);
-      setIsInitialLoad(false);
+      setLoading(false);
     }
-  }, [dispatch, get, brandId]);
+  }, [brandId, get, BASE_URL, productsPerPage]);
 
-  // Manual filtering function
-  const manualFilterByBrand = useCallback((products, brandId) => {
-    if (!products || !brandId) return [];
-    return products.filter(product => product.brandId === brandId);
-  }, []);
-
-  // Debug function to check brand ID matching
-  const checkBrandIdMatching = useCallback(() => {
-    if (items.length > 0 && brandId) {
-      const sampleProducts = items.slice(0, 5);
-      const brandIdsInProducts = [...new Set(items.map(item => item.brandId))];
-      
-      const brandIdExists = brandIdsInProducts.some(id => id === brandId);
-      const matchingProducts = manualFilterByBrand(items, brandId);
-      
-      setDebugInfo({
-        totalProducts: items.length,
-        brandIdFromUrl: brandId,
-        brandIdType: typeof brandId,
-        sampleProductBrandIds: sampleProducts.map(p => ({id: p.id, brandId: p.brandId, brandIdType: typeof p.brandId})),
-        allBrandIdsInProducts: brandIdsInProducts,
-        brandIdExistsInProducts: brandIdExists,
-        matchingProductsCount: matchingProducts.length,
-        apiUrl: `${BASE_URL}/products?limit=1000`,
-        filteredItemsCount: filteredItems.length,
-        manuallyFilteredCount: manuallyFilteredProducts.length,
-        isInitialLoad: isInitialLoad
-      });
-      
-      // If Redux filtering isn't working, use manual filtering
-      if (matchingProducts.length > 0 && filteredItems.length === 0) {
-        setManuallyFilteredProducts(matchingProducts);
-      }
+  // Load brand details and products
+  useEffect(() => {
+    if (brandId) {
+      fetchBrandDetails();
+      fetchBrandProducts(currentPage);
     }
-  }, [items, brandId, filteredItems.length, manualFilterByBrand, manuallyFilteredProducts.length, isInitialLoad]);
+  }, [brandId, currentPage, fetchBrandDetails, fetchBrandProducts]);
 
-  // Fetch brands if not already fetched
-  useEffect(() => {
-    if (brandsStatus === 'idle') {
-      fetchBrands();
-    }
-  }, [brandsStatus, fetchBrands]);
-
-  // Fetch products if not already fetched
-  useEffect(() => {
-    if (status === 'idle' || items.length === 0) {
-      fetchProducts();
-    }
-  }, [status, fetchProducts, items.length]);
-
-  // Filter products when brandId changes or products are loaded
-  useEffect(() => {
-    if (items.length > 0 && brandId) {
-      dispatch(filterByBrand(brandId));
-      checkBrandIdMatching();
-    }
-  }, [brandId, items, dispatch, checkBrandIdMatching]);
-
-  // Handle page refresh
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      // Clear specific cache on refresh to force refetch
-      localStorage.removeItem(`cacheTimestamp_${brandId}`);
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, [brandId]);
-
-  // Scroll to top on mount
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  // Get the current brand
-  const brand = brands.find(b => b.id === brandId);
-  const brandName = brand?.name || `Brand #${brandId}`;
-  const brandDescription = brand?.description || 'Premium tools for professionals';
-  const brandImage = getBrandImage(brand);
+  // Handle page change
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Handle sorting
   const handleSortChange = (e) => {
     setSortOption(e.target.value);
   };
 
-  // Use manually filtered products if Redux filteredItems is empty
-  const productsToDisplay = filteredItems.length > 0 ? filteredItems : manuallyFilteredProducts;
-
   // Sort products based on selected option
-  const sortedProducts = [...productsToDisplay].sort((a, b) => {
-    if (sortOption === 'price-low') return a.price - b.price;
-    if (sortOption === 'price-high') return b.price - a.price;
-    if (sortOption === 'name') return a.name.localeCompare(b.name);
+  const sortedProducts = [...products].sort((a, b) => {
+    if (sortOption === 'price-low') return (a.price || 0) - (b.price || 0);
+    if (sortOption === 'price-high') return (b.price || 0) - (a.price || 0);
+    if (sortOption === 'name') return (a.name || '').localeCompare(b.name || '');
     return 0; // Default sorting (featured)
   });
 
-  if (status === 'loading' || brandsStatus === 'loading' || loadingProducts) {
+  // Get brand name and description
+  const brandName = brand?.name || `Brand #${brandId}`;
+  const brandDescription = brand?.description || 'Premium tools for professionals';
+  const brandImage = getBrandImage(brand);
+
+  // Calculate showing range
+  const getShowingRange = () => {
+    const start = (currentPage - 1) * productsPerPage + 1;
+    const end = Math.min(currentPage * productsPerPage, totalProducts);
+    return { start, end };
+  };
+
+  const { start, end } = getShowingRange();
+
+  if (loading && products.length === 0) {
     return (
       <div className="loading-container">
         <Loading size="medium" variant="spinner" color="primary" />
@@ -213,14 +138,14 @@ const BrandProducts = () => {
     );
   }
 
-  if (brandsError || error) {
+  if (error) {
     return (
       <div className="error-message">
         <div className="error-icon">⚠️</div>
-        <h2>{brandsError || error}</h2>
+        <h2>{error}</h2>
         <button 
           className="retry-button"
-          onClick={brandsError ? fetchBrands : fetchProducts}
+          onClick={() => fetchBrandProducts(currentPage)}
         >
           Retry
         </button>
@@ -238,6 +163,11 @@ const BrandProducts = () => {
           <div className="brand-info">
             <h1>{brandName}</h1>
             <p>{brandDescription}</p>
+            {totalProducts > 0 && (
+              <div className="brand-stats">
+                {totalProducts} {totalProducts === 1 ? 'product' : 'products'} available
+              </div>
+            )}
           </div>
           <div className="brand-image">
             <img 
@@ -255,148 +185,53 @@ const BrandProducts = () => {
       <div className="products-container">
         <div className="container">
           {/* Sorting and Results */}
-          <div className="results-header">
-            <div className="results-count">
-              {sortedProducts.length} {sortedProducts.length === 1 ? 'product' : 'products'} found
-              {manuallyFilteredProducts.length > 0 && filteredItems.length === 0 && (
-                <span style={{fontSize: '12px', color: '#ff5722', marginLeft: '10px'}}>
-                  (using manual filtering)
-                </span>
-              )}
+          {products.length > 0 && (
+            <div className="results-header">
+              <div className="results-info">
+                <p>
+                  Showing {start}-{end} of {totalProducts} {brandName} products
+                </p>
+              </div>
+              <div className="sort-options">
+                <label htmlFor="sort-select">Sort by:</label>
+                <select 
+                  id="sort-select" 
+                  value={sortOption}
+                  onChange={handleSortChange}
+                >
+                  <option value="featured">Featured</option>
+                  <option value="name">Name (A-Z)</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                </select>
+              </div>
             </div>
-            <div className="sort-options">
-              <label htmlFor="sort-select">Sort by:</label>
-              <select 
-                id="sort-select" 
-                value={sortOption}
-                onChange={handleSortChange}
-              >
-                <option value="featured">Featured</option>
-                <option value="name">Name (A-Z)</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Debug toggle button */}
-          {/* <div style={{marginBottom: '10px'}}>
-            <button 
-              onClick={() => setShowDebug(!showDebug)}
-              style={{
-                padding: '5px 10px',
-                background: '#f0f0f0',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                fontSize: '12px'
-              }}
-            >
-              {showDebug ? 'Hide Debug Info' : 'Show Debug Info'}
-            </button>
-            <button 
-              onClick={() => {
-                localStorage.clear();
-                window.location.reload();
-              }}
-              style={{
-                padding: '5px 10px',
-                background: '#ffebee',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                fontSize: '12px',
-                marginLeft: '10px'
-              }}
-            >
-              Clear Cache & Reload
-            </button>
-          </div> */}
-
-          {/* Debug information */}
-          {/* {showDebug && (
-            <div className="debug-info">
-              <h3>Debug Information</h3>
-              <p><strong>API URL:</strong> {debugInfo.apiUrl || 'Not loaded yet'}</p>
-              <p><strong>Total products in store:</strong> {debugInfo.totalProducts || 0}</p>
-              <p><strong>Brand ID from URL:</strong> {debugInfo.brandIdFromUrl} (type: {debugInfo.brandIdType})</p>
-              <p><strong>Brand ID exists in products:</strong> {debugInfo.brandIdExistsInProducts ? 'Yes' : 'No'}</p>
-              <p><strong>Matching products count:</strong> {debugInfo.matchingProductsCount || 0}</p>
-              <p><strong>Redux filtered items count:</strong> {debugInfo.filteredItemsCount || 0}</p>
-              <p><strong>Manually filtered count:</strong> {debugInfo.manuallyFilteredCount || 0}</p>
-              <p><strong>Is initial load:</strong> {debugInfo.isInitialLoad ? 'Yes' : 'No'}</p>
-              
-              {debugInfo.sampleProductBrandIds && (
-                <div>
-                  <p><strong>Sample product brand IDs:</strong></p>
-                  <ul>
-                    {debugInfo.sampleProductBrandIds.map((product, idx) => (
-                      <li key={idx}>
-                        Product {product.id}: {product.brandId} (type: {product.brandIdType})
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              
-              <button 
-                onClick={() => {
-                  console.log('All products:', items);
-                  console.log('Filtered items:', filteredItems);
-                  console.log('Manually filtered:', manuallyFilteredProducts);
-                  console.log('Debug info:', debugInfo);
-                  console.log('Brands:', brands);
-                }}
-                style={{marginTop: '10px', padding: '8px 12px', background: '#eee', border: '1px solid #ccc'}}
-              >
-                Log Debug Info to Console
-              </button>
-            </div>
-          )} */}
+          )}
 
           {/* Products Grid */}
-          {sortedProducts.length > 0 ? (
-            <div className="product-grid">
-              {sortedProducts.map(product => (
-                <ProductCard
-                  key={product.id}
-                  product={{
-                    ...product,
-                    imageUrl: product.images?.[0]?.imageUrl || defaultImg,
-                  }}
-                  linkTo={`/product/${product.id}`}
-                  showBrand={false}
-                />
-              ))}
+          {loading ? (
+            <div className="loading-container">
+              <Loading size="medium" variant="spinner" color="primary" />
             </div>
+          ) : sortedProducts.length > 0 ? (
+            <>
+              <ProductGrid products={sortedProducts} />
+              
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="pagination-wrapper">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
+              )}
+            </>
           ) : (
             <div className="no-products">
               <h3>No products found for {brandName}</h3>
-              
-              {/* {items.length > 0 && (
-                <div className="debug-help">
-                  <h4>Why might this be happening?</h4>
-                  <ul>
-                    <li>The Redux store might be resetting on page refresh</li>
-                    <li>There could be an issue with the filterByBrand action</li>
-                    <li>Check if there are any errors in the console</li>
-                  </ul>
-                  
-                  <div style={{marginTop: '20px'}}>
-                    <button 
-                      onClick={fetchProducts}
-                      style={{
-                        padding: '10px 15px',
-                        background: '#4caf50',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      Refetch Products
-                    </button>
-                  </div>
-                </div>
-              )} */}
+              <p>We couldn't find any products for this brand at the moment.</p>
             </div>
           )}
         </div>
