@@ -400,6 +400,9 @@ const Header = () => {
           </div>
         </div>
       </div>
+      {isMobileMenuOpen && (
+        <div className="backdrop" onClick={() => setIsMobileMenuOpen(false)} />
+      )}
       <nav
         ref={navbarRef}
         className={`navbar ${isMobileMenuOpen ? "open" : ""}`}
