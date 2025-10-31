@@ -469,6 +469,7 @@
 
 .nav-list {
   display: flex;
+  gap: 20px;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -579,6 +580,72 @@ a.dropdown-item {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 0;
+}
+/* Mobile Top Bar - visible on mobile only */
+.mobile-top-bar {
+  display: flex;
+  flex-direction: column; /* stack items vertically */
+  align-items: flex-start;
+  background-color: #072c62; /* adjust as needed */
+  color: #fff;
+  font-size: 14px;
+  padding: 10px 15px;
+  gap: 5px; /* spacing between rows */
+}
+
+/* Right section with phone & store locations */
+.mobile-top-bar-right {
+  display: flex;
+  flex-direction: column; /* vertical layout */
+  gap: 5px; /* spacing between phone and store location */
+}
+
+.phone-link {
+  color: #fff;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.phone-link:hover {
+  color: #e0e0e0;
+}
+
+.mobile-top-bar-right a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.mobile-top-bar-right a:hover {
+  color: #e0e0e0;
+}
+
+.mobile-top-bar-right span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.top-bar-right {
+  display: none;
+}
+.category-logo {
+  width: 100px; /* adjust as needed */
+  height: 50px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* Hide on desktop */
+@media (min-width: 769px) {
+  .mobile-top-bar {
+    display: none;
+  }
+}
+@media (max-width: 768px) {
+  .menu-bars {
+    display: none;
+  }
 }
 
 /* Responsive Styles */
@@ -742,6 +809,7 @@ a.dropdown-item {
 
   .navbar.open {
     transform: translateX(0);
+    width: 250px;
   }
 
   /* Optional overlay behind the menu */

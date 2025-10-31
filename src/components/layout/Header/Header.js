@@ -5,6 +5,8 @@ import { logout } from "../../../store/authSlice";
 import { fetchCategories } from "../../../store/categoriesSlice";
 import "./Header.css";
 import logoImage from "../../../assets/images/OmerToolsLogo.png";
+import OmerToolsLogo from "../../../assets/images/logo512.png";
+
 import {
   FaShoppingCart,
   FaUser,
@@ -465,6 +467,15 @@ const Header = () => {
                 <span className="coming-soon-badge">Coming Soon</span>
               </Link>
             </li>
+            <div className="mobile-top-bar">
+              <div className="mobile-top-bar-right">
+                <span>
+                  <a href="tel:0297598833" className="phone-link">
+                    <FaPhone /> 02 9759 8833
+                  </a>
+                </span>
+              </div>
+            </div>
           </ul>
         </div>
       </nav>

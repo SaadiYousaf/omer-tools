@@ -21,7 +21,9 @@ import {
   FaChevronRight,
 } from "react-icons/fa";
 import "./Product.css";
-
+import Visa from "../../assets/images/visa.png";
+import Mastercard from "../../assets/images/Mastercard.png";
+import Paypal from "../../assets/images/paypal.png";
 // IMPORTANT: must match your API base used in the slice
 
 const API_BASE = process.env.REACT_APP_BASE_URL;
@@ -463,13 +465,13 @@ const Product = () => {
                 <div className="promo-desc">On orders over $99</div>
               </div>
             </div>
-            <div className="promo-card">
+            {/* <div className="promo-card">
               <FaShieldAlt className="promo-icon" />
               <div className="promo-content">
                 <div className="promo-title">3-Year Warranty</div>
                 <div className="promo-desc">Quality guaranteed</div>
               </div>
-            </div>
+            </div> */}
           </div>
           <div className="actions-container">
             <div className="quantity-control">
@@ -522,18 +524,16 @@ const Product = () => {
             </div>
           </div>
 
-          {/* <div className="payment-options">
-          <div className="payment-card">
-            <div className="payment-logo">Afterpay</div>
-            <div className="payment-price">${(currentPrice / 4).toFixed(2)}</div>
-            <div className="payment-desc">4 interest-free payments</div>
+          <div className="payment-options">
+            <div className="payment-card">
+              <div className="payment-logo">
+                <img src={Visa} alt="Visa" />
+                <img src={Mastercard} alt="MasterCard" />
+                <img src={Paypal} alt="PayPal" />
+              </div>
+              <div className="payment-desc">Payments We Accpets</div>
+            </div>
           </div>
-          <div className="payment-card">
-            <div className="payment-logo">Zip Pay</div>
-            <div className="payment-price">${(currentPrice / 10).toFixed(2)}/wk</div>
-            <div className="payment-desc">Flexible payments</div>
-          </div>
-        </div> */}
         </div>
       </div>
 
