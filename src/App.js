@@ -63,7 +63,7 @@ function App() {
       setShowModal(true);
 
       // Hide automatically after 2 seconds
-      setTimeout(() => setShowModal(false), 2000);
+      setTimeout(() => setShowModal(false), 5000);
     }
 
     prevCartLength.current = cartItems.length;
@@ -189,6 +189,7 @@ function App() {
         show={showModal}
         message={modalMessage}
         onClose={() => setShowModal(false)}
+        items={cartItems}
       />
     </div>
   );

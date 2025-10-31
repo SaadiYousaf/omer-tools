@@ -175,21 +175,26 @@ const Cart = () => {
                       <div className="item-sku">SKU: {item.sku}</div>
                     </div>
                   </div>
-                  <div className="item-price">
-                    <div className="price-value">${item.price.toFixed(2)}</div>
-                    {item.originalPrice && item.originalPrice > item.price && (
-                      <div className="original-price discounted">
-                        ${item.originalPrice.toFixed(2)}
+                  <div className="price-qty-total-wrapper">
+                    <div className="item-price">
+                      <div className="price-value">
+                        ${item.price.toFixed(2)}
                       </div>
-                    )}
-                  </div>
-                  <div className="item-quantity">
-                    <div className="quantity-box">
-                      <span className="quantity-value">{item.quantity}</span>
+                      {item.originalPrice &&
+                        item.originalPrice > item.price && (
+                          <div className="original-price discounted">
+                            ${item.originalPrice.toFixed(2)}
+                          </div>
+                        )}
                     </div>
-                  </div>
-                  <div className="item-total">
-                    ${item.totalPrice.toFixed(2)}
+                    <div className="item-quantity">
+                      <div className="quantity-box">
+                        <span className="quantity-value">{item.quantity}</span>
+                      </div>
+                    </div>
+                    <div className="item-total">
+                      ${item.totalPrice.toFixed(2)}
+                    </div>
                   </div>
                   <div className="item-actions">
                     <button

@@ -11,7 +11,7 @@ import "./Home.css";
 import {
   fetchFeaturedProducts,
   fetchAllProducts,
-  selectAllProducts
+  selectAllProducts,
 } from "../../store/productsSlice";
 
 // Desktop  slider images

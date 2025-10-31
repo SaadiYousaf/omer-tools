@@ -2,9 +2,7 @@
 .hero-slider {
   position: relative;
   width: 100%;
-  height: 70vh;
-  min-height: 300px;
-  max-height: 500px;
+  aspect-ratio: 16 / 4.285; /* Keeps consistent image proportions */
   overflow: hidden;
 }
 
@@ -16,10 +14,11 @@
 
 .slide {
   position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-size: cover;
+  background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
   opacity: 0;
@@ -112,15 +111,10 @@
   background-color: white;
   transform: scale(1.2);
 }
-
 /* Mobile Responsive Adjustments */
 @media (max-width: 768px) {
   .hero-slider {
-    height: 20vh;
-    width: auto;
-    min-height: 218px;
-    /* max-height: none;
-    min-width: 400px; */
+    aspect-ratio: 6 / 3; /* taller for mobile */
   }
   .slides-container {
     position: relative;
