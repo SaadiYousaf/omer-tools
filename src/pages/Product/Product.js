@@ -24,6 +24,7 @@ import "./Product.css";
 import Visa from "../../assets/images/visa.png";
 import Mastercard from "../../assets/images/Mastercard.png";
 import Paypal from "../../assets/images/paypal.png";
+import Applepay from "../../assets/images/Applepay.png";
 // IMPORTANT: must match your API base used in the slice
 
 const API_BASE = process.env.REACT_APP_BASE_URL;
@@ -465,6 +466,17 @@ const Product = () => {
                 <div className="promo-desc">On orders over $99</div>
               </div>
             </div>
+            <div className="payment-options">
+              <div className="payment-card">
+                <div className="payment-logo">
+                  <img src={Visa} alt="Visa" />
+                  <img src={Mastercard} alt="MasterCard" />
+                  <img src={Paypal} alt="PayPal" />
+                  <img src={Applepay} alt="ApplePay" />
+                </div>
+                <div className="payment-desc">Payments We Accept</div>
+              </div>
+            </div>
             {/* <div className="promo-card">
               <FaShieldAlt className="promo-icon" />
               <div className="promo-content">
@@ -521,17 +533,6 @@ const Product = () => {
                 </button>
               </Link>
               {/* <button className="buy-btn">BUY NOW</button> */}
-            </div>
-          </div>
-
-          <div className="payment-options">
-            <div className="payment-card">
-              <div className="payment-logo">
-                <img src={Visa} alt="Visa" />
-                <img src={Mastercard} alt="MasterCard" />
-                <img src={Paypal} alt="PayPal" />
-              </div>
-              <div className="payment-desc">Payments We Accpets</div>
             </div>
           </div>
         </div>

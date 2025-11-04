@@ -546,9 +546,8 @@ h3.product-title {
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 15px;
-  max-width: 260px;
-  padding: 20px;
+  gap: 40px;
+  padding: 30px;
   background: var(--light);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
@@ -706,6 +705,13 @@ h3.product-title {
   justify-content: center;
   padding: 20px 0;
   background-color: #ffffff;
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  transition: var(--transition);
+}
+.payment-options:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
 }
 
 .payment-card {
