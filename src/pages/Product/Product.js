@@ -3,6 +3,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import Loading from "../../components/common/Loading/Loading";
+import SEO from "../../components/common/SEO/SEO";
+import { useProductSEO } from "../../hooks/useSEO";
 import {
   fetchProductById,
   fetchAllProducts,
@@ -33,7 +35,8 @@ const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
 const Product = () => {
   const { productId } = useParams();
   const dispatch = useDispatch();
-
+  // SEO HOOK
+  const { seoData, loading: seoLoading } = useProductSEO(productId);
   const status = useSelector(selectProductsStatus);
   const error = useSelector(selectProductsError);
   const currentProduct = useSelector(selectCurrentProduct); // full payload (product, brand, subcategory, category, images, variants)
@@ -54,11 +57,11 @@ const Product = () => {
   }, [productId, dispatch]);
 
   // After we have the current product, fetch all products (for related)
-  useEffect(() => {
-    if (currentProduct) {
-      dispatch(fetchAllProducts());
-    }
-  }, [currentProduct, dispatch]);
+  // useEffect(() => {
+  //   if (currentProduct) {
+  //     dispatch(fetchAllProducts());
+  //   }
+  // }, [currentProduct, dispatch]);
 
   // Normalize the full payload for easy access without changing your UI structure
   const prod = useMemo(() => {
@@ -267,6 +270,21 @@ const Product = () => {
 
   return (
     <div className="product-page">
+          {/*SEO COMPONENT*/}
+      <SEO 
+        title={seoData?.metaTitle || `${prod.name} - ${brandName} | Omer tools`}
+        description={seoData?.metaDescription || 
+          (prod.description 
+            ? prod.description.substring(0, 160) + (prod.description.length > 160 ? '...' : '')
+            : `Buy ${prod.name} from ${brandName}. ${prod.tagLine || 'Best quality at competitive prices.'}`
+          )
+        }
+        keywords={seoData?.metaKeywords || `${prod.name}, ${brandName}, buy, shop, price`}
+        slug={seoData?.canonicalUrl}
+        ogTitle={seoData?.ogTitle || seoData?.metaTitle || `${prod.name} - ${brandName}`}
+        ogDescription={seoData?.ogDescription || seoData?.metaDescription || prod.description}
+        
+      />
       <div className="breadcrumb">
         <Link to="/">Home</Link>
         <FaChevronRight className="chevron" />

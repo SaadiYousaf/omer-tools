@@ -1,4 +1,4 @@
-import React, { useEffect, useState,useCallback,useMemo } from "react";
+import React, { useEffect, useState,useCallback,useMemo,useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectSliderProducts, selectSliderProductsStatus, fetchSliderProducts, fetchAllProducts,selectAllProducts } from "../../../store/productsSlice";
 import ProductCard from "../Card/ProductCard";
@@ -16,7 +16,7 @@ const ProductSlider = ({
   const [visibleProducts, setVisibleProducts] = useState(maxItems);
   const [isLoading, setIsLoading] = useState(false);
   const productsPerLoad = 10;
-
+  const hasFetchedRef = useRef(false);
   // Filter products with non-null tagline
   const taggedProducts = React.useMemo(() => {
     return sliderProducts.slice(0, maxItems);
@@ -24,9 +24,10 @@ const ProductSlider = ({
 
   useEffect(() => {
     // Only fetch products if they haven't been loaded yet
- if (sliderStatus === "idle" || sliderProducts.length === 0) {
+ if (!hasFetchedRef.current && sliderProducts.length === 0) {
+     hasFetchedRef.current = true;
       dispatch(fetchSliderProducts(maxItems));
-      dispatch(fetchAllProducts());
+      // dispatch(fetchAllProducts());
     }
   }, [sliderStatus, dispatch, maxItems, sliderProducts.length]);
 

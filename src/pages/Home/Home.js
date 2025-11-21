@@ -7,6 +7,8 @@ import HeroSlider from "../../components/common/HeroSlider/HeroSlider";
 import BrandSlider from "../../components/common/BrandSlider/BrandSlider";
 import MemberDeals from "../../components/common/MembersDeal/MemberDeals";
 import ScrollToTop from "../../components/common/Scroll/ScrollToTop";
+import SEO from "../../components/common/SEO/SEO";
+import { useSEO } from "../../hooks/useSEO";
 import "./Home.css";
 import {
   fetchFeaturedProducts,
@@ -35,6 +37,14 @@ const Home = () => {
   // State to detect mobile
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
+    //SEO hook
+  const seoData ={
+    title: "Omer Tools - Premium Tools & Equipment",
+    description: "Discover premium power tools, hand tools, and equipment from top brands like Milwaukee, DeWalt, and Hikoki. Best prices, free shipping, and expert service.",
+    keywords: "power tools, hand tools, equipment, construction tools, professional tools, shop online, Milwaukee, DeWalt, Hikoki, Omer Tools",
+    ogTitle: "Omer Tools - Premium Tools & Equipment",
+    ogDescription: "Discover premium power tools, hand tools, and equipment from top brands.",
+};
   // Update isMobile on window resize
   useEffect(() => {
     const handleResize = () => {
@@ -106,6 +116,8 @@ const Home = () => {
   return (
     <div className="home-page">
       <ScrollToTop />
+        {/* SEO Component*/}
+         <SEO {...seoData} />
 
       {/* Hero Section */}
       <section className="hero-section">
