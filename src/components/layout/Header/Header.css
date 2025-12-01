@@ -503,6 +503,7 @@
 .nav-item a:hover,
 .nav-item .dropdown-toggle:hover {
   background-color: #0f8bf9;
+  color: white;
 }
 
 /* Coming Soon Badge */

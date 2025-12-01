@@ -44,6 +44,7 @@ const Home = () => {
     keywords: "power tools, hand tools, equipment, construction tools, professional tools, shop online, Milwaukee, DeWalt, Hikoki, Omer Tools",
     ogTitle: "Omer Tools - Premium Tools & Equipment",
     ogDescription: "Discover premium power tools, hand tools, and equipment from top brands.",
+    siteVerification:'GpiiEykGsHnDUq0g11xRmXXK9rHVIANbQMUL77z7sGM'
 };
   // Update isMobile on window resize
   useEffect(() => {

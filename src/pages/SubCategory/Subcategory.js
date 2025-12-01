@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams, Link } from "react-router-dom";
+import { nameUrlUtils } from "../../components/Utils/nameUrlUtils";
 import {
   fetchSubcategories,
   setCurrentSubcategory,
@@ -426,7 +427,7 @@ const Subcategory = () => {
                       product.images?.[0]?.imageUrl ||
                       "/images/products/default.png",
                   }}
-                  linkTo={`/category/${categoryId}/subcategory/${subcategoryId}/product/${product.id}`}
+                  linkTo={`product/${nameUrlUtils.convertNameToUrl(product.canonicalUrl)}`}
                 />
               ))
             ) : (

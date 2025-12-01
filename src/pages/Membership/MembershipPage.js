@@ -54,7 +54,6 @@ const MembershipPage = () => {
       setIsSubmitting(true);
       // Simulate API call
       setTimeout(() => {
-        console.log('Form submitted:', formData);
         setIsSubmitting(false);
         navigate('/welcome'); // Redirect to welcome page after submission
       }, 1500);

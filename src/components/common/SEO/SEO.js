@@ -19,7 +19,7 @@ const SEO = ({
   const metaOgTitle = ogTitle || metaTitle;
   const metaOgDescription = ogDescription || metaDescription;
   const metaslug = slug || ogUrl || (typeof window !== 'undefined' ? window.location.href : '');
-
+  const siteVerification = 'GpiiEykGsHnDUq0g11xRmXXK9rHVIANbQMUL77z7sGM';
 
   const robotsMeta = [];
   if (noindex) robotsMeta.push('noindex');
@@ -69,6 +69,7 @@ const SEO = ({
         createOrUpdateMetaTag('description', metaDescription),
         createOrUpdateMetaTag('keywords', metaKeywords),
         createOrUpdateMetaTag('robots', robotsContent),
+        createOrUpdateMetaTag('google-site-verification', siteVerification),
 
         // Open Graph tags
         createOrUpdateMetaTag('', metaOgTitle, 'title'),
@@ -95,7 +96,7 @@ const SEO = ({
     return () => clearTimeout(timer);
   }, [
     metaTitle, metaDescription, metaKeywords, robotsContent, metaslug,
-    metaOgTitle, metaOgDescription, structuredData
+    metaOgTitle, metaOgDescription, structuredData,siteVerification
   ]);
 
   return null;

@@ -2,6 +2,7 @@
 import React from 'react';
 import ProductCard from '../Card/ProductCard';
 import './ProductGrid.css';
+import { nameUrlUtils } from '../../Utils/nameUrlUtils';
 
 const ProductGrid = ({ products }) => {
   return (
@@ -10,6 +11,7 @@ const ProductGrid = ({ products }) => {
         <ProductCard 
           key={product.id} 
           product={product}
+            linkTo={`/product/${nameUrlUtils.convertNameToUrl(product.canonicalUrl)}`}
         />
       ))}
     </div>

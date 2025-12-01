@@ -93,10 +93,7 @@ const Payment = ({ onSubmit, onBack, total, onError }) => {
         setLoading(true);
         const details = await actions.order.capture();
 
-        console.log("💰 PayPal payment successful:", {
-          orderID: data.orderID,
-          details: details,
-        });
+      
 
         // Prepare PayPal data to send to parent component
         const paypalData = {
@@ -108,13 +105,11 @@ const Payment = ({ onSubmit, onBack, total, onError }) => {
           timestamp: new Date().toISOString(),
         };
 
-        console.log("📤 Sending PayPal data to parent:", paypalData);
 
         // Call the onSubmit prop with PayPal data
         onSubmit(paypalData);
         setPaypalSuccess(true);
       } catch (error) {
-        console.error("PayPal error:", error);
         setError("PayPal payment failed. Please try again.");
         onError("PayPal payment failed.");
       } finally {
@@ -220,16 +215,11 @@ const Payment = ({ onSubmit, onBack, total, onError }) => {
               });
             }}
             onApprove={async (data, actions) => {
-              console.log("✅ PayPal onApprove triggered:", data);
               try {
                 setLoading(true);
                 const details = await actions.order.capture();
 
-                console.log("💰 PayPal payment successful:", {
-                  orderID: data.orderID,
-                  details: details,
-                });
-
+              
                 // Prepare PayPal data to send to parent component
                 const paypalData = {
                   paymentMethodId: data.orderID,
@@ -241,13 +231,11 @@ const Payment = ({ onSubmit, onBack, total, onError }) => {
                   timestamp: new Date().toISOString(),
                 };
 
-                console.log("📤 Sending PayPal data to parent:", paypalData);
 
                 // Call the onSubmit prop with PayPal data
                 onSubmit(paypalData);
                 setPaypalSuccess(true);
               } catch (error) {
-                console.error("PayPal error:", error);
                 setError("PayPal payment failed. Please try again.");
                 onError("PayPal payment failed.");
               } finally {
@@ -255,7 +243,6 @@ const Payment = ({ onSubmit, onBack, total, onError }) => {
               }
             }}
             onError={(err) => {
-              console.error("PayPal Button Error:", err);
               setError("PayPal payment failed. Please try again.");
               onError("PayPal payment failed.");
             }}

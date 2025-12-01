@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 // export const fetchProductById = createAsyncThunk(
@@ -65,6 +64,22 @@ export const fetchProductById = createAsyncThunk(
   }
 );
 
+export const fetchProductByName = createAsyncThunk(
+  "products/fetchProductByName",
+  async (productName, { rejectWithValue }) => {
+    try {
+      // Change to full details endpoint
+       const urlFriendlyName = productName.toLowerCase().replace(/\s+/g, '-');
+       const response = await fetch(`${BASE_URL}/products/name/${urlFriendlyName}`);
+      if (!response.ok) throw new Error('Product not found');
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
+
 // export const fetchProductById = createAsyncThunk(
 //   "products/fetchProductById",
 //   async (productId, { rejectWithValue }) => {
@@ -88,7 +103,6 @@ export const fetchFeaturedProducts = createAsyncThunk(
      
       return data;
     } catch (err) {
-      console.error('Error fetching featured products:', err); // Debug log
       return rejectWithValue(err.message);
     }
   }
@@ -214,6 +228,18 @@ const productsSlice = createSlice({
       .addCase(fetchProductById.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
+      })
+// fetchProductByName
+      .addCase(fetchProductByName.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchProductByName.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.currentProduct = action.payload;
+      })
+      .addCase(fetchProductByName.rejected, (state, action) => {
+        state.status = 'failed';
+        state.currentProduct = action.payload;
       })
       .addCase(fetchRedemptionProducts.pending, (state) => {
         state.redemptionStatus = "loading";

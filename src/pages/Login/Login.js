@@ -30,7 +30,6 @@ const Login = () => {
   };
 
   const handleGoogleError = () => {
-    console.log('Google Login Failed');
   };
   return (
     <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>

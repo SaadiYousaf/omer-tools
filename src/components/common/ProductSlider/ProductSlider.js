@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectSliderProducts, selectSliderProductsStatus, fetchSliderProducts, fetchAllProducts,selectAllProducts } from "../../../store/productsSlice";
 import ProductCard from "../Card/ProductCard";
 import "./ProductSlider.css";
-
+import { nameUrlUtils } from "../../Utils/nameUrlUtils";
 const ProductSlider = ({
   title = "Premium Collections",
   subtitle = "Discover our enterprise-grade solutions designed for professionals",
@@ -106,7 +106,7 @@ const ProductSlider = ({
         <ProductCard 
           product={product}
           description={product.tagLine}
-          linkTo={`/product/${product.id}`}
+        linkTo={`/product/${nameUrlUtils.convertNameToUrl(product.canonicalUrl)}`}
         />
       </div>
     )), [taggedProducts, visibleProducts]
@@ -186,7 +186,7 @@ const ProductSlider = ({
             <ProductCard 
               product={product}
               description={product.tagLine}
-              linkTo={`/product/${product.id}`}
+             linkTo={`/product/${nameUrlUtils.convertNameToUrl(product.canonicalUrl)}`}
             />
           </div>
         ))}

@@ -41,6 +41,7 @@ const Header = () => {
   const searchRef = useRef(null);
   const navigate = useNavigate();
   const navbarRef = useRef(null);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -68,6 +69,23 @@ const Header = () => {
       dispatch(fetchCategories());
     }
   }, [categoriesStatus, dispatch]);
+  useEffect(() => {
+  const handleClickOutside = (event) => {
+    // Close mobile menu
+    if (isMobileMenuOpen && navbarRef.current && !navbarRef.current.contains(event.target)) {
+      setIsMobileMenuOpen(false);
+      setActiveDropdown(null);
+    }
+    
+    // Close category dropdown
+    if (activeDropdown === "categories" && dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setActiveDropdown(null);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => document.removeEventListener("mousedown", handleClickOutside);
+}, [isMobileMenuOpen, activeDropdown]);
 
   useEffect(() => {
     let isMounted = true;
@@ -425,6 +443,7 @@ const Header = () => {
               className={`nav-item dropdown ${
                 activeDropdown === "categories" ? "active" : ""
               }`}
+                ref={dropdownRef}
               onClick={() => toggleDropdown("categories")}
             >
               <span className="dropdown-toggle">

@@ -75,7 +75,7 @@ const ShopByBrand = () => {
       setProductsLoading(true);
       setProductsError(null);
 
-      // Use your API call with pagination parameters
+      //API call with pagination parameters
       const response = await fetch(
         `${BASE_URL}/products?featured=true&page=${page}&limit=${productsPerPage}`
       );
@@ -199,7 +199,6 @@ const ShopByBrand = () => {
             <div className="brands-grid">
               {displayedBrands.map((brand) => {
                 const imageUrl = getBrandImage(brand);
-                console.log("Brand:", brand.name, "Image URL:", imageUrl); // For debugging
 
                 return (
                   <BrandCard

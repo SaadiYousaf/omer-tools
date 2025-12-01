@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import ProductCard from '../Card/ProductCard';
 import './FeaturedProducts.css';
 import { selectFeaturedProducts } from '../../../store/productsSlice';
-
+import { nameUrlUtils } from '../../Utils/nameUrlUtils';
 const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
 
 const FeaturedProducts = () => {
@@ -113,7 +113,7 @@ if (!isLoadingState && hasNoProducts) {
                 <ProductCard 
                   product={product}
                   description={product.description}
-                  linkTo={`/product/${product.id}`}
+                  linkTo={`/product/${nameUrlUtils.convertNameToUrl(product.canonicalUrl)}`}
                 />
               </div>
             ))}

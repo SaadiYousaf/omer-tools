@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { FaSearch, FaTimes } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { nameUrlUtils } from '../../Utils/nameUrlUtils';
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const SearchComponent = () => {
@@ -48,7 +49,7 @@ const SearchComponent = () => {
   const handleSuggestionClick = (suggestion) => {
     switch (suggestion.Type) {
       case 'Product':
-        navigate(`/products/${suggestion.ReferenceId}`);
+        navigate(`/products/${nameUrlUtils.convertUrlfromSearch(suggestion.ReferenceId)}`);
         break;
       case 'Brand':
         navigate(`/brands/${suggestion.ReferenceId}`);

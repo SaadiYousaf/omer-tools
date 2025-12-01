@@ -6,7 +6,6 @@ const useApi = () => {
   const [error, setError] = useState(null);
 
   const request = useCallback(async (url, method = 'GET', body = null, headers = {}) => {
-    console.log(`[API] Making ${method} request to: ${url}`); // Debug log
     setLoading(true);
     setError(null);
 
@@ -21,14 +20,11 @@ const useApi = () => {
 
       if (body) {
         config.body = JSON.stringify(body);
-        console.log('[API] Request body:', body); // Debug log
       }
 
       const response = await fetch(url, config);
-      console.log('[API] Response status:', response.status); // Debug log
 
       const data = await response.json();
-      console.log('[API] Response data:', data); // Debug log
 
       if (!response.ok) {
         throw new Error(data.message || `HTTP error! status: ${response.status}`);

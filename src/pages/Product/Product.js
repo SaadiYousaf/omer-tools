@@ -5,8 +5,10 @@ import { useSelector, useDispatch } from "react-redux";
 import Loading from "../../components/common/Loading/Loading";
 import SEO from "../../components/common/SEO/SEO";
 import { useProductSEO } from "../../hooks/useSEO";
+import { nameUrlUtils } from "../../components/Utils/nameUrlUtils";
 import {
   fetchProductById,
+  fetchProductByName,
   fetchAllProducts,
   selectAllProducts,
   selectCurrentProduct,
@@ -33,15 +35,29 @@ const API_BASE = process.env.REACT_APP_BASE_URL;
 const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
 
 const Product = () => {
-  const { productId } = useParams();
+  const { productNameUrl } = useParams();
   const dispatch = useDispatch();
-  // SEO HOOK
-  const { seoData, loading: seoLoading } = useProductSEO(productId);
+
+  const productName = productNameUrl;
+ const currentProduct = useSelector(selectCurrentProduct); // full payload (product, brand, subcategory, category, images, variants)
+  const allProducts = useSelector(selectAllProducts); // used to compute "Frequently Bought Together"
+    useEffect(() => {
+    window.scrollTo(0, 0);
+    if (productName) {
+      dispatch(fetchProductByName(productName));
+    }
+  }, [productName, dispatch]);
+  
+
+  
   const status = useSelector(selectProductsStatus);
   const error = useSelector(selectProductsError);
-  const currentProduct = useSelector(selectCurrentProduct); // full payload (product, brand, subcategory, category, images, variants)
-  const allProducts = useSelector(selectAllProducts); // used to compute "Frequently Bought Together"
-
+ 
+    const productId = useMemo(() => {
+    return currentProduct?.Product?.id || currentProduct?.id;
+  }, [currentProduct]);
+    // SEO HOOK
+  const { seoData, loading: seoLoading } = useProductSEO(productId);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [localStock, setLocalStock] = useState(0);
@@ -49,12 +65,12 @@ const Product = () => {
   const [expandedDescription, setExpandedDescription] = useState(false);
 
   // Fetch current product (full details)
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    if (productId) {
-      dispatch(fetchProductById(productId));
-    }
-  }, [productId, dispatch]);
+  // useEffect(() => {
+  //   window.scrollTo(0, 0);
+  //   if (productId) {
+  //     dispatch(fetchProductById(productId));
+  //   }
+  // }, [productId, dispatch]);
 
   // After we have the current product, fetch all products (for related)
   // useEffect(() => {
@@ -64,6 +80,7 @@ const Product = () => {
   // }, [currentProduct, dispatch]);
 
   // Normalize the full payload for easy access without changing your UI structure
+
   const prod = useMemo(() => {
     if (!currentProduct) return null;
 

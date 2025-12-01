@@ -2,6 +2,7 @@ import React, { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addItemToCart } from "../../../store/cartSlice";
+import { nameUrlUtils } from "../../Utils/nameUrlUtils";
 import { 
   FaCartPlus, 
   FaHeart, 
@@ -135,7 +136,7 @@ const ProductCard = ({ product, linkTo }) => {
         </div>
         
         <Link 
-          to={linkTo || `/product/${product.id}`} 
+          to={linkTo || `/product/${nameUrlUtils.convertNameToUrl(product.canonicalUrl)}`} 
           className="card-link"
           aria-label={`View details for ${product.name}`}
         >

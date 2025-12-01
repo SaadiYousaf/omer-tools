@@ -97,6 +97,7 @@ const SearchResultsPage = () => {
       isFeatured: product.isFeatured,
       stockStatus: product.stockStatus,
       stockQuantity: product.stockQuantity,
+      canonicalUrl: product.canonicalUrl || product.name,
     }));
   };
 

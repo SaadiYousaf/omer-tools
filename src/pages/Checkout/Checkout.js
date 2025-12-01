@@ -228,7 +228,6 @@ const Checkout = () => {
         }),
       };
 
-      console.log("Sending order data:", JSON.stringify(orderData, null, 2));
 
       // Send order to backend
       const config = {
@@ -249,7 +248,6 @@ const Checkout = () => {
       if (paymentData.type === "paypal") {
         // For PayPal, payment is already complete, so any success response should proceed
         if (response.data.status === "succeeded") {
-          console.log("✅ PayPal order created successfully:", response.data);
           dispatch(clearCart());
           nextStep();
         } else {
@@ -257,16 +255,13 @@ const Checkout = () => {
         }
       } else {
         if (response.data.status === "succeeded") {
-          console.log("Order created:", response.data);
           dispatch(clearCart());
           nextStep();
         } else if (response.data.status === "payment_failed") {
           // ✅ Handle payment failure without throwing an error
-          console.log("Payment failed:", response.data.message);
           setOrderError(response.data.message); // This will show the actual Stripe message
         } else if (response.data.status === "requires_action") {
           // Handle 3D Secure if needed
-          console.log("Payment requires action");
           // You might need to handle this differently
         } else {
           // For any other unexpected status
@@ -417,12 +412,9 @@ const ShippingForm = ({
       const fullName = `${userProfile.firstName || ""} ${
         userProfile.lastName || ""
       }`.trim();
-      console.log("USER PROFILE", userProfile);
       const hasAddresses =
         userProfile.addresses && userProfile.addresses.length > 0;
-      console.log("Address PROFILE", hasAddresses);
       const defaultAddress = hasAddresses ? userProfile.addresses[0] : null;
-      console.log("defaultAddress PROFILE", defaultAddress);
 
       setFormData((prev) => ({
         ...prev,

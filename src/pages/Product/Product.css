@@ -124,7 +124,7 @@ body {
 
 /* Breadcrumb */
 .breadcrumb {
-  display: flex;
+  display: none;
   align-items: center;
   font-size: 14px;
   color: var(--gray);
@@ -291,6 +291,7 @@ body {
 }
 
 .product-title {
+  margin-top: 2%;
   font-size: 20px;
   font-weight: 700;
   margin-bottom: 15px;
@@ -840,8 +841,8 @@ h3.product-title {
 
 .spec-name {
   width: 40%;
-  font-weight: 500;
-  color: var(--gray);
+  font-weight: bold;
+  color: #000000;
 }
 
 .spec-value {

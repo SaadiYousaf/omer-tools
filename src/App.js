@@ -89,7 +89,7 @@ function App() {
             element={<Subcategory />}
           />
           <Route
-            path="/category/:categoryId/subcategory/:subcategoryId/product/:productId"
+            path="/category/:categoryId/subcategory/:subcategoryId/product/:productNameUrl"
             element={<Product />}
           />
           <Route
@@ -100,7 +100,8 @@ function App() {
           <Route path="/shop-by-brand" element={<ShopByBrand />} />
 
           {/* Other Routes */}
-          <Route path="/product/:productId" element={<Product />} />
+          {/* <Route path="/product/:productId" element={<Product />} /> */}
+          <Route path="/product/:productNameUrl" element={<Product />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/clearance" element={<ClearanceSale />} />

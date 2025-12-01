@@ -153,7 +153,6 @@ const ProductUpload = () => {
       // 3. Get updated product
 
       const updatedProduct = await get(`/api/products/${productResponse.id}`);
-      console.log("Product with images:", updatedProduct);
 
       setSuccess(true);
       // Reset form...
