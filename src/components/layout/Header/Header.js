@@ -41,7 +41,7 @@ const Header = () => {
   const searchRef = useRef(null);
   const navigate = useNavigate();
   const navbarRef = useRef(null);
-  const dropdownRef = useRef(null);
+   const categoriesDropdownRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -69,23 +69,6 @@ const Header = () => {
       dispatch(fetchCategories());
     }
   }, [categoriesStatus, dispatch]);
-  useEffect(() => {
-  const handleClickOutside = (event) => {
-    // Close mobile menu
-    if (isMobileMenuOpen && navbarRef.current && !navbarRef.current.contains(event.target)) {
-      setIsMobileMenuOpen(false);
-      setActiveDropdown(null);
-    }
-    
-    // Close category dropdown
-    if (activeDropdown === "categories" && dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-      setActiveDropdown(null);
-    }
-  };
-
-  document.addEventListener("mousedown", handleClickOutside);
-  return () => document.removeEventListener("mousedown", handleClickOutside);
-}, [isMobileMenuOpen, activeDropdown]);
 
   useEffect(() => {
     let isMounted = true;
@@ -172,8 +155,12 @@ const Header = () => {
     const trimmedTerm = searchTerm.trim();
     if (trimmedTerm) {
       // Forcefully hide the suggestions before navigating
+       window.stop();
+       const highestTimeoutId = setTimeout(() => {}, 0);
+    for (let i = 0; i < highestTimeoutId; i++) {
+      clearTimeout(i);
+    }
       setShowSuggestions(false);
-      setSuggestions([]);
       // Blur the input to close dropdown visually
       if (searchRef.current) {
         const input = searchRef.current.querySelector("input");
@@ -184,7 +171,46 @@ const Header = () => {
       setShowSuggestions(false);
     }
   };
+ useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!isMobileMenuOpen) return;
 
+      if (navbarRef.current && navbarRef.current.contains(event.target)) {
+        return;
+      }
+
+      setIsMobileMenuOpen(false);
+      setActiveDropdown(null);
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isMobileMenuOpen]);
+
+  // Handle click outside to close categories dropdown
+  useEffect(() => {
+    const handleClickOutsideCategories = (event) => {
+      if (activeDropdown !== "categories") return;
+
+      // If click is inside the categories dropdown or on the toggle button, do nothing
+      if (
+        categoriesDropdownRef.current &&
+        categoriesDropdownRef.current.contains(event.target)
+      ) {
+        return;
+      }
+
+      // Otherwise, close the dropdown
+      setActiveDropdown(null);
+    };
+
+    document.addEventListener("mousedown", handleClickOutsideCategories);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutsideCategories);
+    };
+  }, [activeDropdown]);
   const handleSuggestionClick = (suggestion) => {
     if (!suggestion) return;
 
@@ -440,10 +466,10 @@ const Header = () => {
           )}
           <ul className="nav-list">
             <li
+            ref={categoriesDropdownRef}
               className={`nav-item dropdown ${
                 activeDropdown === "categories" ? "active" : ""
               }`}
-                ref={dropdownRef}
               onClick={() => toggleDropdown("categories")}
             >
               <span className="dropdown-toggle">

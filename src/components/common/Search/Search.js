@@ -11,6 +11,7 @@ const SearchComponent = () => {
   const [isFocused, setIsFocused] = useState(false);
   const navigate = useNavigate();
 
+  
   // Debounce function
   const debounce = (func, wait) => {
     let timeout;
