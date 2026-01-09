@@ -29,6 +29,7 @@ import Visa from "../../assets/images/visa.png";
 import Mastercard from "../../assets/images/Mastercard.png";
 import Paypal from "../../assets/images/paypal.png";
 import Applepay from "../../assets/images/Applepay.png";
+import Amex from "../../assets/images/Amex.png"
 // IMPORTANT: must match your API base used in the slice
 
 const API_BASE = process.env.REACT_APP_BASE_URL;
@@ -508,6 +509,7 @@ const Product = () => {
                   <img src={Mastercard} alt="MasterCard" />
                   <img src={Paypal} alt="PayPal" />
                   <img src={Applepay} alt="ApplePay" />
+                  <img src={Amex} alt="American Express" />
                 </div>
                 <div className="payment-desc">Payments We Accept</div>
               </div>

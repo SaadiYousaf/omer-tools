@@ -35,6 +35,9 @@ import PaymentMethodsPage from "./pages/UserProfile/PaymentMethod/PaymentMethod"
 import { verifyToken } from "./store/authSlice";
 import OrderDetailsPage from "./pages/OrderDetails/OrderDetailsPage";
 import Modal from "./components/common/popupmodal/modal";
+import BlogPage from "./pages/Blog/BlogPage";
+import BlogDetailPage from "./pages/Blog/BlogDetailPage";
+import WarrantyClaim from "./components/common/WarrantyClaim/WarrantyClaim";
 
 function App() {
   const dispatch = useDispatch();
@@ -80,7 +83,9 @@ function App() {
         <ScrollToTop />
         <Routes>
           <Route path="/" element={<Home />} />
-
+          <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog/:slug" element={<BlogDetailPage />} />
+            {/* <Route path="/warranty-claim" element={<WarrantyClaim />} /> */}
           {/* Category and Subcategory Routes */}
           <Route path="/search" element={<SearchResultsPage />} />
           <Route path="/category/:categoryId" element={<Category />} />
@@ -117,6 +122,8 @@ function App() {
           <Route path="/payment-methods" element={<PaymentMethodsPage />} />
           <Route path="/account-settings" element={<AccountSettingsPage />} />
           <Route path="/orders/:orderId" element={<OrderDetailsPage />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/blog/:slug" element={<BlogDetailPage />} />
 
           <Route
             path="/orders"

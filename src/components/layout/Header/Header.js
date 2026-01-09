@@ -512,6 +512,11 @@ const Header = () => {
                 <span className="coming-soon-badge">Coming Soon</span>
               </Link>
             </li>
+                {/* <li className="nav-item" onClick={() => setIsMobileMenuOpen(false)}>
+              <Link to="/blog">
+               Blog
+              </Link>
+            </li> */}
             <div className="mobile-top-bar">
               <div className="mobile-top-bar-right">
                 <span>
