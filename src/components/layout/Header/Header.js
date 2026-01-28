@@ -512,6 +512,13 @@ const Header = () => {
                 <span className="coming-soon-badge">Coming Soon</span>
               </Link>
             </li>
+            <div className="mobile-only-links">
+            <li className="nav-item" onClick={() => setIsMobileMenuOpen(false)}>
+              <Link to="/warranty-claim">
+                Warranty Claim
+              </Link>
+            </li>
+            </div>
                 {/* <li className="nav-item" onClick={() => setIsMobileMenuOpen(false)}>
               <Link to="/blog">
                Blog

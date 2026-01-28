@@ -27,7 +27,7 @@ const STORE = {
   id: 1,
   name: "Omer Tools",
   address: "1126 Canterbury Rd, Roselands NSW 2196, Australia",
-  phone: "(02) 9150 0000",
+  phone: "(02) 9759 8833",
   hours: "Mon–Fri: 8:00–17:00, Sat: 9:00–16:00, Sun: Closed",
   coordinates: { lat: -33.9303675, lng: 151.0690975 },
   placeId: "ChIJcU9ul8auEmsR4zQkFEWVg-0",

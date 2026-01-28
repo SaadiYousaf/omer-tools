@@ -63,11 +63,11 @@ const Footer = () => {
                              Blog
                             </Link>
                           </li>
-                                {/* <li >
+                                <li >
                             <Link to="/warranty-claim">
                              Warranty Claim
                             </Link>
-                          </li> */}
+                          </li>
             </ul>
           </div>
           <div className="footer-section">

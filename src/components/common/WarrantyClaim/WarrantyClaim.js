@@ -1,6 +1,8 @@
-// WarrantyClaim.js
+// WarrantyClaim.js - IMPROVED VERSION
 import React, { useState } from 'react';
 import './WarrantyClaim.css';
+
+const API_BASE_URL = process.env.REACT_APP_BASE_URL || '';
 
 const WarrantyClaim = () => {
   const [formData, setFormData] = useState({
@@ -23,6 +25,9 @@ const WarrantyClaim = () => {
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [claimId, setClaimId] = useState('');
+  const [claimNumber, setClaimNumber] = useState('');
+  const [apiError, setApiError] = useState('');
   
   // Handle text/select inputs
   const handleChange = (e) => {
@@ -39,6 +44,9 @@ const WarrantyClaim = () => {
         [name]: ''
       });
     }
+    
+    // Clear API error when user types
+    if (apiError) setApiError('');
   };
   
   // Handle file uploads
@@ -47,18 +55,71 @@ const WarrantyClaim = () => {
     
     if (name === 'proofOfPurchase') {
       if (files.length > 0) {
+        // Validate file size (5MB max)
+        const file = files[0];
+        if (file.size > 5 * 1024 * 1024) {
+          setErrors({
+            ...errors,
+            proofOfPurchase: 'File size must be less than 5MB'
+          });
+          return;
+        }
+        
+        // Validate file type
+        const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+        if (!validTypes.includes(file.type)) {
+          setErrors({
+            ...errors,
+            proofOfPurchase: 'File must be JPG, PNG, or PDF'
+          });
+          return;
+        }
+        
         setFormData({
           ...formData,
-          [name]: files[0]
+          [name]: file
         });
+        
+        // Clear any existing error
+        if (errors.proofOfPurchase) {
+          setErrors({
+            ...errors,
+            proofOfPurchase: ''
+          });
+        }
       }
     } else if (name === 'faultImages') {
       // Handle multiple images
       const imageFiles = Array.from(files);
+      
+      // Validate total images (max 5)
+      const totalImages = formData.faultImages.length + imageFiles.length;
+      if (totalImages > 5) {
+        setErrors({
+          ...errors,
+          faultImages: 'Maximum 5 images allowed'
+        });
+        return;
+      }
+      
+      // Validate each image
+      const validImages = imageFiles.filter(file => {
+        const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+        return validTypes.includes(file.type) && file.size <= 5 * 1024 * 1024;
+      });
+      
       setFormData({
         ...formData,
-        [name]: [...formData.faultImages, ...imageFiles].slice(0, 5) // Limit to 5 images
+        [name]: [...formData.faultImages, ...validImages].slice(0, 5)
       });
+      
+      // Clear any existing error
+      if (errors.faultImages) {
+        setErrors({
+          ...errors,
+          faultImages: ''
+        });
+      }
     }
   };
   
@@ -116,17 +177,85 @@ const WarrantyClaim = () => {
     else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
     
     // Address required for home delivery
-    if ((formData.claimType === 'warranty-inspection' || formData.claimType === 'firstup-failure') && !formData.address.trim()) {
-      newErrors.address = 'Address is required for home delivery claims';
-    }
+    // if ((formData.claimType === 'warranty-inspection' || formData.claimType === 'firstup-failure') && !formData.address.trim()) {
+    //   newErrors.address = 'Address is required for home delivery claims';
+    // }
     
     // Asset Information Validation
     if (!formData.modelNumber.trim()) newErrors.modelNumber = 'Model number is required';
     if (!formData.faultDescription.trim()) newErrors.faultDescription = 'Description of fault is required';
     if (formData.faultDescription.length > 1000) newErrors.faultDescription = 'Description cannot exceed 1000 characters';
     
+    // File validation
+    if (formData.proofOfPurchase && formData.proofOfPurchase.size > 5 * 1024 * 1024) {
+      newErrors.proofOfPurchase = 'Proof of purchase must be less than 5MB';
+    }
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+  
+  // Upload proof of purchase
+  const uploadProofOfPurchase = async (claimId, file) => {
+    if (!file) return { success: true, message: 'No file to upload' };
+    
+    const uploadFormData = new FormData();
+    uploadFormData.append('file', file);
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/warrantyclaims/${claimId}/upload-proof`, {
+        method: 'POST',
+        body: uploadFormData
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        return { 
+          success: false, 
+          message: errorText || 'Failed to upload proof of purchase' 
+        };
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error uploading proof of purchase:', error);
+      return { 
+        success: false, 
+        message: 'Network error uploading proof of purchase' 
+      };
+    }
+  };
+  
+  // Upload fault images
+  const uploadFaultImages = async (claimId, images) => {
+    if (!images || images.length === 0) return { success: true, message: 'No images to upload' };
+    
+    const uploadFormData = new FormData();
+    images.forEach(image => {
+      uploadFormData.append('files', image);
+    });
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/warrantyclaims/${claimId}/upload-images`, {
+        method: 'POST',
+        body: uploadFormData
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        return { 
+          success: false, 
+          message: errorText || 'Failed to upload images' 
+        };
+      }
+      
+      return await response.json();
+    } catch (error) {
+      return { 
+        success: false, 
+        message: 'Network error uploading images' 
+      };
+    }
   };
   
   // Handle form submission
@@ -136,52 +265,92 @@ const WarrantyClaim = () => {
     if (!validateForm()) return;
     
     setIsSubmitting(true);
-    
-    // Create FormData for file uploads
-    const formDataToSend = new FormData();
-    
-    // Append all form data
-    Object.keys(formData).forEach(key => {
-      if (key === 'proofOfPurchase' && formData[key]) {
-        formDataToSend.append(key, formData[key]);
-      } else if (key === 'faultImages') {
-        formData.faultImages.forEach((image, index) => {
-          formDataToSend.append(`faultImage${index}`, image);
-        });
-      } else {
-        formDataToSend.append(key, formData[key]);
-      }
-    });
+    setClaimId('');
+    setClaimNumber('');
+    setApiError('');
     
     try {
-      // TODO: Replace with your actual API endpoint
-      const response = await fetch('/api/warranty-claims', {
+      // Step 1: Create the warranty claim
+      const claimData = {
+        claimType: formData.claimType,
+        fullName: formData.fullName,
+        phoneNumber: formData.phoneNumber,
+        email: formData.email,
+        address: formData.address,
+        modelNumber: formData.modelNumber,
+        serialNumber: formData.serialNumber,
+        faultDescription: formData.faultDescription
+      };
+      
+      
+      const createResponse = await fetch(`${API_BASE_URL}/warrantyclaims`, {
         method: 'POST',
-        body: formDataToSend
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(claimData)
       });
       
-      if (response.ok) {
-        const result = await response.json();
-        alert('Warranty claim submitted successfully! Claim ID: ' + result.claimId);
-        // Reset form
-        setFormData({
-          claimType: '',
-          proofOfPurchase: null,
-          fullName: '',
-          phoneNumber: '',
-          email: '',
-          address: '',
-          modelNumber: '',
-          serialNumber: '',
-          faultDescription: '',
-          faultImages: []
-        });
-      } else {
-        throw new Error('Submission failed');
+      
+      if (!createResponse.ok) {
+        let errorMessage = 'Failed to create warranty claim';
+        try {
+          const errorData = await createResponse.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (jsonError) {
+          const errorText = await createResponse.text();
+          errorMessage = errorText || errorMessage;
+        }
+        throw new Error(errorMessage);
       }
+      
+      const createdClaim = await createResponse.json();
+      
+      const newClaimId = createdClaim.id;
+      const newClaimNumber = createdClaim.claimNumber;
+      
+      setClaimId(newClaimId);
+      setClaimNumber(newClaimNumber);
+      
+      // Step 2: Upload proof of purchase (if required and provided)
+      if (formData.claimType !== 'service-repair' && formData.proofOfPurchase) {
+        const proofResult = await uploadProofOfPurchase(newClaimId, formData.proofOfPurchase);
+        if (!proofResult.success) {
+          console.warn('Proof of purchase upload failed:', proofResult.message);
+          // Continue anyway - don't fail the whole claim
+        }
+      }
+      
+      // Step 3: Upload fault images (if provided)
+      if (formData.faultImages.length > 0) {
+        const imagesResult = await uploadFaultImages(newClaimId, formData.faultImages);
+        if (!imagesResult.success) {
+          console.warn('Fault images upload failed:', imagesResult.message);
+          // Continue anyway - don't fail the whole claim
+        }
+      }
+      
+      // Success message
+      alert(`✅ Warranty claim submitted successfully!\n\nClaim Number: ${newClaimNumber}\n\n Please save your claim number for future reference.`);
+      
+      // Reset form
+      setFormData({
+        claimType: '',
+        proofOfPurchase: null,
+        fullName: '',
+        phoneNumber: '',
+        email: '',
+        address: '',
+        modelNumber: '',
+        serialNumber: '',
+        faultDescription: '',
+        faultImages: []
+      });
+      
     } catch (error) {
-      alert('Error submitting claim. Please try again.');
       console.error('Submission error:', error);
+      setApiError(error.message);
+      alert(`❌ Error submitting claim: ${error.message}\n\nPlease try again or contact support.`);
     } finally {
       setIsSubmitting(false);
     }
@@ -198,17 +367,30 @@ const WarrantyClaim = () => {
           <p>Please fill out all required fields to process your warranty claim</p>
         </div>
         
+        {apiError && (
+          <div className="error-banner">
+            <p><strong>Error:</strong> {apiError}</p>
+          </div>
+        )}
+        
+        {claimNumber && (
+          <div className="success-banner">
+            <p>✅ Claim submitted successfully! Your claim number is: <strong>{claimNumber}</strong></p>
+            <p>Please save this number for future reference.</p>
+          </div>
+        )}
+        
         <form onSubmit={handleSubmit} className="warranty-claim-form">
           
           {/* SECTION 1: DISTRIBUTION PARTNER INFORMATION */}
           <div className="form-section">
             <div className="section-header">
-              <h2>DISTRIBUTION PARTNER INFORMATION</h2>
+              <h2>Claim Selection</h2>
               <div className="section-divider"></div>
             </div>
             
             <div className="claim-type-selection">
-              <p className="section-subtitle">Select Claim Type *</p>
+              <p className="section-subtitle"></p>
               <div className="claim-type-options">
                 <div 
                   className={`claim-type-option ${formData.claimType === 'warranty-inspection' ? 'selected' : ''}`}
@@ -220,7 +402,7 @@ const WarrantyClaim = () => {
                     </span>
                     <span className="option-title">Warranty Inspection</span>
                   </div>
-                  <p className="option-description">For products under warranty period requiring inspection</p>
+                  <p className="option-description">For products under warranty period requiring inspection (proof of purchase required)</p>
                 </div>
                 
                 <div 
@@ -233,7 +415,7 @@ const WarrantyClaim = () => {
                     </span>
                     <span className="option-title">Service Repair Inspection</span>
                   </div>
-                  <p className="option-description">Proof of purchase not required for service repairs</p>
+                  <p className="option-description">Proof of purchase not required for service repairs (Minimum Charge 50$)</p>
                 </div>
                 
                 <div 
@@ -287,9 +469,10 @@ const WarrantyClaim = () => {
                       <button 
                         type="button" 
                         className="remove-file"
+                        text="Delete"
                         onClick={removeProofOfPurchase}
                       >
-                        ×
+                        Delete
                       </button>
                     </div>
                   )}
@@ -302,7 +485,7 @@ const WarrantyClaim = () => {
           {/* SECTION 2: END USER INFORMATION */}
           <div className="form-section">
             <div className="section-header">
-              <h2>END USER INFORMATION</h2>
+              <h2>CUSTOMER INFORMATION</h2>
               <div className="section-divider"></div>
             </div>
             
@@ -352,10 +535,8 @@ const WarrantyClaim = () => {
             
             <div className="form-group">
               <label htmlFor="address">
-                Address {formData.claimType !== 'service-repair' ? '*' : ''}
-                {formData.claimType !== 'service-repair' && (
+                Address 
                   <span className="field-note">(Required for home delivery)</span>
-                )}
               </label>
               <input
                 type="text"
@@ -500,7 +681,7 @@ const WarrantyClaim = () => {
             </button>
             <p className="form-note">
               By submitting this form, you agree to our Warranty Terms and Conditions.
-              You will receive a confirmation email with your claim ID.
+             
             </p>
           </div>
         </form>

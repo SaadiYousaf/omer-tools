@@ -85,7 +85,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogDetailPage />} />
-            {/* <Route path="/warranty-claim" element={<WarrantyClaim />} /> */}
+            <Route path="/warranty-claim" element={<WarrantyClaim />} />
           {/* Category and Subcategory Routes */}
           <Route path="/search" element={<SearchResultsPage />} />
           <Route path="/category/:categoryId" element={<Category />} />

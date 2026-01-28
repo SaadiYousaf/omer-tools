@@ -600,7 +600,16 @@ a.dropdown-item {
   flex-direction: column; /* vertical layout */
   gap: 5px; /* spacing between phone and store location */
 }
+.mobile-only {
+  display: none;
+}
 
+/* Show on mobile */
+@media (max-width: 992px) {
+  .mobile-only {
+    display: block;
+  }
+}
 .phone-link {
   color: #fff;
   text-decoration: none;
@@ -639,6 +648,9 @@ a.dropdown-item {
 
 /* Hide on desktop */
 @media (min-width: 769px) {
+  .mobile-only-links{
+    display: none;
+  }
   .mobile-top-bar {
     display: none;
   }
