@@ -1,4 +1,4 @@
-// WarrantyClaim.js - IMPROVED VERSION
+
 import React, { useState } from 'react';
 import './WarrantyClaim.css';
 
@@ -16,10 +16,19 @@ const WarrantyClaim = () => {
     email: '',
     address: '',
     
-    // Asset Information
-    modelNumber: '',
-    serialNumber: '',
-    faultDescription: '',
+    // Products Array 
+    products: [
+      {
+        modelNumber: '',
+        serialNumber: '',
+        faultDescription: ''
+      }
+    ],
+    
+    // Common fault description for all products (optional)
+    commonFaultDescription: '',
+    
+    // Fault images (common for all products)
     faultImages: []
   });
 
@@ -29,7 +38,7 @@ const WarrantyClaim = () => {
   const [claimNumber, setClaimNumber] = useState('');
   const [apiError, setApiError] = useState('');
   
-  // Handle text/select inputs
+  // Handle text/select inputs for main form
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -47,6 +56,75 @@ const WarrantyClaim = () => {
     
     // Clear API error when user types
     if (apiError) setApiError('');
+  };
+  
+  // Handle product field changes
+  const handleProductChange = (index, field, value) => {
+    const updatedProducts = [...formData.products];
+    updatedProducts[index] = {
+      ...updatedProducts[index],
+      [field]: value
+    };
+    
+    setFormData({
+      ...formData,
+      products: updatedProducts
+    });
+    
+    // Clear product-specific errors
+    const errorKey = `products[${index}].${field}`;
+    if (errors[errorKey]) {
+      const newErrors = { ...errors };
+      delete newErrors[errorKey];
+      setErrors(newErrors);
+    }
+  };
+  
+  // Add a new product
+  const addProduct = () => {
+    if (formData.products.length >= 5) {
+      setErrors({
+        ...errors,
+        products: 'Maximum 5 products per claim'
+      });
+      return;
+    }
+    
+    setFormData({
+      ...formData,
+      products: [
+        ...formData.products,
+        {
+          modelNumber: '',
+          serialNumber: '',
+          faultDescription: ''
+        }
+      ]
+    });
+    
+    // Clear products error if exists
+    if (errors.products) {
+      setErrors({
+        ...errors,
+        products: ''
+      });
+    }
+  };
+  
+  // Remove a product
+  const removeProduct = (index) => {
+    if (formData.products.length <= 1) {
+      setErrors({
+        ...errors,
+        products: 'At least one product is required'
+      });
+      return;
+    }
+    
+    setFormData({
+      ...formData,
+      products: formData.products.filter((_, i) => i !== index)
+    });
   };
   
   // Handle file uploads
@@ -176,15 +254,23 @@ const WarrantyClaim = () => {
     if (!formData.email.trim()) newErrors.email = 'Email is required';
     else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
     
-    // Address required for home delivery
-    // if ((formData.claimType === 'warranty-inspection' || formData.claimType === 'firstup-failure') && !formData.address.trim()) {
-    //   newErrors.address = 'Address is required for home delivery claims';
-    // }
+    // Product Validation
+    formData.products.forEach((product, index) => {
+      if (!product.modelNumber.trim()) {
+        newErrors[`products[${index}].modelNumber`] = 'Model number is required';
+      }
+      
+      if (!product.faultDescription.trim()) {
+        newErrors[`products[${index}].faultDescription`] = 'Description of fault is required';
+      } else if (product.faultDescription.length > 500) {
+        newErrors[`products[${index}].faultDescription`] = 'Description cannot exceed 500 characters';
+      }
+    });
     
-    // Asset Information Validation
-    if (!formData.modelNumber.trim()) newErrors.modelNumber = 'Model number is required';
-    if (!formData.faultDescription.trim()) newErrors.faultDescription = 'Description of fault is required';
-    if (formData.faultDescription.length > 1000) newErrors.faultDescription = 'Description cannot exceed 1000 characters';
+    // Validate common fault description if provided
+    if (formData.commonFaultDescription && formData.commonFaultDescription.length > 1000) {
+      newErrors.commonFaultDescription = 'Common description cannot exceed 1000 characters';
+    }
     
     // File validation
     if (formData.proofOfPurchase && formData.proofOfPurchase.size > 5 * 1024 * 1024) {
@@ -270,18 +356,22 @@ const WarrantyClaim = () => {
     setApiError('');
     
     try {
-      // Step 1: Create the warranty claim
+      // Step 1: Create the warranty claim with multiple products
       const claimData = {
         claimType: formData.claimType,
         fullName: formData.fullName,
         phoneNumber: formData.phoneNumber,
         email: formData.email,
         address: formData.address,
-        modelNumber: formData.modelNumber,
-        serialNumber: formData.serialNumber,
-        faultDescription: formData.faultDescription
+        commonFaultDescription: formData.commonFaultDescription,
+        products: formData.products.map(product => ({
+          modelNumber: product.modelNumber,
+          serialNumber: product.serialNumber,
+          faultDescription: product.faultDescription
+        }))
       };
       
+      console.log('Submitting claim data:', claimData);
       
       const createResponse = await fetch(`${API_BASE_URL}/warrantyclaims`, {
         method: 'POST',
@@ -290,7 +380,6 @@ const WarrantyClaim = () => {
         },
         body: JSON.stringify(claimData)
       });
-      
       
       if (!createResponse.ok) {
         let errorMessage = 'Failed to create warranty claim';
@@ -331,7 +420,7 @@ const WarrantyClaim = () => {
       }
       
       // Success message
-      alert(`✅ Warranty claim submitted successfully!\n\nClaim Number: ${newClaimNumber}\n\n Please save your claim number for future reference.`);
+      alert(`✅ Warranty claim submitted successfully!\n\nClaim Number: ${newClaimNumber}\nProducts: ${formData.products.length}\n\nPlease save your claim number for future reference.`);
       
       // Reset form
       setFormData({
@@ -341,11 +430,19 @@ const WarrantyClaim = () => {
         phoneNumber: '',
         email: '',
         address: '',
-        modelNumber: '',
-        serialNumber: '',
-        faultDescription: '',
+        products: [
+          {
+            modelNumber: '',
+            serialNumber: '',
+            faultDescription: ''
+          }
+        ],
+        commonFaultDescription: '',
         faultImages: []
       });
+      
+      // Clear all errors
+      setErrors({});
       
     } catch (error) {
       console.error('Submission error:', error);
@@ -356,15 +453,96 @@ const WarrantyClaim = () => {
     }
   };
   
-  // Character counter for fault description
-  const faultDescriptionLength = formData.faultDescription.length;
+  // Character counter for common fault description
+  const commonFaultDescriptionLength = formData.commonFaultDescription.length;
   
+  // Render product sections
+  const renderProductSections = () => {
+    return formData.products.map((product, index) => {
+      const productError = errors.products;
+      const modelError = errors[`products[${index}].modelNumber`];
+      const faultError = errors[`products[${index}].faultDescription`];
+      
+      return (
+        <div key={index} className="product-section">
+          <div className="product-section-header">
+            <h3 className="product-title">
+              Product {index + 1}
+              {index === 0 && <span className="required-badge">*</span>}
+            </h3>
+            {formData.products.length > 1 && (
+              <button 
+                type="button"
+                className="remove-product-btn"
+                onClick={() => removeProduct(index)}
+              >
+                Remove
+              </button>
+            )}
+          </div>
+          
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor={`modelNumber-${index}`}>
+                Model Number *
+              </label>
+              <input
+                type="text"
+                id={`modelNumber-${index}`}
+                value={product.modelNumber}
+                onChange={(e) => handleProductChange(index, 'modelNumber', e.target.value)}
+                placeholder="Enter product model number"
+                className={modelError ? 'error' : ''}
+              />
+              {modelError && <span className="field-error">{modelError}</span>}
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor={`serialNumber-${index}`}>
+                Serial Number
+                <span className="field-note">(Optional)</span>
+              </label>
+              <input
+                type="text"
+                id={`serialNumber-${index}`}
+                value={product.serialNumber}
+                onChange={(e) => handleProductChange(index, 'serialNumber', e.target.value)}
+                placeholder="Enter product serial number"
+              />
+            </div>
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor={`faultDescription-${index}`}>
+              Description of Fault *
+              <span className="char-counter">
+                {product.faultDescription.length}/500 characters
+              </span>
+            </label>
+            <textarea
+              id={`faultDescription-${index}`}
+              value={product.faultDescription}
+              onChange={(e) => handleProductChange(index, 'faultDescription', e.target.value)}
+              placeholder="Describe the specific issue with this product..."
+              rows="3"
+              maxLength="500"
+              className={faultError ? 'error' : ''}
+            />
+            {faultError && <span className="field-error">{faultError}</span>}
+          </div>
+          
+          {index < formData.products.length - 1 && <hr className="product-divider" />}
+        </div>
+      );
+    });
+  };
+
   return (
     <div className="warranty-claim-container">
       <div className="warranty-claim-wrapper">
         <div className="warranty-claim-header">
           <h1>Submit Warranty Claim</h1>
-          <p>Please fill out all required fields to process your warranty claim</p>
+          <p>You can submit claims for up to 5 products at once</p>
         </div>
         
         {apiError && (
@@ -375,8 +553,9 @@ const WarrantyClaim = () => {
         
         {claimNumber && (
           <div className="success-banner">
-            <p>✅ Claim submitted successfully! Your claim number is: <strong>{claimNumber}</strong></p>
-            <p>Please save this number for future reference.</p>
+            <p>✅ Claim submitted successfully!</p>
+            <p>Your claim number is: <strong>{claimNumber}</strong></p>
+            <p>Please save your claim number for future reference.</p>
           </div>
         )}
         
@@ -469,7 +648,6 @@ const WarrantyClaim = () => {
                       <button 
                         type="button" 
                         className="remove-file"
-                        text="Delete"
                         onClick={removeProofOfPurchase}
                       >
                         Delete
@@ -551,63 +729,61 @@ const WarrantyClaim = () => {
             </div>
           </div>
           
-          {/* SECTION 3: ASSET INFORMATION */}
+          {/* SECTION 3: PRODUCT INFORMATION */}
           <div className="form-section">
             <div className="section-header">
-              <h2>ASSET INFORMATION</h2>
+              <div className="section-header-top">
+                <h2>PRODUCT INFORMATION</h2>
+                <div className="products-controls">
+                  <button 
+                    type="button"
+                    className="add-product-btn"
+                    onClick={addProduct}
+                    disabled={formData.products.length >= 5}
+                  >
+                    + Add Product
+                  </button>
+                  <span className="products-counter">
+                    {formData.products.length}/5 products
+                  </span>
+                </div>
+              </div>
               <div className="section-divider"></div>
+              {errors.products && <span className="field-error">{errors.products}</span>}
             </div>
             
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="modelNumber">Model Number *</label>
-                <input
-                  type="text"
-                  id="modelNumber"
-                  name="modelNumber"
-                  value={formData.modelNumber}
-                  onChange={handleChange}
-                  placeholder="Enter product model number"
-                  className={errors.modelNumber ? 'error' : ''}
-                />
-                {errors.modelNumber && <span className="field-error">{errors.modelNumber}</span>}
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="serialNumber">
-                  Serial Number
-                  <span className="field-note">(Optional)</span>
+            {renderProductSections()}
+            
+            {/* Common Fault Description for multiple products */}
+            {formData.products.length > 1 && (
+              <div className="form-group common-fault-section">
+                <label htmlFor="commonFaultDescription">
+                  Common Fault Description (Optional)
+                  <span className="field-note">
+                    Describe issues common to all products
+                  </span>
+                  <span className="char-counter">
+                    {commonFaultDescriptionLength}/1000 characters
+                  </span>
                 </label>
-                <input
-                  type="text"
-                  id="serialNumber"
-                  name="serialNumber"
-                  value={formData.serialNumber}
+                <textarea
+                  id="commonFaultDescription"
+                  name="commonFaultDescription"
+                  value={formData.commonFaultDescription}
                   onChange={handleChange}
-                  placeholder="Enter product serial number"
+                  placeholder="If all products have the same issue, describe it here..."
+                  rows="3"
+                  maxLength="1000"
+                  className={errors.commonFaultDescription ? 'error' : ''}
                 />
+                {errors.commonFaultDescription && (
+                  <span className="field-error">{errors.commonFaultDescription}</span>
+                )}
+                <p className="field-hint">
+                  This description will be associated with all products in your claim
+                </p>
               </div>
-            </div>
-            
-            <div className="form-group">
-              <label htmlFor="faultDescription">
-                Description of Fault *
-                <span className="char-counter">
-                  {faultDescriptionLength}/1000 characters
-                </span>
-              </label>
-              <textarea
-                id="faultDescription"
-                name="faultDescription"
-                value={formData.faultDescription}
-                onChange={handleChange}
-                placeholder="Describe the issue in detail..."
-                rows="4"
-                maxLength="1000"
-                className={errors.faultDescription ? 'error' : ''}
-              />
-              {errors.faultDescription && <span className="field-error">{errors.faultDescription}</span>}
-            </div>
+            )}
             
             {/* Fault Images Upload */}
             <div className="form-group">
@@ -660,6 +836,7 @@ const WarrantyClaim = () => {
                   ))}
                 </div>
               )}
+              {errors.faultImages && <span className="field-error">{errors.faultImages}</span>}
             </div>
           </div>
           
@@ -673,15 +850,14 @@ const WarrantyClaim = () => {
               {isSubmitting ? (
                 <>
                   <span className="spinner"></span>
-                  Submitting Claim...
+                  Submitting Claim for {formData.products.length} Product(s)...
                 </>
               ) : (
-                'Submit Warranty Claim'
+                `Submit Claim for ${formData.products.length} Product(s)`
               )}
             </button>
             <p className="form-note">
               By submitting this form, you agree to our Warranty Terms and Conditions.
-             
             </p>
           </div>
         </form>
