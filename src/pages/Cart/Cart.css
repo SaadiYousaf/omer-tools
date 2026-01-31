@@ -280,22 +280,16 @@
 
 /* === Payment Icons === */
 .payment-icons {
+  margin-top: 24px;
   display: flex;
-  justify-content: center;
-  gap: 0.75rem;
-  margin-top: 1.5rem;
-  border-top: 1px solid #eee;
-  padding-top: 1rem;
+  gap: 10px;
+  align-items: center;
 }
 
 .payment-icon {
-  width: 40px;
-  height: 25px;
-  background-color: #f5f5f5;
-  border-radius: 3px;
-  background-size: 80%;
-  background-position: center;
-  background-repeat: no-repeat;
+  height: 32px;
+  width: auto;
+  object-fit: contain;
 }
 
 /* === Empty Cart === */

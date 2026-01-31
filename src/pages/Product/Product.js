@@ -29,7 +29,7 @@ import Visa from "../../assets/images/visa.png";
 import Mastercard from "../../assets/images/Mastercard.png";
 import Paypal from "../../assets/images/paypal.png";
 import Applepay from "../../assets/images/Applepay.png";
-import Amex from "../../assets/images/Amex.png"
+import Amex from "../../assets/images/Amex.png";
 // IMPORTANT: must match your API base used in the slice
 
 const API_BASE = process.env.REACT_APP_BASE_URL;
@@ -40,24 +40,22 @@ const Product = () => {
   const dispatch = useDispatch();
 
   const productName = productNameUrl;
- const currentProduct = useSelector(selectCurrentProduct); // full payload (product, brand, subcategory, category, images, variants)
+  const currentProduct = useSelector(selectCurrentProduct); // full payload (product, brand, subcategory, category, images, variants)
   const allProducts = useSelector(selectAllProducts); // used to compute "Frequently Bought Together"
-    useEffect(() => {
+  useEffect(() => {
     window.scrollTo(0, 0);
     if (productName) {
       dispatch(fetchProductByName(productName));
     }
   }, [productName, dispatch]);
-  
 
-  
   const status = useSelector(selectProductsStatus);
   const error = useSelector(selectProductsError);
- 
-    const productId = useMemo(() => {
+
+  const productId = useMemo(() => {
     return currentProduct?.Product?.id || currentProduct?.id;
   }, [currentProduct]);
-    // SEO HOOK
+  // SEO HOOK
   const { seoData, loading: seoLoading } = useProductSEO(productId);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
@@ -145,7 +143,7 @@ const Product = () => {
           image: mainImage,
           quantity: quantity,
           sku: prod.sku,
-        })
+        }),
       );
       setLocalStock((s) => s - quantity);
       setQuantity(1);
@@ -255,7 +253,7 @@ const Product = () => {
         p &&
         p.id !== prod.id &&
         (Number(p.brandId) === Number(prod.brandId) ||
-          Number(p.subcategoryId) === Number(prod.subcategoryId))
+          Number(p.subcategoryId) === Number(prod.subcategoryId)),
     );
 
     // Choose first 4
@@ -288,20 +286,29 @@ const Product = () => {
 
   return (
     <div className="product-page">
-          {/*SEO COMPONENT*/}
-      <SEO 
+      {/*SEO COMPONENT*/}
+      <SEO
         title={seoData?.metaTitle || `${prod.name} - ${brandName} | Omer tools`}
-        description={seoData?.metaDescription || 
-          (prod.description 
-            ? prod.description.substring(0, 160) + (prod.description.length > 160 ? '...' : '')
-            : `Buy ${prod.name} from ${brandName}. ${prod.tagLine || 'Best quality at competitive prices.'}`
-          )
+        description={
+          seoData?.metaDescription ||
+          (prod.description
+            ? prod.description.substring(0, 160) +
+              (prod.description.length > 160 ? "..." : "")
+            : `Buy ${prod.name} from ${brandName}. ${prod.tagLine || "Best quality at competitive prices."}`)
         }
-        keywords={seoData?.metaKeywords || `${prod.name}, ${brandName}, buy, shop, price`}
+        keywords={
+          seoData?.metaKeywords ||
+          `${prod.name}, ${brandName}, buy, shop, price`
+        }
         slug={seoData?.canonicalUrl}
-        ogTitle={seoData?.ogTitle || seoData?.metaTitle || `${prod.name} - ${brandName}`}
-        ogDescription={seoData?.ogDescription || seoData?.metaDescription || prod.description}
-        
+        ogTitle={
+          seoData?.ogTitle ||
+          seoData?.metaTitle ||
+          `${prod.name} - ${brandName}`
+        }
+        ogDescription={
+          seoData?.ogDescription || seoData?.metaDescription || prod.description
+        }
       />
       <div className="breadcrumb">
         <Link to="/">Home</Link>
@@ -428,7 +435,7 @@ const Product = () => {
                   <div className="savings-badge">
                     Save $
                     {(Number(prod.price) - Number(prod.discountPrice)).toFixed(
-                      2
+                      2,
                     )}
                   </div>
                 )}
@@ -498,7 +505,7 @@ const Product = () => {
             <div className="promo-card">
               <FaTruck className="promo-icon" />
               <div className="promo-content">
-                <div className="promo-title">Free Shipping</div>
+                <div className="promo-title">Free Delivery</div>
                 <div className="promo-desc">On orders over $99</div>
               </div>
             </div>
@@ -672,7 +679,7 @@ const Product = () => {
                             originalPrice: rpHasDiscount ? rp.price : null,
                             image: rpImage,
                             quantity: 1,
-                          })
+                          }),
                         )
                       }
                     >

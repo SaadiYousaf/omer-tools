@@ -12,7 +12,7 @@ import "./Checkout.css";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 const stripePromise = loadStripe(
-  "pk_live_51Rs0GlIL9Fa1nSZ5II0JcN2bbgts7PsdjJ4nb4zzpmF8cKDNWVNLTXt8K141GvhzOsYaI5RHcrPoV9tnvkJHHmfx007pCkUOCv"
+  "pk_live_51Rs0GlIL9Fa1nSZ5II0JcN2bbgts7PsdjJ4nb4zzpmF8cKDNWVNLTXt8K141GvhzOsYaI5RHcrPoV9tnvkJHHmfx007pCkUOCv",
 );
 
 const Checkout = () => {
@@ -140,7 +140,7 @@ const Checkout = () => {
                 {
                   token: token,
                   refreshToken: refreshToken,
-                }
+                },
               );
 
               token = refreshResponse.data.token;
@@ -228,7 +228,6 @@ const Checkout = () => {
         }),
       };
 
-
       // Send order to backend
       const config = {
         headers: {
@@ -243,7 +242,7 @@ const Checkout = () => {
       const response = await axios.post(
         `${BASE_URL}/orders`,
         orderData,
-        config
+        config,
       );
       if (paymentData.type === "paypal") {
         // For PayPal, payment is already complete, so any success response should proceed
@@ -278,7 +277,7 @@ const Checkout = () => {
         if (error.response.data.status === "payment_failed") {
           // Use the specific Stripe error message
           setOrderError(
-            error.response.data.message || "Payment failed. Please try again."
+            error.response.data.message || "Payment failed. Please try again.",
           );
         }
         // Check for validation errors
@@ -295,7 +294,7 @@ const Checkout = () => {
       } else if (error.request) {
         console.error("Request error:", error.request);
         setOrderError(
-          "Network error. Please check your connection and try again."
+          "Network error. Please check your connection and try again.",
         );
       } else {
         setOrderError("Failed to place order. Please try again.");
@@ -579,7 +578,7 @@ const ShippingForm = ({
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Full Name</label>
+            <label>Full Name *</label>
             <input
               type="text"
               name="fullName"
@@ -592,7 +591,7 @@ const ShippingForm = ({
             )}
           </div>
           <div className="form-group">
-            <label>Email</label>
+            <label>Email *</label>
             <input
               type="email"
               name="email"
@@ -621,7 +620,7 @@ const ShippingForm = ({
             {errors.phone && <span className="error-text">{errors.phone}</span>}
           </div>
           <div className="form-group">
-            <label>Address</label>
+            <label>Address *</label>
             <input
               type="text"
               name="address"
@@ -634,7 +633,7 @@ const ShippingForm = ({
             )}
           </div>
           <div className="form-group">
-            <label>City</label>
+            <label>City *</label>
             <input
               type="text"
               name="city"
@@ -646,7 +645,7 @@ const ShippingForm = ({
           </div>
           <div className="form-row">
             <div className="form-group">
-              <label>State/Province</label>
+              <label>State/Province *</label>
               <input
                 type="text"
                 name="state"
@@ -659,7 +658,7 @@ const ShippingForm = ({
               )}
             </div>
             <div className="form-group">
-              <label>Postal Code</label>
+              <label>Postal Code *</label>
               <input
                 type="text"
                 name="postalCode"

@@ -28,29 +28,83 @@ const STORE = {
   name: "Omer Tools",
   address: "1126 Canterbury Rd, Roselands NSW 2196, Australia",
   phone: "(02) 9759 8833",
-  hours: "Mon–Fri: 8:00–17:00, Sat: 9:00–16:00, Sun: Closed",
+  hours: "Mon–Fri: 8:30 AM – 5:00 PM, Sat: 10:00 AM – 2:00 PM, Sun: Closed",
   coordinates: { lat: -33.9303675, lng: 151.0690975 },
   placeId: "ChIJcU9ul8auEmsR4zQkFEWVg-0",
 };
 
 const MAP_STYLE = [
-  { featureType: "all", elementType: "labels.text.fill", stylers: [{ saturation: 36 }, { color: "#111827" }, { lightness: 40 }] },
-  { featureType: "all", elementType: "labels.text.stroke", stylers: [{ visibility: "on" }, { color: "#ffffff" }, { lightness: 16 }] },
-  { featureType: "all", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
-  { featureType: "administrative", elementType: "geometry.fill", stylers: [{ color: "#f3f4f6" }, { lightness: 20 }] },
-  { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#e5e7eb" }, { lightness: 17 }, { weight: 1.2 }] },
-  { featureType: "landscape", elementType: "geometry", stylers: [{ color: "#f9fafb" }, { lightness: 20 }] },
-  { featureType: "poi", elementType: "geometry", stylers: [{ color: "#f3f4f6" }, { lightness: 21 }] },
-  { featureType: "road.highway", elementType: "geometry.fill", stylers: [{ color: "#e5e7eb" }, { lightness: 17 }] },
-  { featureType: "road.highway", elementType: "geometry.stroke", stylers: [{ color: "#d1d5db" }, { lightness: 29 }, { weight: 0.2 }] },
-  { featureType: "road.arterial", elementType: "geometry", stylers: [{ color: "#e5e7eb" }, { lightness: 18 }] },
-  { featureType: "road.local", elementType: "geometry", stylers: [{ color: "#f3f4f6" }, { lightness: 16 }] },
-  { featureType: "transit", elementType: "geometry", stylers: [{ color: "#e5e7eb" }, { lightness: 19 }] },
-  { featureType: "water", elementType: "geometry", stylers: [{ color: "#dbeafe" }, { lightness: 17 }] },
+  {
+    featureType: "all",
+    elementType: "labels.text.fill",
+    stylers: [{ saturation: 36 }, { color: "#111827" }, { lightness: 40 }],
+  },
+  {
+    featureType: "all",
+    elementType: "labels.text.stroke",
+    stylers: [{ visibility: "on" }, { color: "#ffffff" }, { lightness: 16 }],
+  },
+  {
+    featureType: "all",
+    elementType: "labels.icon",
+    stylers: [{ visibility: "off" }],
+  },
+  {
+    featureType: "administrative",
+    elementType: "geometry.fill",
+    stylers: [{ color: "#f3f4f6" }, { lightness: 20 }],
+  },
+  {
+    featureType: "administrative",
+    elementType: "geometry.stroke",
+    stylers: [{ color: "#e5e7eb" }, { lightness: 17 }, { weight: 1.2 }],
+  },
+  {
+    featureType: "landscape",
+    elementType: "geometry",
+    stylers: [{ color: "#f9fafb" }, { lightness: 20 }],
+  },
+  {
+    featureType: "poi",
+    elementType: "geometry",
+    stylers: [{ color: "#f3f4f6" }, { lightness: 21 }],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "geometry.fill",
+    stylers: [{ color: "#e5e7eb" }, { lightness: 17 }],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "geometry.stroke",
+    stylers: [{ color: "#d1d5db" }, { lightness: 29 }, { weight: 0.2 }],
+  },
+  {
+    featureType: "road.arterial",
+    elementType: "geometry",
+    stylers: [{ color: "#e5e7eb" }, { lightness: 18 }],
+  },
+  {
+    featureType: "road.local",
+    elementType: "geometry",
+    stylers: [{ color: "#f3f4f6" }, { lightness: 16 }],
+  },
+  {
+    featureType: "transit",
+    elementType: "geometry",
+    stylers: [{ color: "#e5e7eb" }, { lightness: 19 }],
+  },
+  {
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [{ color: "#dbeafe" }, { lightness: 17 }],
+  },
 ];
 
 // ✅ Hardcoded API key (can also fallback to env if available)
-const API_KEY = process.env.REACT_APP_GOOGLE_MAPS_KEY || "AIzaSyBTJ8so7xZFYtUyvy78KBxZBDaMB0wqUaY";
+const API_KEY =
+  process.env.REACT_APP_GOOGLE_MAPS_KEY ||
+  "AIzaSyBTJ8so7xZFYtUyvy78KBxZBDaMB0wqUaY";
 // ✅ Script id (fixed)
 const GOOGLE_SCRIPT_ID = "google-maps-script";
 
@@ -138,7 +192,9 @@ function OmerToolsStoreLocator() {
     script.defer = true;
     script.crossOrigin = "anonymous";
     script.onerror = () => {
-      setError("Failed to load Google Maps script. Check your key and restrictions.");
+      setError(
+        "Failed to load Google Maps script. Check your key and restrictions.",
+      );
       setIsLoading(false);
       setLoadingMap(false);
     };
@@ -285,7 +341,7 @@ function OmerToolsStoreLocator() {
               } else {
                 setError("Could not calculate directions. Try again later.");
               }
-            }
+            },
           );
         } else {
           setIsLoading(false);
@@ -296,7 +352,7 @@ function OmerToolsStoreLocator() {
         setIsLoading(false);
         setError(err?.message || "Unable to fetch your location.");
       },
-      { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 },
     );
   }, [map, directionsRenderer]);
 
@@ -332,7 +388,9 @@ function OmerToolsStoreLocator() {
     <section className="otsl">
       <header className="otsl__header">
         <h1 className="otsl__title">{STORE.name}</h1>
-        <p className="otsl__subtitle">Visit our flagship store in Roselands, NSW</p>
+        <p className="otsl__subtitle">
+          Visit our flagship store in Roselands, NSW
+        </p>
       </header>
 
       <div className="otsl__grid">
@@ -342,14 +400,23 @@ function OmerToolsStoreLocator() {
           <p>{STORE.phone}</p>
           <p>{STORE.hours}</p>
 
-          <button className="btn btn--primary" onClick={locateUser} disabled={isLoading || loadingMap}>
+          <button
+            className="btn btn--primary"
+            onClick={locateUser}
+            disabled={isLoading || loadingMap}
+          >
             {isLoading ? "Loading…" : "Show My Location & Directions"}
           </button>
-          <button className="btn btn--ghost" onClick={resetView}>Reset View</button>
+          <button className="btn btn--ghost" onClick={resetView}>
+            Reset View
+          </button>
 
           {userLocation && (
             <div>
-              <p>Your Location: {userLocation.lat.toFixed(6)}, {userLocation.lng.toFixed(6)}</p>
+              <p>
+                Your Location: {userLocation.lat.toFixed(6)},{" "}
+                {userLocation.lng.toFixed(6)}
+              </p>
               {travelInfo && (
                 <>
                   <p>Distance: {travelInfo.distance}</p>
@@ -362,7 +429,9 @@ function OmerToolsStoreLocator() {
           {error && (
             <div className="alert">
               <p>{friendlyErrorMessage(error)}</p>
-              <button className="btn btn--danger" onClick={retryLoad}>Try Again</button>
+              <button className="btn btn--danger" onClick={retryLoad}>
+                Try Again
+              </button>
             </div>
           )}
         </aside>

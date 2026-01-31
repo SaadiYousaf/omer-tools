@@ -41,7 +41,7 @@ const Header = () => {
   const searchRef = useRef(null);
   const navigate = useNavigate();
   const navbarRef = useRef(null);
-   const categoriesDropdownRef = useRef(null);
+  const categoriesDropdownRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -90,14 +90,14 @@ const Header = () => {
         const timestamp = Date.now();
         const response = await fetch(
           `${BASE_URL}/search/autocomplete?term=${encodeURIComponent(
-            trimmedTerm
+            trimmedTerm,
           )}&t=${timestamp}`,
-          { signal }
+          { signal },
         );
 
         if (!response.ok) {
           throw new Error(
-            `API error: ${response.status} ${response.statusText}`
+            `API error: ${response.status} ${response.statusText}`,
           );
         }
 
@@ -155,11 +155,11 @@ const Header = () => {
     const trimmedTerm = searchTerm.trim();
     if (trimmedTerm) {
       // Forcefully hide the suggestions before navigating
-       window.stop();
-       const highestTimeoutId = setTimeout(() => {}, 0);
-    for (let i = 0; i < highestTimeoutId; i++) {
-      clearTimeout(i);
-    }
+      window.stop();
+      const highestTimeoutId = setTimeout(() => {}, 0);
+      for (let i = 0; i < highestTimeoutId; i++) {
+        clearTimeout(i);
+      }
       setShowSuggestions(false);
       // Blur the input to close dropdown visually
       if (searchRef.current) {
@@ -171,7 +171,7 @@ const Header = () => {
       setShowSuggestions(false);
     }
   };
- useEffect(() => {
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (!isMobileMenuOpen) return;
 
@@ -273,7 +273,7 @@ const Header = () => {
 
   // Sort categories alphabetically by name
   const sortedCategories = [...categories].sort((a, b) =>
-    a.name.localeCompare(b.name)
+    a.name.localeCompare(b.name),
   );
 
   // Calculate categories to display
@@ -300,7 +300,7 @@ const Header = () => {
               </span>
               <span>
                 <FaMapMarkerAlt />{" "}
-                <Link to="/store-locations">Store Locations</Link>
+                <Link to="/store-locations">Store Location</Link>
               </span>
             </div>
           </div>
@@ -466,7 +466,7 @@ const Header = () => {
           )}
           <ul className="nav-list">
             <li
-            ref={categoriesDropdownRef}
+              ref={categoriesDropdownRef}
               className={`nav-item dropdown ${
                 activeDropdown === "categories" ? "active" : ""
               }`}
@@ -504,7 +504,7 @@ const Header = () => {
               <Link to="/redemption">Redemptions</Link>
             </li>
             <li className="nav-item" onClick={() => setIsMobileMenuOpen(false)}>
-              <Link to="/store-locations">Store Locations</Link>
+              <Link to="/store-locations">Store Location</Link>
             </li>
             <li className="nav-item" onClick={() => setIsMobileMenuOpen(false)}>
               <Link to="/create-your-kit">
@@ -513,13 +513,14 @@ const Header = () => {
               </Link>
             </li>
             <div className="mobile-only-links">
-            <li className="nav-item" onClick={() => setIsMobileMenuOpen(false)}>
-              <Link to="/warranty-claim">
-                Warranty Claim
-              </Link>
-            </li>
+              <li
+                className="nav-item"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <Link to="/warranty-claim">Warranty Claim</Link>
+              </li>
             </div>
-                {/* <li className="nav-item" onClick={() => setIsMobileMenuOpen(false)}>
+            {/* <li className="nav-item" onClick={() => setIsMobileMenuOpen(false)}>
               <Link to="/blog">
                Blog
               </Link>

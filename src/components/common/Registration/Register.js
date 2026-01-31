@@ -1,38 +1,38 @@
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { registerUser } from '../../../store/authSlice';
-import { useNavigate,useLocation } from 'react-router-dom';
-import './Register.css';
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { registerUser } from "../../../store/authSlice";
+import { useNavigate, useLocation } from "react-router-dom";
+import "./Register.css";
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    PhoneNumber: '',
-    address: ''
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    PhoneNumber: "",
+    address: "",
   });
   const [errors, setErrors] = useState({});
-    const [showGuestConversion, setShowGuestConversion] = useState(false);
-  
+  const [showGuestConversion, setShowGuestConversion] = useState(false);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const { loading, error } = useSelector(state => state.auth);
+  const { loading, error } = useSelector((state) => state.auth);
 
   // ✅ Check if coming from guest checkout
   React.useEffect(() => {
-    const guestEmail = localStorage.getItem('guestEmail');
+    const guestEmail = localStorage.getItem("guestEmail");
     if (guestEmail) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        email: guestEmail
+        email: guestEmail,
       }));
       setShowGuestConversion(true);
       // Clear the guest email from storage
-      localStorage.removeItem('guestEmail');
+      localStorage.removeItem("guestEmail");
     }
   }, []);
 
@@ -40,61 +40,69 @@ const Register = () => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
-    
+
     // Clear error when user types
     if (errors[name]) {
       setErrors({
         ...errors,
-        [name]: ''
+        [name]: "",
       });
     }
   };
 
   const validateForm = () => {
     const newErrors = {};
-    
-    if (!formData.email) newErrors.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
-    
-    if (!formData.password) newErrors.password = 'Password is required';
-    else if (formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters';
-    
+
+    if (!formData.email) newErrors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
+      newErrors.email = "Email is invalid";
+
+    if (!formData.password) newErrors.password = "Password is required";
+    else if (formData.password.length < 6)
+      newErrors.password = "Password must be at least 6 characters";
+
     if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+      newErrors.confirmPassword = "Passwords do not match";
     }
-    
-    if (!formData.firstName) newErrors.firstName = 'First name is required';
-    if (!formData.lastName) newErrors.lastName = 'Last name is required';
-    if (!formData.PhoneNumber) newErrors.PhoneNumber = 'Phone number is required';
-    if (!formData.address) newErrors.address = 'Address is required';
-    
+
+    if (!formData.firstName) newErrors.firstName = "First name is required";
+    if (!formData.lastName) newErrors.lastName = "Last name is required";
+    if (!formData.PhoneNumber)
+      newErrors.PhoneNumber = "Phone number is required";
+    if (!formData.address) newErrors.address = "Address is required";
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     // Remove confirmPassword from data sent to server
     const { confirmPassword, ...userData } = formData;
-    
+
     const result = await dispatch(registerUser(userData));
-       if (registerUser.fulfilled.match(result)) {
+    if (registerUser.fulfilled.match(result)) {
       // ✅ Check if this was a guest conversion
-      if (result.payload?.message?.includes('upgraded') || result.payload?.message?.includes('guest')) {
+      if (
+        result.payload?.message?.includes("upgraded") ||
+        result.payload?.message?.includes("guest")
+      ) {
         // Show success message for guest conversion
-        alert('Your guest account has been successfully upgraded! Your order history has been preserved.');
+        alert(
+          "Your guest account has been successfully upgraded! Your order history has been preserved.",
+        );
       } else {
         // Regular registration success
-        alert('Account created successfully!');
+        alert("Account created successfully!");
       }
-      
+
       // Navigate based on where they came from
-      const from = location.state?.from || '/';
+      const from = location.state?.from || "/";
       navigate(from);
     }
   };
@@ -105,8 +113,11 @@ const Register = () => {
         <div className="register-left-panel">
           <div className="register-promo-content">
             <h2>Join Us Today!</h2>
-            <p>Create an account to enjoy exclusive benefits, faster checkout, and personalized shopping experiences.</p>
-           {showGuestConversion && (
+            <p>
+              Create an account to enjoy exclusive benefits, faster checkout,
+              and personalised shopping experiences.
+            </p>
+            {showGuestConversion && (
               <div className="guest-conversion-notice">
                 <h3>✨ Upgrade Your Guest Account</h3>
                 <p>We found your previous guest order! Create an account to:</p>
@@ -133,7 +144,7 @@ const Register = () => {
               </div>
               <div className="benefit-item">
                 <span className="benefit-icon">✓</span>
-                <span>Personalized recommendations</span>
+                <span>Personalised recommendations</span>
               </div>
               <div className="benefit-item">
                 <span className="benefit-icon">✓</span>
@@ -142,21 +153,21 @@ const Register = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="register-right-panel">
           <div className="register-form-container">
             <div className="register-header">
               <h2>Create Your Account</h2>
               <p>Fill in your details to get started</p>
             </div>
-            
+
             {error && (
               <div className="error-message">
                 <span className="error-icon">⚠️</span>
                 {error}
               </div>
             )}
-            
+
             <form onSubmit={handleSubmit} className="register-form">
               <div className="form-row">
                 <div className="form-group">
@@ -169,11 +180,13 @@ const Register = () => {
                     onChange={handleChange}
                     placeholder="Enter your first name"
                     required
-                    className={errors.firstName ? 'error' : ''}
+                    className={errors.firstName ? "error" : ""}
                   />
-                  {errors.firstName && <span className="field-error">{errors.firstName}</span>}
+                  {errors.firstName && (
+                    <span className="field-error">{errors.firstName}</span>
+                  )}
                 </div>
-                
+
                 <div className="form-group">
                   <label htmlFor="lastName">Last Name</label>
                   <input
@@ -184,12 +197,14 @@ const Register = () => {
                     onChange={handleChange}
                     placeholder="Enter your last name"
                     required
-                    className={errors.lastName ? 'error' : ''}
+                    className={errors.lastName ? "error" : ""}
                   />
-                  {errors.lastName && <span className="field-error">{errors.lastName}</span>}
+                  {errors.lastName && (
+                    <span className="field-error">{errors.lastName}</span>
+                  )}
                 </div>
               </div>
-              
+
               <div className="form-group">
                 <label htmlFor="email">Email Address</label>
                 <input
@@ -200,11 +215,13 @@ const Register = () => {
                   onChange={handleChange}
                   placeholder="Enter your email address"
                   required
-                  className={errors.email ? 'error' : ''}
+                  className={errors.email ? "error" : ""}
                 />
-                {errors.email && <span className="field-error">{errors.email}</span>}
+                {errors.email && (
+                  <span className="field-error">{errors.email}</span>
+                )}
               </div>
-              
+
               <div className="form-group">
                 <label htmlFor="PhoneNumber">Phone Number</label>
                 <input
@@ -215,11 +232,13 @@ const Register = () => {
                   onChange={handleChange}
                   placeholder="Enter your phone number"
                   required
-                  className={errors.PhoneNumber ? 'error' : ''}
+                  className={errors.PhoneNumber ? "error" : ""}
                 />
-                {errors.PhoneNumber && <span className="field-error">{errors.PhoneNumber}</span>}
+                {errors.PhoneNumber && (
+                  <span className="field-error">{errors.PhoneNumber}</span>
+                )}
               </div>
-              
+
               <div className="form-group">
                 <label htmlFor="address">Address</label>
                 <input
@@ -230,11 +249,13 @@ const Register = () => {
                   onChange={handleChange}
                   placeholder="Enter your full address"
                   required
-                  className={errors.address ? 'error' : ''}
+                  className={errors.address ? "error" : ""}
                 />
-                {errors.address && <span className="field-error">{errors.address}</span>}
+                {errors.address && (
+                  <span className="field-error">{errors.address}</span>
+                )}
               </div>
-              
+
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="password">Password</label>
@@ -246,11 +267,13 @@ const Register = () => {
                     onChange={handleChange}
                     placeholder="Create a password"
                     required
-                    className={errors.password ? 'error' : ''}
+                    className={errors.password ? "error" : ""}
                   />
-                  {errors.password && <span className="field-error">{errors.password}</span>}
+                  {errors.password && (
+                    <span className="field-error">{errors.password}</span>
+                  )}
                 </div>
-                
+
                 <div className="form-group">
                   <label htmlFor="confirmPassword">Confirm Password</label>
                   <input
@@ -261,33 +284,61 @@ const Register = () => {
                     onChange={handleChange}
                     placeholder="Confirm your password"
                     required
-                    className={errors.confirmPassword ? 'error' : ''}
+                    className={errors.confirmPassword ? "error" : ""}
                   />
-                  {errors.confirmPassword && <span className="field-error">{errors.confirmPassword}</span>}
+                  {errors.confirmPassword && (
+                    <span className="field-error">
+                      {errors.confirmPassword}
+                    </span>
+                  )}
                 </div>
               </div>
-              
+              <div className="form-group">
+                <label htmlFor="address">Trade (Optional)</label>
+                <input
+                  id="address"
+                  name="address"
+                  type="text"
+                  // value={formData.address}
+                  // onChange={handleChange}
+                  placeholder="Enter your full address"
+                  required
+                  // className={errors.address ? "error" : ""}
+                />
+                {/* {errors.address && (
+                  <span className="field-error">{errors.address}</span>
+                )} */}
+              </div>
+
               <div className="terms-agreement">
                 <input type="checkbox" id="terms" required />
                 <label htmlFor="terms">
-                  I agree to the <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>
+                  I agree to the <a href="/terms">Terms of Service</a> and{" "}
+                  <a href="/privacy">Privacy Policy</a>
                 </label>
               </div>
-              
-              <button type="submit" disabled={loading} className="register-submit-btn">
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="register-submit-btn"
+              >
                 {loading ? (
                   <>
                     <span className="spinner"></span>
                     Creating Account...
                   </>
                 ) : (
-                  'Create Account'
+                  "Create Account"
                 )}
               </button>
             </form>
-            
+
             <div className="login-redirect">
-              Already have an account? <a href="/login" className="login-link">Sign in here</a>
+              Already have an account?{" "}
+              <a href="/login" className="login-link">
+                Sign in here
+              </a>
             </div>
           </div>
         </div>

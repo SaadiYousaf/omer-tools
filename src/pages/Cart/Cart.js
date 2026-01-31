@@ -5,12 +5,17 @@ import { removeItemFromCart, clearCart } from "../../store/cartSlice";
 import { useNavigate } from "react-router-dom";
 import ScrollToTop from "../../components/common/Scroll/ScrollToTop";
 import "./Cart.css";
+import Visa from "../../assets/images/visa.png";
+import Mastercard from "../../assets/images/Mastercard.png";
+import Paypal from "../../assets/images/paypal.png";
+import Applepay from "../../assets/images/Applepay.png";
+import Amex from "../../assets/images/Amex.png";
 
 const Cart = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { items, totalQuantity, totalAmount } = useSelector(
-    (state) => state.cart
+    (state) => state.cart,
   );
   const { user, isAuthenticated } = useSelector((state) => state.auth); // ✅ Get user from auth state
   const [showGuestOption, setShowGuestOption] = useState(false); // ✅ NEW STATE
@@ -242,12 +247,20 @@ const Cart = () => {
                   Continue Shopping
                 </button>
               </div>
-
               <div className="payment-icons">
-                <div className="payment-icon visa"></div>
-                <div className="payment-icon mastercard"></div>
-                <div className="payment-icon amex"></div>
-                <div className="payment-icon paypal"></div>
+                <img src={Visa} alt="Visa" className="payment-icon" />
+                <img
+                  src={Mastercard}
+                  alt="Mastercard"
+                  className="payment-icon"
+                />
+                <img
+                  src={Amex}
+                  alt="American Express"
+                  className="payment-icon"
+                />
+                <img src={Paypal} alt="PayPal" className="payment-icon" />
+                <img src={Applepay} alt="Apple Pay" className="payment-icon" />
               </div>
             </div>
           </div>

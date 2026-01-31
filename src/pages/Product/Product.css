@@ -406,9 +406,11 @@ h3.product-title {
   margin-top: 1rem;
   gap: 0.5rem;
 }
+.buy-btn {
+  display: none;
+}
 
-.mobile-action-buttons .cart-btn,
-.mobile-action-buttons .buy-btn {
+.mobile-action-buttons .cart-btn {
   width: 100%;
   padding: 0.75rem;
   font-size: 1rem;
@@ -656,8 +658,7 @@ h3.product-title {
   margin-bottom: 10px;
 }
 
-.cart-btn,
-.buy-btn {
+.cart-btn {
   flex: 1;
   padding: 18px;
   border: none;
@@ -690,7 +691,7 @@ h3.product-title {
   box-shadow: none;
 }
 
-.buy-btn {
+/* .buy-btn {
   background: var(--light);
   color: var(--primary);
   border: 2px solid var(--primary);
@@ -699,7 +700,7 @@ h3.product-title {
 .buy-btn:hover {
   background: var(--primary-light);
   transform: translateY(-3px);
-}
+} */
 
 .payment-options {
   display: flex;
