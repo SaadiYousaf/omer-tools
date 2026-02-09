@@ -290,14 +290,14 @@ const Product = () => {
       <SEO
         title={seoData?.metaTitle || `${prod.name} - ${brandName} | Omer tools`}
         description={
-          seoData?.metaDescription ||
+          prod?.metaDescription ||
           (prod.description
             ? prod.description.substring(0, 160) +
               (prod.description.length > 160 ? "..." : "")
             : `Buy ${prod.name} from ${brandName}. ${prod.tagLine || "Best quality at competitive prices."}`)
         }
         keywords={
-          seoData?.metaKeywords ||
+          prod?.metaKeywords ||
           `${prod.name}, ${brandName}, buy, shop, price`
         }
         slug={seoData?.canonicalUrl}
@@ -307,7 +307,7 @@ const Product = () => {
           `${prod.name} - ${brandName}`
         }
         ogDescription={
-          seoData?.ogDescription || seoData?.metaDescription || prod.description
+          seoData?.ogDescription || prod?.ogDescription || prod.description
         }
       />
       <div className="breadcrumb">

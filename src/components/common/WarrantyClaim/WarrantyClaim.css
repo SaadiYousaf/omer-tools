@@ -626,3 +626,175 @@ input.error, textarea.error {
   font-size: 1.1em;
   color: #0c5460;
 }
+/* Proof of Purchase Section */
+.proof-of-purchase-section {
+  margin-top: 20px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.proof-method-options {
+  margin-bottom: 20px;
+}
+
+.proof-method-row {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+  .proof-method-row {
+    flex-direction: column;
+  }
+}
+
+.proof-method-option {
+  flex: 1;
+  padding: 15px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.proof-method-option:hover {
+  border-color: #007bff;
+  background: #f8f9ff;
+}
+
+.proof-method-option.selected {
+  border-color: #007bff;
+  background: #e7f1ff;
+}
+
+.method-checkbox {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #6c757d;
+  border-radius: 4px;
+  margin-right: 10px;
+  text-align: center;
+  line-height: 16px;
+  font-size: 14px;
+  color: white;
+  background: #6c757d;
+}
+
+.proof-method-option.selected .method-checkbox {
+  background: #007bff;
+  border-color: #007bff;
+}
+
+.method-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: #333;
+}
+
+.method-hint {
+  display: block;
+  font-size: 14px;
+  color: #6c757d;
+  margin-top: 5px;
+}
+
+/* Invoice Input Section */
+.invoice-input-section {
+  margin-top: 15px;
+}
+
+.invoice-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.invoice-input-wrapper input {
+  flex: 1;
+  padding-right: 80px;
+}
+
+.clear-invoice-btn {
+  position: absolute;
+  right: 10px;
+  padding: 6px 12px;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.3s ease;
+}
+
+.clear-invoice-btn:hover {
+  background: #5a6268;
+}
+
+.file-upload-section {
+  margin-top: 15px;
+}
+
+.uploaded-file {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  margin-top: 10px;
+}
+
+.file-icon {
+  font-size: 20px;
+}
+
+.file-name {
+  flex: 1;
+  font-size: 14px;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-size {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.remove-file {
+  padding: 4px 10px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.3s ease;
+}
+
+.remove-file:hover {
+  background: #c82333;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .proof-method-option {
+    padding: 12px;
+  }
+  
+  .method-title {
+    font-size: 14px;
+  }
+  
+  .method-hint {
+    font-size: 12px;
+  }
+}

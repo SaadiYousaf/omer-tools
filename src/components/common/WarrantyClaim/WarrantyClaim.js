@@ -9,7 +9,8 @@ const WarrantyClaim = () => {
     // Distribution Partner Information
     claimType: '', // 'warranty-inspection', 'service-repair', 'firstup-failure'
     proofOfPurchase: null,
-    
+    invoiceNumber: '', // New field for invoice number
+    proofMethod: '', // 'upload' or 'invoice' - tracks which method is selected
     // End User Information
     fullName: '',
     phoneNumber: '',
@@ -155,7 +156,9 @@ const WarrantyClaim = () => {
         
         setFormData({
           ...formData,
-          [name]: file
+          proofOfPurchase: file,
+          proofMethod: 'upload' // method to upload when file is selected
+
         });
         
         // Clear any existing error
@@ -165,6 +168,19 @@ const WarrantyClaim = () => {
             proofOfPurchase: ''
           });
         }
+        if (errors.invoiceNumber) {
+          setErrors({
+            ...errors,
+            invoiceNumber: ''
+          });
+        }
+        if (errors.proofMethod) {
+          setErrors({
+            ...errors,
+            proofMethod: ''
+          });
+        }
+
       }
     } else if (name === 'faultImages') {
       // Handle multiple images
@@ -205,7 +221,11 @@ const WarrantyClaim = () => {
   const handleClaimTypeChange = (type) => {
     setFormData({
       ...formData,
-      claimType: type
+      claimType: type,
+      proofOfPurchase: null,
+      invoiceNumber: '',
+      proofMethod: ''
+
     });
     
     // Clear related errors
@@ -215,6 +235,44 @@ const WarrantyClaim = () => {
         claimType: ''
       });
     }
+        if (errors.proofMethod) {
+      setErrors({
+        ...errors,
+        proofMethod: ''
+      });
+    }
+  };
+  
+  // Handle proof method selection (upload or invoice)
+  const handleProofMethodChange = (method) => {
+    setFormData({
+      ...formData,
+      proofMethod: method,
+      // Clear the other method's data
+      ...(method === 'upload' && { invoiceNumber: '' }),
+      ...(method === 'invoice' && { proofOfPurchase: null })
+    });
+    
+    // Clear errors
+    if (errors.proofMethod) {
+      setErrors({
+        ...errors,
+        proofMethod: ''
+      });
+    }
+    if (errors.proofOfPurchase) {
+      setErrors({
+        ...errors,
+        proofOfPurchase: ''
+      });
+    }
+    if (errors.invoiceNumber) {
+      setErrors({
+        ...errors,
+        invoiceNumber: ''
+      });
+    }
+
   };
   
   // Remove an uploaded image
@@ -230,10 +288,18 @@ const WarrantyClaim = () => {
   const removeProofOfPurchase = () => {
     setFormData({
       ...formData,
-      proofOfPurchase: null
+      proofOfPurchase: null,
+       proofMethod: formData.invoiceNumber ? 'invoice' : ''
     });
   };
-  
+   const clearInvoiceNumber = () => {
+
+    setFormData({
+      ...formData,
+      invoiceNumber: '',
+      proofMethod: formData.proofOfPurchase ? 'upload' : ''
+   });
+   };
   // Validate form
   const validateForm = () => {
     const newErrors = {};
@@ -244,8 +310,17 @@ const WarrantyClaim = () => {
     }
     
     // Proof of Purchase Validation (not required for service-repair)
-    if (formData.claimType !== 'service-repair' && !formData.proofOfPurchase) {
-      newErrors.proofOfPurchase = 'Proof of purchase is required for this claim type';
+     if (formData.claimType !== 'service-repair') {
+      // Check if either method is selected
+      if (!formData.proofMethod) {
+        newErrors.proofMethod = 'Please provide proof of purchase';
+      } else if (formData.proofMethod === 'upload' && !formData.proofOfPurchase) {
+        newErrors.proofOfPurchase = 'Please upload proof of purchase';
+      } else if (formData.proofMethod === 'invoice' && !formData.invoiceNumber.trim()) {
+        newErrors.invoiceNumber = 'Please enter invoice number';
+      } else if (formData.proofMethod === 'invoice' && formData.invoiceNumber.trim().length < 3) {
+        newErrors.invoiceNumber = 'Invoice number must be at least 3 characters';
+      }
     }
     
     // End User Validation
@@ -364,6 +439,8 @@ const WarrantyClaim = () => {
         email: formData.email,
         address: formData.address,
         commonFaultDescription: formData.commonFaultDescription,
+        proofMethod: formData.proofMethod,
+        invoiceNumber: formData.invoiceNumber || null,
         products: formData.products.map(product => ({
           modelNumber: product.modelNumber,
           serialNumber: product.serialNumber,
@@ -402,7 +479,7 @@ const WarrantyClaim = () => {
       setClaimNumber(newClaimNumber);
       
       // Step 2: Upload proof of purchase (if required and provided)
-      if (formData.claimType !== 'service-repair' && formData.proofOfPurchase) {
+      if (formData.claimType !== 'service-repair' &&  formData.proofMethod === 'upload' && formData.proofOfPurchase) {
         const proofResult = await uploadProofOfPurchase(newClaimId, formData.proofOfPurchase);
         if (!proofResult.success) {
           console.warn('Proof of purchase upload failed:', proofResult.message);
@@ -426,6 +503,8 @@ const WarrantyClaim = () => {
       setFormData({
         claimType: '',
         proofOfPurchase: null,
+        invoiceNumber: '',
+        proofMethod: '',
         fullName: '',
         phoneNumber: '',
         email: '',
@@ -613,48 +692,117 @@ const WarrantyClaim = () => {
               {errors.claimType && <span className="field-error">{errors.claimType}</span>}
             </div>
             
-            {/* Proof of Purchase Upload */}
+            {/* Proof of Purchase Upload OR Invoice Number */}
             {formData.claimType !== 'service-repair' && (
-              <div className="file-upload-section">
+              <div className="proof-of-purchase-section">
                 <div className="form-group">
-                  <label htmlFor="proofOfPurchase">
+                  <label>
                     Proof of Purchase *
-                    <span className="file-requirements">(Accepted: JPG, PNG, PDF up to 5MB)</span>
+                    <span className="file-requirements">(Required for warranty claims)</span>
                   </label>
                   
-                  {!formData.proofOfPurchase ? (
-                    <div className="file-upload-area">
-                      <input
-                        type="file"
-                        id="proofOfPurchase"
-                        name="proofOfPurchase"
-                        onChange={handleFileChange}
-                        accept=".jpg,.jpeg,.png,.pdf"
-                        className="file-input"
-                      />
-                      <div className="upload-placeholder">
-                        <span className="upload-icon">📎</span>
-                        <p>Click to upload proof of purchase</p>
-                        <p className="upload-hint">Invoice, receipt, or purchase confirmation</p>
+                  {/* Proof Method Selection */}
+                  <div className="proof-method-options">
+                    <div className="proof-method-row">
+                      <div 
+                        className={`proof-method-option ${formData.proofMethod === 'upload' ? 'selected' : ''}`}
+                        onClick={() => handleProofMethodChange('upload')}
+                      >
+                        <span className="method-checkbox">
+                          {formData.proofMethod === 'upload' && '✓'}
+                        </span>
+                        <span className="method-title">Upload Document</span>
+                        <span className="method-hint">(Invoice, receipt, or purchase confirmation)</span>
+                      </div>
+                      
+                      <div 
+                        className={`proof-method-option ${formData.proofMethod === 'invoice' ? 'selected' : ''}`}
+                        onClick={() => handleProofMethodChange('invoice')}
+                      >
+                        <span className="method-checkbox">
+                          {formData.proofMethod === 'invoice' && '✓'}
+                        </span>
+                        <span className="method-title">Enter Invoice Number</span>
+                        <span className="method-hint">(If you have the invoice number)</span>
                       </div>
                     </div>
-                  ) : (
-                    <div className="uploaded-file">
-                      <span className="file-icon">📄</span>
-                      <span className="file-name">{formData.proofOfPurchase.name}</span>
-                      <span className="file-size">
-                        {(formData.proofOfPurchase.size / (1024 * 1024)).toFixed(2)} MB
-                      </span>
-                      <button 
-                        type="button" 
-                        className="remove-file"
-                        onClick={removeProofOfPurchase}
-                      >
-                        Delete
-                      </button>
+                    {errors.proofMethod && <span className="field-error">{errors.proofMethod}</span>}
+                  </div>
+                  
+                  {/* Upload Document Option */}
+                  {formData.proofMethod === 'upload' && (
+                    <div className="file-upload-section">
+                      {!formData.proofOfPurchase ? (
+                        <div className="file-upload-area">
+                          <input
+                            type="file"
+                            id="proofOfPurchase"
+                            name="proofOfPurchase"
+                            onChange={handleFileChange}
+                            accept=".jpg,.jpeg,.png,.pdf"
+                            className="file-input"
+                          />
+                          <div className="upload-placeholder">
+                            <span className="upload-icon">📎</span>
+                            <p>Click to upload proof of purchase</p>
+                            <p className="upload-hint">Accepted: JPG, PNG, PDF up to 5MB</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="uploaded-file">
+                          <span className="file-icon">📄</span>
+                          <span className="file-name">{formData.proofOfPurchase.name}</span>
+                          <span className="file-size">
+                            {(formData.proofOfPurchase.size / (1024 * 1024)).toFixed(2)} MB
+                          </span>
+                          <button 
+                            type="button" 
+                            className="remove-file"
+                            onClick={removeProofOfPurchase}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      )}
+                      {errors.proofOfPurchase && <span className="field-error">{errors.proofOfPurchase}</span>}
                     </div>
                   )}
-                  {errors.proofOfPurchase && <span className="field-error">{errors.proofOfPurchase}</span>}
+                  
+                  {/* Invoice Number Option */}
+                  {formData.proofMethod === 'invoice' && (
+                    <div className="invoice-input-section">
+                      <div className="form-group">
+                        <label htmlFor="invoiceNumber">
+                          Invoice Number *
+                          <span className="field-note">(Enter your purchase invoice number)</span>
+                        </label>
+                        <div className="invoice-input-wrapper">
+                          <input
+                            type="text"
+                            id="invoiceNumber"
+                            name="invoiceNumber"
+                            value={formData.invoiceNumber}
+                            onChange={handleChange}
+                            placeholder="Enter invoice number (e.g., INV-12345)"
+                            className={errors.invoiceNumber ? 'error' : ''}
+                          />
+                          {formData.invoiceNumber && (
+                            <button 
+                              type="button"
+                              className="clear-invoice-btn"
+                              onClick={clearInvoiceNumber}
+                            >
+                              Clear
+                            </button>
+                          )}
+                        </div>
+                        {errors.invoiceNumber && <span className="field-error">{errors.invoiceNumber}</span>}
+                        <p className="field-hint">
+                          Please enter the exact invoice number from your purchase receipt
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
