@@ -86,6 +86,7 @@ const Checkout = () => {
   const dynamicShippingCost = isConfirmAndCollect ? 0 : shippingCost;
   const dynamicTotal = totalAmount + dynamicShippingCost;
   const originalTotal = totalAmount + shippingCost; // ✅ For Step 1
+   const hasRequiredItems = items.some(item => item.isOrderRequired);
 
   const total = totalAmount + shippingCost;
 
@@ -191,6 +192,9 @@ const Checkout = () => {
           },
         };
       }
+
+       const requiredItemsCount = items.filter(item => item.isOrderRequired).length;
+      
       // Format order data to match backend expectations
       const orderData = {
         sessionId: `session_${Date.now()}`,
@@ -202,6 +206,7 @@ const Checkout = () => {
           quantity: item.quantity,
           unitPrice: item.price,
           imageUrl: item.image || "",
+           isOrderRequired: item.isOrderRequired || false
         })),
         ...paymentPayload,
         shippingAddress: {
@@ -405,6 +410,7 @@ const ShippingForm = ({
   const [errors, setErrors] = useState({});
   const dynamicShippingCost = isConfirmAndCollect ? 0 : shippingCost;
   const dynamicTotal = totalAmount + dynamicShippingCost;
+    const hasRequiredItems = items.some(item => item.isOrderRequired);
 
   useEffect(() => {
     if (useMyInfo && userProfile && !isGuestCheckout) {
@@ -506,6 +512,16 @@ const ShippingForm = ({
             <span className="guest-badge">Guest Checkout</span>
           )}
         </h3>
+
+         {hasRequiredItems && (
+          <div className="required-items-warning">
+            <strong>⚠️ Special Order Items</strong>
+            <p>
+              Your cart contains items that may require special ordering from suppliers. 
+              This might affect delivery times.
+            </p>
+          </div>
+        )}
 
         {/* ✅ GUEST CHECKOUT NOTICE */}
         {isGuestCheckout && (
@@ -697,7 +713,6 @@ const ShippingForm = ({
     </div>
   );
 };
-
 const OrderSummary = ({
   items,
   totalAmount,
@@ -705,6 +720,7 @@ const OrderSummary = ({
   total,
   isConfirmAndCollect,
 }) => (
+  
   <div className="checkout-summary">
     <h3>Order Summary</h3>
     {isConfirmAndCollect && (
@@ -713,17 +729,23 @@ const OrderSummary = ({
         <p>You will collect your order from our store</p>
       </div>
     )}
-    <div className="order-items">
-      {items.map((item) => (
-        <div key={item.id} className="order-item">
-          <div className="item-info">
-            <span className="item-quantity">{item.quantity}x</span>
-            <span className="item-name">{item.name}</span>
+      
+   <div className="order-items">
+        {items.map((item) => (
+          <div key={item.id} className={`order-item ${item.isOrderRequired ? 'item-required' : ''}`}>
+            <div className="item-info">
+              <span className="item-quantity">{item.quantity}x</span>
+              <span className="item-name">
+                {item.name}
+                {item.isOrderRequired && (
+                  <span className="required-badge" title="Requires special ordering">⚠️</span>
+                )}
+              </span>
+            </div>
+            <span className="item-price">${item.totalPrice.toFixed(2)}</span>
           </div>
-          <span className="item-price">${item.totalPrice.toFixed(2)}</span>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
 
     <div className="summary-details">
       <div className="summary-item">

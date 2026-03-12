@@ -143,6 +143,7 @@ const Product = () => {
           image: mainImage,
           quantity: quantity,
           sku: prod.sku,
+          isOrderRequired:prod.isOrderRequired
         }),
       );
       setLocalStock((s) => s - quantity);
@@ -345,10 +346,9 @@ const Product = () => {
             ))}
           </div>
           <div className="main-image-container">
-            {/* Add tagline ribbon here */}
-            {prod.tagLine && (
-              <div className="main-tagline-ribbon">{prod.tagLine}</div>
-            )}
+ {prod.tagLine && (
+    <div className="main-tagline-ribbon">{prod.tagLine}</div>
+  )}
 
             <div className="main-image">
               <img
@@ -501,6 +501,16 @@ const Product = () => {
               </div>
             )}
           </div>
+          {prod?.isOrderRequired && (
+    <div className="order-demand-container">
+    <div className="order-demand-ribbon details-ribbon">
+      <span>Please NOTE: THIS IS AN 'ORDER IN' PRODUCT 📦</span>
+    </div>
+    {/* <div className="order-demand-note">
+      <span>⏱️ Please allow 5-14 business days to be contacted regarding your order</span>
+    </div> */}
+  </div>
+)}
           <div className="promo-banner">
             <div className="promo-card">
               <FaTruck className="promo-icon" />
@@ -509,6 +519,7 @@ const Product = () => {
                 <div className="promo-desc">On orders over $99</div>
               </div>
             </div>
+       
             <div className="payment-options">
               <div className="payment-card">
                 <div className="payment-logo">
