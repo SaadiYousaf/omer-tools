@@ -20,8 +20,10 @@ import {
 import slide1 from "../../assets/images/Slider1.jpg";
 import slide2 from "../../assets/images/Slider2.jpg";
 import slide3 from "../../assets/images/Slider3.jpg";
-import slide4 from "../../assets/images/dew2.jpg";
-import slide5 from "../../assets/images/HIKOKI.jpg";
+import slide4 from "../../assets/images/1.jpg";
+import slide5 from "../../assets/images/2.jpg";
+import slide6 from "../../assets/images/6.jpg";
+import slide7 from "../../assets/images/7.jpg";
 import ProductSlider from "../../components/common/ProductSlider/ProductSlider";
 // Mobile Images
 import slide1Mobile from "../../assets/images/milwaukee_phone_size.jpg";
@@ -70,12 +72,13 @@ const Home = () => {
     ? [
         {
           id: 1,
-          image: slide1Mobile,
+          image: slide1,
           cta: "Shop Now",
           link: "/category/power-tools",
         },
-        { id: 2, image: slide2Mobile, cta: "Explore", link: "/new-arrivals" },
-        { id: 3, image: slide3Mobile, cta: "none", link: "/new-arrivals" },
+        { id: 2, image: slide2, cta: "Explore", link: "/new-arrivals" },
+        { id: 3, image: slide3, cta: "none", link: "/new-arrivals" },
+         { id: 4, image: slide6, cta: "none", link: "/new-arrivals" },
       ]
     : [
         {
@@ -86,6 +89,7 @@ const Home = () => {
         },
         { id: 2, image: slide2, cta: "Explore", link: "/new-arrivals" },
         { id: 3, image: slide3, cta: "none", link: "/new-arrivals" },
+        { id: 4, image: slide6, cta: "none", link: "/new-arrivals" },
       ];
 
   const heroSlides2 = /* isMobile
@@ -104,8 +108,9 @@ const Home = () => {
         },
       ]
     :*/ [
-    { id: 1, image: slide4, cta: "Learn More", link: "/shipping-info" },
+    { id: 1, image: slide7, cta: "Learn More", link: "/shipping-info" },
     { id: 2, image: slide5, cta: "Buy Now", link: "/category/hand-tools" },
+     { id: 3, image: slide4, cta: "Buy Now", link: "/category/hand-tools" },
   ];
 
   // const heroSlides3 = [
