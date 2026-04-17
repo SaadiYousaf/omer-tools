@@ -32,12 +32,18 @@ import slide3Mobile from "../../assets/images/dewalt-phone-size.jpg";
 // import slide4Mobile from "../../assets/images/dew2-mobile.jpg";
 // import slide5Mobile from "../../assets/images/new-arrivals-mobile.jpg";
 
+const BASE_URL = process.env.REACT_APP_BASE_URL || '';
+const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL || '';
+
 const Home = () => {
   const dispatch = useDispatch();
   const categories = useSelector((state) => state.categories.categories);
   const products = useSelector(selectAllProducts);
   // State to detect mobile
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  // API-driven hero slides (override static if API returns data)
+  const [apiHeroSlides1, setApiHeroSlides1] = useState([]);
+  const [apiHeroSlides2, setApiHeroSlides2] = useState([]);
 
     //SEO hook
   const seoData ={
@@ -66,6 +72,32 @@ const Home = () => {
     dispatch(fetchFeaturedProducts());
     //  dispatch(fetchAllProducts());
   }, [dispatch]);
+
+  // Fetch hero images from API
+  useEffect(() => {
+    const fetchHeroImages = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/site-settings/hero-images`);
+        if (response.ok) {
+          const data = await response.json();
+          const toSlide = (img) => ({
+            id: img.id,
+            image: BASE_IMG_URL + img.imageUrl,
+            cta: img.ctaText || 'Shop Now',
+            link: img.linkUrl || '/',
+            altText: img.altText,
+          });
+          const mainImages = data.filter((img) => img.section === 'main').map(toSlide);
+          const secondaryImages = data.filter((img) => img.section === 'secondary').map(toSlide);
+          if (mainImages.length > 0) setApiHeroSlides1(mainImages);
+          if (secondaryImages.length > 0) setApiHeroSlides2(secondaryImages);
+        }
+      } catch (err) {
+        // Fall back to static images silently
+      }
+    };
+    fetchHeroImages();
+  }, []);
 
   // Define slide sets
   const heroSlides1 = isMobile
@@ -127,7 +159,7 @@ const Home = () => {
 
       {/* Hero Section */}
       <section className="hero-section">
-        <HeroSlider slides={heroSlides1} />
+        <HeroSlider slides={apiHeroSlides1.length > 0 ? apiHeroSlides1 : heroSlides1} />
       </section>
 
       {/* Brand Showcase */}
@@ -155,7 +187,7 @@ const Home = () => {
         <div className="container">
           <div className="dual-hero-container">
             <div className="hero-column">
-              <HeroSlider slides={heroSlides2} />
+              <HeroSlider slides={apiHeroSlides2.length > 0 ? apiHeroSlides2 : heroSlides2} />
             </div>
           </div>
         </div>

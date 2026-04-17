@@ -896,3 +896,53 @@ a.dropdown-item {
     border-radius: 6px; /* optional rounded corners */
   }
 }
+
+/* ── Header Promo Banner ── */
+.header-promo-banner {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: #1B3A5C;
+}
+
+.header-promo-slide {
+  display: none;
+  width: 100%;
+}
+
+.header-promo-slide.active {
+  display: block;
+}
+
+.header-promo-slide img {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-height: 120px;
+  object-fit: cover;
+}
+
+.header-promo-dots {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 10;
+}
+
+.header-promo-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s;
+}
+
+.header-promo-dot.active {
+  background: #fff;
+}

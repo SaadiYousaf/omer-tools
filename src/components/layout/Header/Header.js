@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { logout } from "../../../store/authSlice";
 import { fetchCategories } from "../../../store/categoriesSlice";
 import "./Header.css";
@@ -26,11 +26,14 @@ const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const Header = () => {
   const dispatch = useDispatch();
+  const location = useLocation();
   const { isAuthenticated, user } = useSelector((state) => state.auth);
   const cartTotalQuantity = useSelector((state) => state.cart.totalQuantity);
   const categories = useSelector((state) => state.categories.categories);
   const categoriesStatus = useSelector((state) => state.categories.status);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [headerBanners, setHeaderBanners] = useState([]);
+  const [activeBannerIdx, setActiveBannerIdx] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState([]);
@@ -69,6 +72,39 @@ const Header = () => {
       dispatch(fetchCategories());
     }
   }, [categoriesStatus, dispatch]);
+
+  // Fetch header promo banners
+  useEffect(() => {
+    const fetchHeaderBanners = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/site-settings/hero-images?section=header`);
+        if (response.ok) {
+          const data = await response.json();
+          if (Array.isArray(data) && data.length > 0) {
+            const banners = data.map((img) => ({
+              id: img.id,
+              image: (process.env.REACT_APP_BASE_IMG_URL || '') + img.imageUrl,
+              linkUrl: img.linkUrl || null,
+              altText: img.altText || '',
+            }));
+            setHeaderBanners(banners);
+          }
+        }
+      } catch {
+        // No banner on error — silent fail
+      }
+    };
+    fetchHeaderBanners();
+  }, []);
+
+  // Auto-rotate header banners
+  useEffect(() => {
+    if (headerBanners.length <= 1) return;
+    const timer = setInterval(() => {
+      setActiveBannerIdx((prev) => (prev + 1) % headerBanners.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [headerBanners]);
 
   useEffect(() => {
     let isMounted = true;
@@ -283,6 +319,37 @@ const Header = () => {
 
   return (
     <header className="header">
+      {/* Header Promo Banner — only shown on homepage */}
+      {location.pathname === "/" && headerBanners.length > 0 && (
+        <div className="header-promo-banner">
+          {headerBanners.map((banner, idx) => (
+            <div
+              key={banner.id}
+              className={`header-promo-slide ${idx === activeBannerIdx ? "active" : ""}`}
+            >
+              {banner.linkUrl ? (
+                <Link to={banner.linkUrl}>
+                  <img src={banner.image} alt={banner.altText} />
+                </Link>
+              ) : (
+                <img src={banner.image} alt={banner.altText} />
+              )}
+            </div>
+          ))}
+          {headerBanners.length > 1 && (
+            <div className="header-promo-dots">
+              {headerBanners.map((_, idx) => (
+                <button
+                  key={idx}
+                  className={`header-promo-dot ${idx === activeBannerIdx ? "active" : ""}`}
+                  onClick={() => setActiveBannerIdx(idx)}
+                  aria-label={`Banner ${idx + 1}`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
       <div className="top-bar">
         <div className="container">
           <div className="top-bar-content">
@@ -509,7 +576,6 @@ const Header = () => {
             <li className="nav-item" onClick={() => setIsMobileMenuOpen(false)}>
               <Link to="/create-your-kit">
                 Create Your Own Kit
-                <span className="coming-soon-badge">Coming Soon</span>
               </Link>
             </li>
             <div className="mobile-only-links">

@@ -38,6 +38,7 @@ import Modal from "./components/common/popupmodal/modal";
 import BlogPage from "./pages/Blog/BlogPage";
 import BlogDetailPage from "./pages/Blog/BlogDetailPage";
 import WarrantyClaim from "./components/common/WarrantyClaim/WarrantyClaim";
+import KitBuilder from "./pages/KitBuilder/KitBuilder";
 
 function App() {
   const dispatch = useDispatch();
@@ -110,7 +111,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/clearance" element={<ClearanceSale />} />
-          <Route path="/create-your-kit" element={<ComingSoon />} />
+          <Route path="/create-your-kit" element={<KitBuilder />} />
           <Route path="/brand/:brandId" element={<BrandProducts />} />
           <Route path="/redemption" element={<RedemptionProducts />} />
           <Route path="/store-locations" element={<OmerToolsStoreLocator />} />
