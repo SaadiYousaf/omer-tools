@@ -136,27 +136,33 @@
   }
 }
 
-/* @media (max-width: 480px) {
+@media (max-width: 480px) {
   .hero-slider {
-     height: 20vh;
-    width: auto;
+    aspect-ratio: 4 / 3;
   }
-  
+
   .slide-title {
-    font-size: 1.8rem;
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
   }
-  
+
   .slide-subtitle {
-    font-size: 1rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .cta-button {
-    padding: 0.7rem 1.5rem;
     font-size: 0.9rem;
+    margin-bottom: 1rem;
   }
-  
+
+  .cta-button {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.85rem;
+  }
+
   .slider-dots {
-    bottom: 20px;
+    bottom: 14px;
+    gap: 8px;
   }
-} */
+
+  .dot {
+    width: 10px;
+    height: 10px;
+  }
+}

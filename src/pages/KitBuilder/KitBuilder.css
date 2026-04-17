@@ -194,3 +194,23 @@
   .kb-actions { flex-direction: column; }
   .kb-confirmed h2 { font-size: 24px; }
 }
+
+@media (max-width: 375px) {
+  .kb-header { padding: 0 10px; }
+  .kb-header-subtitle { display: none; }
+  .kb-content { padding: 12px 10px; }
+  .kb-hero { padding: 20px 14px; }
+  .kb-hero h1 { font-size: 20px; }
+  .kb-hero-badges { gap: 5px; }
+  .kb-hero-badge { padding: 6px 10px; font-size: 10px; }
+  .kb-step-btn { padding: 10px 2px; font-size: 10px; gap: 4px; }
+  .kb-items-grid { grid-template-columns: 1fr; }
+  .kb-brand-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .kb-brand-btn { padding: 18px 10px; }
+  .kb-totals-value { font-size: 24px; }
+  .kb-requirements { gap: 10px; padding: 12px 14px; }
+  .kb-promo { padding: 10px 14px; }
+  .kb-promo-items { gap: 8px; }
+  .kb-promo-next { display: none; }
+  .kb-review { padding: 0 2px; }
+}
