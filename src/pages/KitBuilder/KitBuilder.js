@@ -429,7 +429,7 @@ const KitBuilder = () => {
                   <button
                     className="kb-btn kb-btn-gradient"
                     style={{ flex: 2 }}
-                    onClick={() => { if (kb.requirementsMet) { kb.setValidationMsg(""); kb.setCheckoutStep("form"); } }}
+                    onClick={() => { if (kb.requirementsMet) { kb.setValidationMsg(""); kb.proceedToCheckout(); } }}
                     disabled={!kb.requirementsMet}
                   >
                     Proceed to Checkout – ${kb.total.toLocaleString("en-AU", { minimumFractionDigits: 2 })}

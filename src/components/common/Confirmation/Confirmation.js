@@ -6,6 +6,8 @@ const Confirmation = ({
   shippingData, 
   paymentData, 
   items, 
+  subtotal,
+  discountAmount,
   total, 
   shippingCost, 
   onConfirm, 
@@ -106,8 +108,14 @@ const Confirmation = ({
             <div className="summary-details">
               <div className="summary-item">
                 <span>Subtotal</span>
-                <span>${(total - shippingCost).toFixed(2)}</span>
+                <span>${subtotal ? subtotal.toFixed(2) : (total - shippingCost).toFixed(2)}</span>
               </div>
+              {discountAmount > 0 && (
+                <div className="summary-item discount">
+                  <span>Discount</span>
+                  <span>-${discountAmount.toFixed(2)}</span>
+                </div>
+              )}
               <div className="summary-item">
                 <span>Shipping</span>
                 <span>{shippingCost === 0 ? 'FREE' : `$${shippingCost.toFixed(2)}`}</span>

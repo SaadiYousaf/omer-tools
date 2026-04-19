@@ -12,7 +12,7 @@ import "./Checkout.css";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 const stripePromise = loadStripe(
-  "pk_live_51Rs0GlIL9Fa1nSZ5II0JcN2bbgts7PsdjJ4nb4zzpmF8cKDNWVNLTXt8K141GvhzOsYaI5RHcrPoV9tnvkJHHmfx007pCkUOCv",
+  "pk_test_51Rs0GuEVlbAMcsC6lnD1cWaXKCh2Va2Ty07zIc3YWn8TRGT3JS7SbfgRazRUGwVykR6aV2pQi3te443KW9JdFErQ00zQieTQOi",
 );
 
 const Checkout = () => {
@@ -78,17 +78,37 @@ const Checkout = () => {
     return defaultAddress || userAddresses[0]; // Return default or first address
   };
 
+  const isKitOrder = items.some((item) => item.isKit === true);
+  const kitMetadata = isKitOrder ? JSON.parse(localStorage.getItem("kitMetadata") || "{}") : null;
+
+  const kitItemsTotal = items
+    .filter((item) => item.isKit === true)
+    .reduce((sum, item) => sum + item.totalPrice, 0);
+  const nonKitItemsTotal = items
+    .filter((item) => item.isKit !== true)
+    .reduce((sum, item) => sum + item.totalPrice, 0);
+
+  const kitSubtotal = kitMetadata?.subtotal ?? kitItemsTotal;
+  const kitTotal = kitMetadata?.total ?? kitItemsTotal;
+  const kitDiscount = kitMetadata?.discountAmount ?? Math.max(0, kitSubtotal - kitTotal);
+
+  const effectiveSubtotal = nonKitItemsTotal + kitSubtotal;
+  const effectiveDiscount = kitDiscount;
+  const effectiveTotalWithoutShipping = nonKitItemsTotal + kitTotal;
+
   const calculateShipping = () => {
-    return totalAmount > 100 ? 0 : 12;
+    const basis = effectiveTotalWithoutShipping;
+    return basis > 100 ? 0 : 12;
   };
 
   const shippingCost = calculateShipping();
   const dynamicShippingCost = isConfirmAndCollect ? 0 : shippingCost;
-  const dynamicTotal = totalAmount + dynamicShippingCost;
-  const originalTotal = totalAmount + shippingCost; // ✅ For Step 1
-   const hasRequiredItems = items.some(item => item.isOrderRequired);
+  const kitOrderTotal = effectiveSubtotal - effectiveDiscount;
+  const dynamicTotal = kitOrderTotal + dynamicShippingCost;
+  const shippingStepTotal = kitOrderTotal + shippingCost;
+  const hasRequiredItems = items.some((item) => item.isOrderRequired);
 
-  const total = totalAmount + shippingCost;
+  const total = kitOrderTotal + shippingCost;
 
   const nextStep = () => setStep(step + 1);
   const prevStep = () => setStep(step - 1);
@@ -161,6 +181,11 @@ const Checkout = () => {
           }
         }
       }
+
+      // ✅ CHECK IF THIS IS A CUSTOM KIT ORDER
+      const isKitOrder = items.some((item) => item.isKit === true);
+      const kitMetadata = isKitOrder ? JSON.parse(localStorage.getItem("kitMetadata") || "{}") : null;
+
       let paymentPayload = {};
       if (paymentData.type === "stripe") {
         paymentPayload = {
@@ -193,83 +218,149 @@ const Checkout = () => {
         };
       }
 
-       const requiredItemsCount = items.filter(item => item.isOrderRequired).length;
-      
-      // Format order data to match backend expectations
-      const orderData = {
-        sessionId: `session_${Date.now()}`,
-        userEmail: shippingData.email,
-        phoneNumber: shippingData.phone,
-        orderItems: items.map((item) => ({
-          productId: item.id.toString(),
-          productName: item.name,
-          quantity: item.quantity,
-          unitPrice: item.price,
-          imageUrl: item.image || "",
-           isOrderRequired: item.isOrderRequired || false
-        })),
-        ...paymentPayload,
-        shippingAddress: {
-          fullName: shippingData.fullName,
-          addressLine1: shippingData.address,
-          addressLine2: "",
-          city: shippingData.city,
-          state: shippingData.state,
-          postalCode: shippingData.postalCode,
-          country: shippingData.country,
-        },
-        subtotal: totalAmount, // Amount without shipping
-        shippingCost: dynamicShippingCost, // ✅ Dynamic shipping cost
-        totalAmount: dynamicTotal, // ✅ Dynamic total
-        // ✅ Add the new flag
-        isConfirmAndCollect: isConfirmAndCollect,
-        isGuestOrder: isGuestCheckout, // ✅ ADD GUEST ORDER FLAG
-
-        ...(isGuestCheckout && {
-          GuestUser: {
-            FullName: shippingData.fullName,
-            Email: shippingData.email,
+      // ✅ BUILD KIT ORDER PAYLOAD IF APPLICABLE
+      if (isKitOrder) {
+        const kitOrderData = {
+          brandId: kitMetadata.brandId || '',
+          brandName: kitMetadata.brandName || '',
+          customerName: shippingData.fullName,
+          customerEmail: shippingData.email,
+          customerPhone: shippingData.phone,
+          deliveryAddress: `${shippingData.address}, ${shippingData.city}, ${shippingData.state} ${shippingData.postalCode}, ${shippingData.country}`,
+          orderNotes: '',
+          subtotal: kitMetadata.subtotal || totalAmount,
+          discountPercent: kitMetadata.discountPercent || 0,
+          discountAmount: kitMetadata.discountAmount || 0,
+          total: kitMetadata.total || dynamicTotal,
+          tierLabel: kitMetadata.tierLabel || '',
+          freeItems: kitMetadata.freeItems || '',
+          items: items
+            .filter((item) => item.isKit === true)
+            .map((item) => ({
+              itemType: item.kitItemType || 'tool',
+              itemName: item.name,
+              itemCategory: item.category || '',
+              unitPrice: item.price,
+              quantity: item.quantity,
+              productId: item.productId || item.id || '',
+            })),
+          ...paymentPayload,
+          shippingAddress: {
+            fullName: shippingData.fullName,
+            addressLine1: shippingData.address,
+            addressLine2: "",
+            city: shippingData.city,
+            state: shippingData.state,
+            postalCode: shippingData.postalCode,
+            country: shippingData.country,
           },
-        }),
-      };
+        };
 
-      // Send order to backend
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      };
+        // Send to /customkits endpoint
+        const config = {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        };
 
-      if (token && !isGuestCheckout) {
-        config.headers["Authorization"] = `Bearer ${token}`;
-      }
+        if (token && !isGuestCheckout) {
+          config.headers["Authorization"] = `Bearer ${token}`;
+        }
 
-      const response = await axios.post(
-        `${BASE_URL}/orders`,
-        orderData,
-        config,
-      );
-      if (paymentData.type === "paypal") {
-        // For PayPal, payment is already complete, so any success response should proceed
-        if (response.data.status === "succeeded") {
+        const response = await axios.post(
+          `${BASE_URL}/customkits`,
+          kitOrderData,
+          config,
+        );
+
+        if (response.data.status === "succeeded" || response.data.kitNumber) {
+          // Clear kit metadata from localStorage
+          localStorage.removeItem("kitMetadata");
           dispatch(clearCart());
           nextStep();
         } else {
-          setOrderError("Failed to create order after PayPal payment.");
+          setOrderError(response.data.message || "Failed to create custom kit order.");
         }
       } else {
-        if (response.data.status === "succeeded") {
-          dispatch(clearCart());
-          nextStep();
-        } else if (response.data.status === "payment_failed") {
-          // ✅ Handle payment failure without throwing an error
-          setOrderError(response.data.message); // This will show the actual Stripe message
-        } else if (response.data.status === "requires_action") {
-          // Handle 3D Secure if needed
-          // You might need to handle this differently
+        // ✅ REGULAR ORDER FLOW
+        const requiredItemsCount = items.filter(item => item.isOrderRequired).length;
+        
+        // Format order data to match backend expectations
+        const orderData = {
+          sessionId: `session_${Date.now()}`,
+          userEmail: shippingData.email,
+          phoneNumber: shippingData.phone,
+          orderItems: items.map((item) => ({
+            productId: item.id.toString(),
+            productName: item.name,
+            quantity: item.quantity,
+            unitPrice: item.price,
+            imageUrl: item.image || "",
+             isOrderRequired: item.isOrderRequired || false
+          })),
+          ...paymentPayload,
+          shippingAddress: {
+            fullName: shippingData.fullName,
+            addressLine1: shippingData.address,
+            addressLine2: "",
+            city: shippingData.city,
+            state: shippingData.state,
+            postalCode: shippingData.postalCode,
+            country: shippingData.country,
+          },
+          subtotal: totalAmount, // Amount without shipping
+          shippingCost: dynamicShippingCost, // ✅ Dynamic shipping cost
+          totalAmount: dynamicTotal, // ✅ Dynamic total
+          // ✅ Add the new flag
+          isConfirmAndCollect: isConfirmAndCollect,
+          isGuestOrder: isGuestCheckout, // ✅ ADD GUEST ORDER FLAG
+
+          ...(isGuestCheckout && {
+            GuestUser: {
+              FullName: shippingData.fullName,
+              Email: shippingData.email,
+            },
+          }),
+        };
+
+        // Send order to backend
+        const config = {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        };
+
+        if (token && !isGuestCheckout) {
+          config.headers["Authorization"] = `Bearer ${token}`;
+        }
+
+        const response = await axios.post(
+          `${BASE_URL}/orders`,
+          orderData,
+          config,
+        );
+        if (paymentData.type === "paypal") {
+          // For PayPal, payment is already complete, so any success response should proceed
+          if (response.data.status === "succeeded") {
+            dispatch(clearCart());
+            nextStep();
+          } else {
+            setOrderError("Failed to create order after PayPal payment.");
+          }
         } else {
-          // For any other unexpected status
-          setOrderError(response.data.message || "Unexpected error occurred");
+          if (response.data.status === "succeeded") {
+            dispatch(clearCart());
+            nextStep();
+          } else if (response.data.status === "payment_failed") {
+            // ✅ Handle payment failure without throwing an error
+            setOrderError(response.data.message); // This will show the actual Stripe message
+          } else if (response.data.status === "requires_action") {
+            // Handle 3D Secure if needed
+            // You might need to handle this differently
+          } else {
+            // For any other unexpected status
+            setOrderError(response.data.message || "Unexpected error occurred");
+          }
         }
       }
     } catch (error) {
@@ -316,7 +407,9 @@ const Checkout = () => {
           <ShippingForm
             onSubmit={handleShippingSubmit}
             shippingCost={shippingCost}
-            total={originalTotal}
+            subtotal={effectiveSubtotal}
+            discountAmount={effectiveDiscount}
+            total={shippingStepTotal}
             userAddresses={userAddresses}
             userProfile={userProfile}
             isGuestCheckout={isGuestCheckout}
@@ -340,6 +433,8 @@ const Checkout = () => {
             shippingData={shippingData}
             paymentData={paymentData}
             items={items}
+            subtotal={effectiveSubtotal}
+            discountAmount={effectiveDiscount}
             total={dynamicTotal}
             shippingCost={dynamicShippingCost}
             onConfirm={handlePlaceOrder}
@@ -389,12 +484,14 @@ const Checkout = () => {
 const ShippingForm = ({
   onSubmit,
   shippingCost,
+  subtotal,
+  discountAmount,
   total,
   userAddresses,
   userProfile,
   isGuestCheckout,
 }) => {
-  const { items, totalAmount } = useSelector((state) => state.cart);
+  const { items } = useSelector((state) => state.cart);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -409,7 +506,8 @@ const ShippingForm = ({
   const [useMyInfo, setUseMyInfo] = useState(false); // ✅ Renamed to be more general
   const [errors, setErrors] = useState({});
   const dynamicShippingCost = isConfirmAndCollect ? 0 : shippingCost;
-  const dynamicTotal = totalAmount + dynamicShippingCost;
+  const effectiveTotal = subtotal - discountAmount;
+  const dynamicTotal = effectiveTotal + dynamicShippingCost;
     const hasRequiredItems = items.some(item => item.isOrderRequired);
 
   useEffect(() => {
@@ -705,7 +803,8 @@ const ShippingForm = ({
 
       <OrderSummary
         items={items}
-        totalAmount={totalAmount}
+        subtotal={subtotal}
+        discountAmount={discountAmount}
         shippingCost={dynamicShippingCost}
         total={dynamicTotal}
         isConfirmAndCollect={isConfirmAndCollect}
@@ -715,11 +814,14 @@ const ShippingForm = ({
 };
 const OrderSummary = ({
   items,
-  totalAmount,
+  subtotal,
+  discountAmount,
   shippingCost,
   total,
   isConfirmAndCollect,
-}) => (
+}) => {
+  const calculatedTotal = subtotal - discountAmount + shippingCost;
+  return (
   
   <div className="checkout-summary">
     <h3>Order Summary</h3>
@@ -750,19 +852,26 @@ const OrderSummary = ({
     <div className="summary-details">
       <div className="summary-item">
         <span>Subtotal</span>
-        <span>${totalAmount.toFixed(2)}</span>
+        <span>${subtotal.toFixed(2)}</span>
       </div>
+      {discountAmount > 0 && (
+        <div className="summary-item discount">
+          <span>Discount</span>
+          <span>-${discountAmount.toFixed(2)}</span>
+        </div>
+      )}
       <div className="summary-item">
         <span>Shipping</span>
         <span>${shippingCost.toFixed(2)}</span>
       </div>
       <div className="summary-item total">
         <span>Total</span>
-        <span>${total.toFixed(2)}</span>
+        <span>${calculatedTotal.toFixed(2)}</span>
       </div>
     </div>
   </div>
 );
+};
 
 const OrderSuccess = ({ isGuestCheckout }) => {
   const navigate = useNavigate();

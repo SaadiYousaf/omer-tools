@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { getTier, getNextTier, calcDiscount, MIN_BATTERIES, MIN_CHARGERS } from './kitPricingConfig';
 import { submitCustomKit, fetchBrands, fetchCustomKitProducts } from './kitBuilderService';
+import { addItemToCart, clearCart } from '../../store/cartSlice';
 
 const BRAND_COLORS = {
   milwaukee: '#DB0032',
@@ -16,6 +19,10 @@ const brandColor = (name = '') => {
 };
 
 const useKitBuilder = () => {
+  // ── Redux & Navigation ────────────────────────────────────────
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   // ── Wizard state ──────────────────────────────────────────────
   const [step, setStep] = useState(0);
   const [brand, setBrand] = useState(null);       // brand object from API
@@ -160,6 +167,48 @@ const useKitBuilder = () => {
     }
   };
 
+  // ── Proceed to Checkout ────────────────────────────────────────
+  // Adds all kit items to Redux cart and navigates to standard checkout
+  const proceedToCheckout = () => {
+    try {
+      // Store kit metadata for checkout to access
+      const kitMetadata = {
+        isKit: true,
+        brandId: brand?.id || '',
+        brandName: brand?.name || '',
+        discountPercent: tier.discount,
+        discountAmount: discount,
+        tierLabel: tier.label,
+        freeItems: tier.freeItems || '',
+        subtotal,
+        total,
+      };
+      localStorage.setItem('kitMetadata', JSON.stringify(kitMetadata));
+
+      // Add all cart items to Redux cart
+      cart.forEach((item) => {
+        dispatch(addItemToCart({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.qty,
+          image: item.image || null,
+          isKit: true,
+          kitItemType: item.type, // 'tool', 'battery', 'charger'
+          category: item.category || '',
+          productId: item.productId || item.id,
+          sku: `KIT-${item.id}`,
+        }));
+      });
+
+      // Navigate to checkout
+      navigate('/checkout');
+    } catch (error) {
+      setValidationMsg('Failed to proceed to checkout. Please try again.');
+      console.error('Checkout error:', error);
+    }
+  };
+
   // ── Derived brand display data ─────────────────────────────────
   const brandsForDisplay = brands.map((b) => ({
     ...b,
@@ -187,7 +236,7 @@ const useKitBuilder = () => {
     totalToolQty, totalBatQty, totalChgQty,
     batteriesOk, chargersOk, requirementsMet,
     // actions
-    resetKit, tryReview, handlePlaceOrder,
+    resetKit, tryReview, handlePlaceOrder, proceedToCheckout,
   };
 };
 

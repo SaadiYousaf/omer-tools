@@ -1,7 +1,7 @@
 .kit-builder { min-height: 100vh; background: #F5F8FB; font-family: 'Inter', system-ui, sans-serif; color: #1B2A3D; }
 
 /* Header */
-.kb-header { background: #1B3A5C; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; height: 64px; }
+.kb-header { background: #072c62; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; height: 64px; }
 .kb-header-brand { display: flex; align-items: center; gap: 12px; }
 .kb-logo { width: 36px; height: 36px; background: #2878B5; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 14px; }
 .kb-header-title { color: #fff; font-weight: 800; font-size: 17px; letter-spacing: 1.5px; }
