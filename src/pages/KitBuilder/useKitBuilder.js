@@ -165,6 +165,7 @@ const useKitBuilder = () => {
     ...b,
     color: brandColor(b.name),
     logo: b.name ? b.name.charAt(0).toUpperCase() : '?',
+    logoUrl: b.logoUrl || b.images?.find(img => img.isPrimary)?.imageUrl || b.images?.[0]?.imageUrl || null,
   }));
 
   return {

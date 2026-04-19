@@ -22,7 +22,7 @@ export const submitCustomKit = async (kitData) => {
 };
 
 export const fetchBrands = async () => {
-  const response = await fetch(`${API_BASE_URL}/brands`);
+  const response = await fetch(`${API_BASE_URL}/brands?includeImages=true`);
   if (!response.ok) throw new Error('Failed to fetch brands');
   const data = await response.json();
   return Array.isArray(data) ? data : (data.data || []);

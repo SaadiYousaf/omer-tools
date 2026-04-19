@@ -169,9 +169,9 @@ const KitBuilder = () => {
                     style={{ "--brand-color": b.color }}
                     onClick={() => kb.selectBrand(b)}
                   >
-                    <div className="kb-brand-logo" style={{ background: b.color, color: b.name?.toLowerCase() === "dewalt" ? "#000" : "#fff" }}>
+                    <div className="kb-brand-logo" style={{ background: b.logoUrl ? "#fff" : b.color, color: b.name?.toLowerCase() === "dewalt" ? "#000" : "#fff" }}>
                       {b.logoUrl
-                        ? <img src={b.logoUrl} alt={b.name} style={{ width: 32, height: 32, objectFit: "contain" }} />
+                        ? <img src={b.logoUrl} alt={b.name} style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: 8, padding: 4 }} />
                         : b.logo}
                     </div>
                     <div className="kb-brand-name">{b.name}</div>
