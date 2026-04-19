@@ -54,7 +54,7 @@
 .kb-brand-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
 .kb-brand-btn { background: #fff; border: 2px solid #D4DEE8; border-radius: 12px; padding: 28px 14px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .kb-brand-btn:hover { border-color: var(--brand-color); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
-.kb-brand-logo { width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 900; }
+.kb-brand-logo { width: 160px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 900; }
 .kb-brand-name { font-weight: 700; font-size: 14px; color: #1B3A5C; }
 
 /* Tools/Items Grid */

@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import useKitBuilder from "./useKitBuilder";
 import { TIERS } from "./kitPricingConfig";
 import "./KitBuilder.css";
+import ScrollToTop from "../../components/common/Scroll/ScrollToTop";
 
 const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
 const QtyStepper = ({ qty, onInc, onDec, onRemove }) => (
@@ -187,6 +188,7 @@ const KitBuilder = () => {
         {kb.step === 1 && (
           <div>
             <div className="kb-page-header">
+                <ScrollToTop />
               <div>
                 <h2>Choose Your Tools</h2>
                 <p>Bare units (skin only) – use +/– to adjust qty</p>
