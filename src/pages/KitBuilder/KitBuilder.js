@@ -3,6 +3,7 @@ import useKitBuilder from "./useKitBuilder";
 import { TIERS } from "./kitPricingConfig";
 import "./KitBuilder.css";
 
+const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
 const QtyStepper = ({ qty, onInc, onDec, onRemove }) => (
   <div className="kb-qty-stepper">
     <button className={`kb-qty-btn ${qty <= 1 ? "remove" : ""}`} onClick={() => (qty <= 1 ? onRemove() : onDec())}>
@@ -171,7 +172,7 @@ const KitBuilder = () => {
                   >
                     <div className="kb-brand-logo" style={{ background: b.logoUrl ? "#fff" : b.color, color: b.name?.toLowerCase() === "dewalt" ? "#000" : "#fff" }}>
                       {b.logoUrl
-                        ? <img src={b.logoUrl} alt={b.name} style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: 8, padding: 4 }} />
+                        ? <img src={BASE_IMG_URL + b.logoUrl} alt={b.name} style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: 8, padding: 4 }} />
                         : b.logo}
                     </div>
                     <div className="kb-brand-name">{b.name}</div>

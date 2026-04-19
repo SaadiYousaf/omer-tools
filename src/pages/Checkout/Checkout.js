@@ -12,7 +12,7 @@ import "./Checkout.css";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 const stripePromise = loadStripe(
-  "pk_test_51Rs0GuEVlbAMcsC6lnD1cWaXKCh2Va2Ty07zIc3YWn8TRGT3JS7SbfgRazRUGwVykR6aV2pQi3te443KW9JdFErQ00zQieTQOi",
+  "pk_live_51Rs0GlIL9Fa1nSZ5II0JcN2bbgts7PsdjJ4nb4zzpmF8cKDNWVNLTXt8K141GvhzOsYaI5RHcrPoV9tnvkJHHmfx007pCkUOCv",
 );
 
 const Checkout = () => {
