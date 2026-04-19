@@ -23,7 +23,7 @@ const ItemCard = ({ item, type, cartItem, onAdd, onSetQty, onRemove }) => {
       <div>
         <div className="kb-item-header">
           {item.image
-            ? <img src={item.image} alt={item.name} style={{ width: 40, height: 40, objectFit: "contain" }} />
+            ? <img src={BASE_IMG_URL + item.image} alt={item.name} style={{ width: 120, height: 120, objectFit: "contain" }} />
             : <span style={{ fontSize: 26 }}>{typeIcon}</span>}
           {added && <span className="kb-in-cart-badge">IN KIT</span>}
         </div>

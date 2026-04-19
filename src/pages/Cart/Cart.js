@@ -10,7 +10,7 @@ import Mastercard from "../../assets/images/Mastercard.png";
 import Paypal from "../../assets/images/paypal.png";
 import Applepay from "../../assets/images/Applepay.png";
 import Amex from "../../assets/images/Amex.png";
-
+const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
 const Cart = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -173,7 +173,7 @@ const Cart = () => {
                 <div key={item.id} className="cart-item">
                   <div className="item-product">
                     <div className="item-image">
-                      <img src={item.image} alt={item.name} />
+                      <img src={BASE_IMG_URL + item.image} alt={item.name} />
                     </div>
                     <div className="item-details">
                       <h3>{item.name}</h3>
