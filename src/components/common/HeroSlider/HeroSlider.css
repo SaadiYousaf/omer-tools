@@ -29,7 +29,7 @@
   opacity: 1;
 }
 
-.slide-overlay {
+.hero-slide-overlay {
   position: absolute;
   top: 0;
   left: 0;
@@ -114,12 +114,16 @@
 /* Mobile Responsive Adjustments */
 @media (max-width: 768px) {
   .hero-slider {
-    aspect-ratio: 6 / 3; /* taller for mobile */
+    aspect-ratio: 16 / 9; /* wider for mobile banners */
   }
   .slides-container {
     position: relative;
     width: 100%;
     height: 100%;
+  }
+
+  .slide {
+    background-size: cover;
   }
 
   .slide-title {
@@ -138,7 +142,11 @@
 
 @media (max-width: 480px) {
   .hero-slider {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 16 / 9;
+  }
+
+  .slide {
+    background-size: cover;
   }
 
   .slide-title {

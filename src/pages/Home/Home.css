@@ -187,12 +187,12 @@
 /* Responsive Adjustments */
 @media (max-width: 1024px) {
   .dual-hero-banners {
-    aspect-ratio: 3 / 1; /* slightly taller */
+    aspect-ratio: 16 / 9; /* adjusted for tablets */
   }
 }
 
 @media (max-width: 768px) {
   .dual-hero-banners {
-    aspect-ratio: 3 / 1.55; /* even taller for phones */
+    aspect-ratio: 16 / 9; /* wider for mobile */
   }
 }

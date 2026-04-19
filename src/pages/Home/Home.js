@@ -29,8 +29,7 @@ import ProductSlider from "../../components/common/ProductSlider/ProductSlider";
 import slide1Mobile from "../../assets/images/milwaukee_phone_size.jpg";
 import slide2Mobile from "../../assets/images/hikoki_phone_size.jpg";
 import slide3Mobile from "../../assets/images/dewalt-phone-size.jpg";
-// import slide4Mobile from "../../assets/images/dew2-mobile.jpg";
-// import slide5Mobile from "../../assets/images/new-arrivals-mobile.jpg";
+import slide4Mobile from "../../assets/images/dewalt-phone-size.jpg";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL || '';
 const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL || '';
@@ -82,7 +81,7 @@ const Home = () => {
           const data = await response.json();
           const toSlide = (img) => ({
             id: img.id,
-            image: BASE_IMG_URL + img.imageUrl,
+            image: `${BASE_IMG_URL}${img.imageUrl}`,
             cta: img.ctaText || 'Shop Now',
             link: img.linkUrl || '/',
             altText: img.altText,
@@ -104,13 +103,13 @@ const Home = () => {
     ? [
         {
           id: 1,
-          image: slide1,
+          image: slide1Mobile,
           cta: "Shop Now",
           link: "/category/power-tools",
         },
-        { id: 2, image: slide2, cta: "Explore", link: "/new-arrivals" },
-        { id: 3, image: slide3, cta: "none", link: "/new-arrivals" },
-         { id: 4, image: slide6, cta: "none", link: "/new-arrivals" },
+        { id: 2, image: slide2Mobile, cta: "Explore", link: "/new-arrivals" },
+        { id: 3, image: slide3Mobile, cta: "none", link: "/new-arrivals" },
+         { id: 4, image: slide4Mobile, cta: "none", link: "/new-arrivals" },
       ]
     : [
         {
@@ -124,7 +123,7 @@ const Home = () => {
         { id: 4, image: slide6, cta: "none", link: "/new-arrivals" },
       ];
 
-  const heroSlides2 = /* isMobile
+  const heroSlides2 = isMobile
     ? [
         {
           id: 1,
@@ -132,18 +131,14 @@ const Home = () => {
           cta: "Learn More",
           link: "/shipping-info",
         },
-        {
-          id: 2,
-          image: slide5Mobile,
-          cta: "Buy Now",
-          link: "/category/hand-tools",
-        },
+        { id: 2, image: slide1Mobile, cta: "Buy Now", link: "/category/hand-tools" },
+        { id: 3, image: slide2Mobile, cta: "Shop Now", link: "/category/hand-tools" },
       ]
-    :*/ [
-    { id: 1, image: slide7, cta: "Learn More", link: "/shipping-info" },
-    { id: 2, image: slide5, cta: "Buy Now", link: "/category/hand-tools" },
-     { id: 3, image: slide4, cta: "Buy Now", link: "/category/hand-tools" },
-  ];
+    : [
+        { id: 1, image: slide7, cta: "Learn More", link: "/shipping-info" },
+        { id: 2, image: slide5, cta: "Buy Now", link: "/category/hand-tools" },
+        { id: 3, image: slide4, cta: "Buy Now", link: "/category/hand-tools" },
+      ];
 
   // const heroSlides3 = [
   //   { id: 1, image: slide5, cta: "Hot Deals", link: "/deals" },

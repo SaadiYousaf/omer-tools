@@ -73,7 +73,7 @@ const KitBuilder = () => {
           <div className="kb-logo">OT</div>
           <div>
             <div className="kb-header-title">OMER TOOLS</div>
-            <div className="kb-header-subtitle">CUSTOM KIT BUILDER</div>
+            <div className="kb-header-subtitle">BUILD YOUR OWN KIT</div>
           </div>
         </div>
         {kb.cart.length > 0 && (

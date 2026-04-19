@@ -21,7 +21,7 @@ const HeroSlider = ({ slides }) => {
             className={`slide ${index === currentSlide ? "active" : ""}`}
             style={{ backgroundImage: `url(${slide.image})` }}
           >
-            <div className="slide-overlay"></div>
+            <div className="hero-slide-overlay"></div>
             {/* <div className="slide-content">
               <a href={slide.link} className="cta-button">{slide.cta}</a>
             </div> */}
