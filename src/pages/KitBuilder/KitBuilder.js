@@ -1,7 +1,14 @@
 import React, { useMemo } from "react";
 import useKitBuilder from "./useKitBuilder";
 import { TIERS } from "./kitPricingConfig";
+import Payment from "../../components/common/Payment/Payment";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
 import "./KitBuilder.css";
+
+const stripePromise = loadStripe(
+  "pk_live_51Rs0GlIL9Fa1nSZ5II0JcN2bbgts7PsdjJ4nb4zzpmF8cKDNWVNLTXt8K141GvhzOsYaI5RHcrPoV9tnvkJHHmfx007pCkUOCv"
+);
 
 const QtyStepper = ({ qty, onInc, onDec, onRemove }) => (
   <div className="kb-qty-stepper">
@@ -306,6 +313,26 @@ const KitBuilder = () => {
                 <br />
                 <button className="kb-btn kb-btn-primary" onClick={kb.resetKit}>Build Another Kit</button>
               </div>
+            ) : kb.checkoutStep === "payment" ? (
+              <div>
+                <div className="kb-order-mini" style={{ marginBottom: 16 }}>
+                  <div className="kb-order-mini-row">
+                    <span className="kb-order-mini-info">{kb.totalItems} items – {kb.brand?.name}</span>
+                    <span className="kb-order-mini-total">${kb.total.toLocaleString("en-AU", { minimumFractionDigits: 2 })}</span>
+                  </div>
+                  {kb.tier.min > 0 && <div className="kb-order-mini-discount">{kb.tier.label} applied – Saving ${kb.discount.toFixed(2)}{kb.tier.freeItems ? ` + ${kb.tier.freeItems}` : ""}</div>}
+                </div>
+                {kb.submitting && <div className="kb-loading" style={{ marginBottom: 12 }}>Processing your order...</div>}
+                {kb.validationMsg && <div className="kb-validation-msg" style={{ marginBottom: 12 }}>{kb.validationMsg}</div>}
+                <Elements stripe={stripePromise}>
+                  <Payment
+                    total={kb.total}
+                    onSubmit={kb.handlePaymentSubmit}
+                    onBack={() => kb.setCheckoutStep("form")}
+                    onError={(msg) => kb.setValidationMsg(msg)}
+                  />
+                </Elements>
+              </div>
             ) : kb.checkoutStep === "form" ? (
               <div>
                 <button className="kb-btn kb-btn-secondary" style={{ marginBottom: 16, padding: "6px 12px", fontSize: 13 }} onClick={() => kb.setCheckoutStep(null)}>&larr; Back to review</button>
@@ -347,11 +374,11 @@ const KitBuilder = () => {
                   </div>
                 </div>
 
-                <button className="kb-btn kb-btn-gradient" style={{ marginTop: 20 }} onClick={kb.handlePlaceOrder} disabled={kb.submitting}>
-                  {kb.submitting ? "Placing Order..." : `Place Order – $${kb.total.toLocaleString("en-AU", { minimumFractionDigits: 2 })}`}
+                <button className="kb-btn kb-btn-gradient" style={{ marginTop: 20 }} onClick={kb.handlePlaceOrder}>
+                  Proceed to Payment – ${kb.total.toLocaleString("en-AU", { minimumFractionDigits: 2 })}
                 </button>
                 {kb.validationMsg && <div className="kb-validation-msg" style={{ marginTop: 12 }}>{kb.validationMsg}</div>}
-                <div className="kb-secure-note">Secure checkout 🔒 We'll confirm via email within 24hrs</div>
+                <div className="kb-secure-note">Secure checkout 🔒 Pay with card or PayPal on the next step</div>
               </div>
             ) : (
               <div>

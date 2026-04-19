@@ -24,6 +24,7 @@ const useKitBuilder = () => {
   const [validationMsg, setValidationMsg] = useState('');
   const [checkoutStep, setCheckoutStep] = useState(null);
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', address: '', notes: '' });
+  const [paymentData, setPaymentData] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [orderResult, setOrderResult] = useState(null);
 
@@ -104,6 +105,7 @@ const useKitBuilder = () => {
     setValidationMsg('');
     setCheckoutStep(null);
     setOrderResult(null);
+    setPaymentData(null);
   };
 
   const tryReview = () => {
@@ -119,11 +121,17 @@ const useKitBuilder = () => {
     setStep(3);
   };
 
-  const handlePlaceOrder = async () => {
+  const handlePlaceOrder = () => {
     if (!formData.name || !formData.email || !formData.phone || !formData.address) {
       setValidationMsg('Please fill in all required fields.');
       return;
     }
+    setValidationMsg('');
+    setCheckoutStep('payment');
+  };
+
+  const handlePaymentSubmit = async (pData) => {
+    setPaymentData(pData);
     setSubmitting(true);
     setValidationMsg('');
     try {
@@ -141,6 +149,9 @@ const useKitBuilder = () => {
         total,
         tierLabel: tier.label,
         freeItems: tier.freeItems || '',
+        paymentMethodId: pData.paymentMethodId || '',
+        paymentType: pData.type || '',
+        paymentStatus: pData.paymentStatus || (pData.paymentCompleted ? 'completed' : 'pending'),
         items: cart.map((c) => ({
           itemType: c.type,
           itemName: c.name,
@@ -155,6 +166,7 @@ const useKitBuilder = () => {
       setCheckoutStep('confirmed');
     } catch (error) {
       setValidationMsg(error.message);
+      setCheckoutStep('payment');
     } finally {
       setSubmitting(false);
     }
@@ -187,7 +199,7 @@ const useKitBuilder = () => {
     totalToolQty, totalBatQty, totalChgQty,
     batteriesOk, chargersOk, requirementsMet,
     // actions
-    resetKit, tryReview, handlePlaceOrder,
+    resetKit, tryReview, handlePlaceOrder, handlePaymentSubmit,
   };
 };
 
