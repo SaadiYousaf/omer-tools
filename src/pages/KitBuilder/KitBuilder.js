@@ -145,7 +145,7 @@ const KitBuilder = () => {
 
             <div className="kb-tiers">
               {TIERS.slice(1).map((t, i) => {
-                const colors = ["#EA8B1C", "#E06020", "#16A34A"];
+                const colors = ["#EA8B1C", "#E06020", "#8B5CF6", "#16A34A"];
                 return (
                   <div key={i} className="kb-tier-card" style={{ borderColor: colors[i] + "20" }}>
                     <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 4, background: colors[i] }} />
@@ -197,6 +197,8 @@ const KitBuilder = () => {
                 Next: Batteries &rarr;
               </button>
             </div>
+
+            {kb.validationMsg && <div className="kb-validation-msg">{kb.validationMsg}</div>}
 
             {kb.catalogLoading ? (
               <div className="kb-loading">Loading products...</div>

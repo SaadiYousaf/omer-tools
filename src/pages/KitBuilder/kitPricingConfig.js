@@ -3,6 +3,7 @@ export const TIERS = [
   { min: 1000, label: "10% OFF", discount: 10, freeItems: null },
   { min: 1500, label: "15% OFF + 1x FREE 5Ah Battery", discount: 15, freeItems: "1x FREE 5Ah Battery" },
   { min: 2000, label: "20% OFF + 2x FREE 5Ah Batteries", discount: 20, freeItems: "2x FREE 5Ah Batteries" },
+  { min: 3000, label: "25% OFF + 3x FREE 5Ah Batteries", discount: 25, freeItems: "3x FREE 5Ah Batteries" },
 ];
 
 export const MIN_BATTERIES = 2;

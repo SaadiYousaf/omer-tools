@@ -173,7 +173,7 @@ const Cart = () => {
                 <div key={item.id} className="cart-item">
                   <div className="item-product">
                     <div className="item-image">
-                      <img src={BASE_IMG_URL + item.image} alt={item.name} />
+                      <img src={item.image && (item.image.startsWith('http') || item.image.includes(BASE_IMG_URL)) ? item.image : BASE_IMG_URL + item.image} alt={item.name} />
                     </div>
                     <div className="item-details">
                       <h3>{item.name}</h3>

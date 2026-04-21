@@ -18,6 +18,11 @@ const brandColor = (name = '') => {
   return BRAND_COLORS[key] || '#072c62';
 };
 
+// Max quantities per item type
+const MAX_TOOLS_PER_ITEM = 2;
+const MAX_BATTERIES_PER_ITEM = 6;
+const MAX_CHARGERS_PER_ITEM = 2;
+
 const useKitBuilder = () => {
   // ── Redux & Navigation ────────────────────────────────────────
   const dispatch = useDispatch();
@@ -62,17 +67,38 @@ const useKitBuilder = () => {
 
   // ── Cart helpers ──────────────────────────────────────────────
   const addItem = (item, type) => {
+    const maxQty = type === 'tool' ? MAX_TOOLS_PER_ITEM : type === 'battery' ? MAX_BATTERIES_PER_ITEM : MAX_CHARGERS_PER_ITEM;
+    const existing = cart.find((c) => c.id === item.id);
+    
+    if (existing && existing.qty >= maxQty) {
+      const typeLabel = type.charAt(0).toUpperCase() + type.slice(1);
+      setValidationMsg(`Maximum ${maxQty} ${type}(s) of "${item.name}" allowed per kit.`);
+      return;
+    }
+
     setCart((prev) => {
-      const existing = prev.find((c) => c.id === item.id);
-      if (existing) return prev.map((c) => c.id === item.id ? { ...c, qty: c.qty + 1 } : c);
+      const existingItem = prev.find((c) => c.id === item.id);
+      if (existingItem) return prev.map((c) => c.id === item.id ? { ...c, qty: c.qty + 1 } : c);
       return [...prev, { ...item, type, qty: 1 }];
     });
     setValidationMsg('');
   };
   const removeItem = (id) => setCart((prev) => prev.filter((c) => c.id !== id));
   const setQty = (id, n) => {
-    if (n <= 0) removeItem(id);
-    else setCart((prev) => prev.map((c) => c.id === id ? { ...c, qty: n } : c));
+    const item = cart.find((c) => c.id === id);
+    if (!item) return;
+    
+    const maxQty = item.type === 'tool' ? MAX_TOOLS_PER_ITEM : item.type === 'battery' ? MAX_BATTERIES_PER_ITEM : MAX_CHARGERS_PER_ITEM;
+    
+    if (n <= 0) {
+      removeItem(id);
+    } else if (n > maxQty) {
+      const typeLabel = item.type.charAt(0).toUpperCase() + item.type.slice(1);
+      setValidationMsg(`Maximum ${maxQty} ${item.type}(s) of "${item.name}" allowed per kit.`);
+    } else {
+      setCart((prev) => prev.map((c) => c.id === id ? { ...c, qty: n } : c));
+      setValidationMsg('');
+    }
   };
   const getCartItem = (id) => cart.find((c) => c.id === id);
 
