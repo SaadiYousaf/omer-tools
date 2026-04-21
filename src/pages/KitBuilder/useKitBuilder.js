@@ -236,12 +236,17 @@ const useKitBuilder = () => {
   };
 
   // ── Derived brand display data ─────────────────────────────────
-  const brandsForDisplay = brands.map((b) => ({
-    ...b,
-    color: brandColor(b.name),
-    logo: b.name ? b.name.charAt(0).toUpperCase() : '?',
-    logoUrl: b.logoUrl || b.images?.find(img => img.isPrimary)?.imageUrl || b.images?.[0]?.imageUrl || null,
-  }));
+  const ALLOWED_BRANDS = ['Milwaukee', 'Dewalt', 'Hikoki', 'Makita', 'Metabo'];
+  
+  const brandsForDisplay = brands
+    .filter((b) => ALLOWED_BRANDS.includes(b.name))
+    .sort((a, b) => ALLOWED_BRANDS.indexOf(a.name) - ALLOWED_BRANDS.indexOf(b.name))
+    .map((b) => ({
+      ...b,
+      color: brandColor(b.name),
+      logo: b.name ? b.name.charAt(0).toUpperCase() : '?',
+      logoUrl: b.logoUrl || b.images?.find(img => img.isPrimary)?.imageUrl || b.images?.[0]?.imageUrl || null,
+    }));
 
   return {
     // wizard

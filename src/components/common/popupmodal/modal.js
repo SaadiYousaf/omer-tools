@@ -3,10 +3,22 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./modal.css";
 
+const BASE_IMG_URL = process.env.REACT_APP_BASE_IMG_URL;
+
 const Modal = ({ show, onClose, items, message }) => {
   const navigate = useNavigate();
 
   if (!show) return null;
+
+  const getImageUrl = (imageUrl) => {
+    if (!imageUrl) return '';
+    // If already absolute URL or already contains base URL
+    if (imageUrl.startsWith('http') || imageUrl.includes(BASE_IMG_URL)) {
+      return imageUrl;
+    }
+    // Otherwise prepend base URL
+    return BASE_IMG_URL + imageUrl;
+  };
 
   const handleCheckout = () => {
     navigate("/checkout"); // ✅ keeps Redux state intact
@@ -26,7 +38,7 @@ const Modal = ({ show, onClose, items, message }) => {
           <div className="modal-cart-items">
             {items.map((item) => (
               <div key={item.id} className="modal-cart-item">
-                <img src={item.image} alt={item.name} />
+                <img src={getImageUrl(item.image)} alt={item.name} />
                 <div className="modal-item-details">
                   <p className="modal-item-name">{item.name}</p>
                   <p className="modal-item-qty">Qty: {item.quantity}</p>
