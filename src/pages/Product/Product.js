@@ -240,7 +240,7 @@ const Product = () => {
   const specifications =
     parsedSpecifications && Object.keys(parsedSpecifications).length > 0
       ? parsedSpecifications
-      : fallbackSpecifications;
+      : '';
 
   // Build "Frequently Bought Together" from all products with same subcategoryId OR brandId
   const relatedProducts = useMemo(() => {
@@ -615,20 +615,7 @@ const Product = () => {
               />
             ) : (
               <div className="default-description">
-                <p>
-                  The DEWALT DCGG581P1GXE 18V 5.0Ah XR Li-Ion Cordless 2-Speed
-                  Grease Gun Combo Kit delivers professional-grade performance
-                  for demanding lubrication tasks. Engineered with a
-                  high-performance motor, this grease gun provides up to 15g of
-                  grease per minute at 10,000 psi.
-                </p>
-                <p>
-                  The innovative 2-speed selector allows you to switch between
-                  high-speed application for efficiency and high-pressure mode
-                  for stubborn fittings. The ergonomic design features a
-                  comfortable grip and balanced weight distribution to minimize
-                  user fatigue during extended operation.
-                </p>
+               
               </div>
             )}
           </div>

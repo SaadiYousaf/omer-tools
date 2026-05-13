@@ -155,8 +155,8 @@
 .slide {
   position: absolute;
   inset: 0;
-  background-size: cover; /* cover the full column */
-  background-position: top;
+  background-size: contain; /* contain to show full image */
+  background-position: top center;
   opacity: 0;
   transition: opacity 1s ease-in-out;
 }
@@ -187,12 +187,12 @@
 /* Responsive Adjustments */
 @media (max-width: 1024px) {
   .dual-hero-banners {
-    aspect-ratio: 16 / 9; /* adjusted for tablets */
+    aspect-ratio: 16 / 11;
   }
 }
 
 @media (max-width: 768px) {
   .dual-hero-banners {
-    aspect-ratio: 16 / 9; /* wider for mobile */
+    aspect-ratio: 16 / 12;
   }
 }

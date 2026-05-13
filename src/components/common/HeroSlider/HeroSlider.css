@@ -94,6 +94,9 @@
   display: flex;
   gap: 12px;
   z-index: 3;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
 }
 
 .dot {
@@ -114,7 +117,8 @@
 /* Mobile Responsive Adjustments */
 @media (max-width: 768px) {
   .hero-slider {
-    aspect-ratio: 16 / 9; /* wider for mobile banners */
+    aspect-ratio: 16 / 10; /* taller for mobile to show full image */
+    margin-top: 50px; /* Space below fixed header/search bar */
   }
   .slides-container {
     position: relative;
@@ -123,54 +127,46 @@
   }
 
   .slide {
-    background-size: cover;
+    background-size: contain;
   }
 
-  .slide-title {
-    font-size: 2rem;
+  .slider-dots {
+    bottom: 10px;
+    padding: 6px 10px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 15px;
   }
 
-  .slide-subtitle {
-    font-size: 1.2rem;
-  }
-
-  .cta-button {
-    padding: 0.8rem 2rem;
-    font-size: 1rem;
+  .dot {
+    width: 12px;
+    height: 12px;
+    border-width: 2px;
+    border-color: #fff;
   }
 }
 
 @media (max-width: 480px) {
   .hero-slider {
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 16 / 6;
+    margin-top: 5px; /* Space below fixed header/search bar */
   }
 
   .slide {
-    background-size: cover;
-  }
-
-  .slide-title {
-    font-size: 1.4rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .slide-subtitle {
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
-  }
-
-  .cta-button {
-    padding: 0.6rem 1.2rem;
-    font-size: 0.85rem;
+    background-size: contain;
   }
 
   .slider-dots {
-    bottom: 14px;
+    bottom: 10px;
     gap: 8px;
+    padding: 6px 10px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 15px;
   }
 
   .dot {
     width: 10px;
     height: 10px;
+    border-width: 2px;
+    border-color: #fff;
   }
 }
