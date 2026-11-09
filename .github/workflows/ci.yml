@@ -1,0 +1,39 @@
+name: Storefront CI
+
+on:
+  push:
+    branches: [main, newCustomKit]
+  pull_request:
+    branches: [main, newCustomKit]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          # Create React App fails the build on lint warnings when CI=true.
+          # Keep false until existing warnings are cleaned up.
+          CI: false
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: storefront-build
+          path: build
+          retention-days: 7
